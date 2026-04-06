@@ -231,6 +231,7 @@ export default function MealDetail() {
           </div>
         </div>
       )}
+      
     </div>
   )
 }
