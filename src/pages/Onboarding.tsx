@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
-import { ArrowLeft, Check, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Check } from 'lucide-react'
 
 const DIETARY_OPTIONS = [
   { label: 'Vegetarian', emoji: '🥬' },
@@ -371,9 +371,7 @@ export default function Onboarding() {
                           }}>
                             <Check size={14} color="#FFF" />
                           </div>
-                        ) : (
-                          <ChevronRight size={18} color="#D5D1DC" style={{ flexShrink: 0 }} />
-                        )}
+                        ) : null}
                       </button>
                     )
                   })}

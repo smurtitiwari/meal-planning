@@ -119,7 +119,6 @@ export default function Home() {
                 ingredients={meal.ingredients}
                 image={meal.image}
                 cookTime={meal.cookTime}
-                tags={meal.tags}
                 isCurrent={isCurrent}
                 isDone={isDone}
                 isSkipped={isSkipped}
@@ -158,11 +157,11 @@ export default function Home() {
 
 /* ─── MEAL CARD COMPONENT ─── */
 function MealCard({
-  type, name, calories, ingredients, image, cookTime, tags,
+  type, name, calories, ingredients, image, cookTime,
   isCurrent, isDone, isSkipped, onClick,
 }: {
   type: string; name: string; calories?: number; ingredients: string[]
-  image: string; cookTime?: string; tags?: string[]
+  image: string; cookTime?: string
   isCurrent: boolean; isDone?: boolean; isSkipped?: boolean
   onClick: () => void
 }) {
@@ -233,27 +232,15 @@ function MealCard({
             {ingredients.length > 4 ? '...' : ''}
           </p>
 
-          {/* Tags */}
-          {tags && tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-3">
-              {tags.slice(0, 3).map((tag) => (
-                <span key={tag} style={{
-                  fontSize: '10px', fontWeight: 600, color: '#7A768A',
-                  padding: '4px 10px', borderRadius: 100,
-                  border: '1px solid #EAE4DC', background: '#FAFAF8',
-                  textTransform: 'uppercase', letterSpacing: '0.04em',
-                }}>{tag}</span>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Image */}
         {showImage ? (
           <div style={{
-            marginTop: 16,
+            margin: '16px 14px 14px',
             height: 200,
             overflow: 'hidden',
+            borderRadius: 16,
             position: 'relative',
           }}>
             <img
