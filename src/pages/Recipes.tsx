@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useStore, generateId, guessIngredients, detectSourceType } from '../store/useStore'
 import type { Recipe, SharedRecipe } from '../store/useStore'
 import BottomNav from '../components/BottomNav'
+import SegmentedControl from '../components/SegmentedControl'
 import { Plus, X, Link2, Sparkles, Trash2, Edit3, ExternalLink, MessageCircle, Play, Video, FileText } from 'lucide-react'
 
 const MEAL_TYPE_FILTERS = ['All', 'Breakfast', 'Lunch', 'Dinner', 'Snacks']
@@ -63,6 +64,41 @@ export default function Recipes() {
   const [note, setNote] = useState('')
 
   const userName = preferences.name || 'You'
+
+  const lightColors = {
+    accent: '#3C151A',
+    accentPurple: '#3C151A',
+    accentLight: '#FBF5F6',
+    accentBorder: '#D9D9D9',
+    accentText: '#3C151A',
+    surface: '#FFFFFF',
+    pageSurface: '#FFFFFF',
+    card: '#F6F6F6',
+    border: '#F4F4F4',
+    elevated: '#FBFBFB',
+    textPrimary: '#111111',
+    textSecondary: '#8A8A8A',
+    textTertiary: '#8A8A8A',
+    warmSurface: '#FBFBFB'
+  }
+  const darkColors = {
+    accent: '#9A4D5A',
+    accentPurple: '#9A4D5A',
+    accentLight: 'rgba(154, 77, 90, 0.18)',
+    accentBorder: '#6A2B34',
+    surface: '#121212',
+    pageSurface: '#121212',
+    card: '#1B1B1B',
+    border: '#2E2E2E',
+    elevated: '#111111',
+    textPrimary: '#FEFEFE',
+    textSecondary: '#D6D1D3',
+    textTertiary: '#A9A0A3',
+    accentText: '#F0C7CF',
+    warmSurface: '#111111'
+  }
+  const colors = preferences.darkMode ? darkColors : lightColors;
+
 
   const resetForm = () => {
     setName(''); setLink(''); setCategory('main'); setMealType('lunch');
@@ -134,15 +170,15 @@ export default function Recipes() {
   }
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: '#F7F3EE' }}>
+    <div className="min-h-screen pb-24" style={{ background: colors.pageSurface }}>
       <div className="px-5 pt-14 pb-1">
         <div className="flex items-center justify-between">
-          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#1F1E2E', margin: 0, letterSpacing: '-0.03em' }}>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: colors.textPrimary, margin: 0, letterSpacing: '-0.03em' }}>
             Recipes
           </h1>
           <button onClick={() => { resetForm(); setShowAdd(true) }}
             className="w-10 h-10 rounded-full flex items-center justify-center border-none cursor-pointer"
-            style={{ background: '#26233A', color: '#FFF' }}>
+            style={{ background: colors.accent, color: colors.surface }}>
             <Plus size={18} />
           </button>
         </div>
@@ -150,20 +186,18 @@ export default function Recipes() {
 
       {/* Mine / Shared Tabs */}
       <div className="px-5 mt-4 mb-3">
-        <div className="flex p-1 rounded-xl" style={{ background: '#EFE9E0' }}>
-          {(['mine', 'shared'] as const).map((tab) => (
-            <button key={tab} onClick={() => setActiveTab(tab)}
-              className="flex-1 py-2.5 rounded-lg border-none cursor-pointer transition-smooth"
-              style={{
-                background: activeTab === tab ? '#FFF' : 'transparent',
-                color: activeTab === tab ? '#1F1E2E' : '#A09DAB',
-                fontSize: '13px', fontWeight: 600,
-                boxShadow: activeTab === tab ? '0 1px 4px rgba(0,0,0,0.06)' : 'none',
-              }}>
-              {tab === 'mine' ? `Mine (${recipes.length})` : `Shared (${allShared.length})`}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          options={[
+            { value: 'mine', label: `Mine (${recipes.length})` },
+            { value: 'shared', label: `Shared (${allShared.length})` },
+          ]}
+          value={activeTab}
+          onChange={(tab) => { setActiveTab(tab); setMealFilter('All') }}
+          railBackground={preferences.darkMode ? '#1B1B1B' : '#F6F6F6'}
+          activeBackground={preferences.darkMode ? '#2E2E2E' : colors.surface}
+          activeText={preferences.darkMode ? '#FEFEFE' : '#111111'}
+          inactiveText={preferences.darkMode ? '#A9A0A3' : '#8A8A8A'}
+        />
       </div>
 
       {/* Meal type filter chips */}
@@ -171,10 +205,11 @@ export default function Recipes() {
         <div className="flex gap-2 overflow-x-auto pb-1">
           {MEAL_TYPE_FILTERS.map((chip) => (
             <button key={chip} onClick={() => setMealFilter(chip)}
-              className="px-3.5 py-1.5 rounded-full border-none cursor-pointer transition-smooth whitespace-nowrap"
+              className="px-3.5 py-1.5 rounded-full border cursor-pointer transition-smooth whitespace-nowrap"
               style={{
-                background: mealFilter === chip ? '#26233A' : '#EFE9E0',
-                color: mealFilter === chip ? '#FFF' : '#7A768A',
+                background: mealFilter === chip ? (preferences.darkMode ? 'rgba(154, 77, 90, 0.18)' : '#FBF5F6') : 'transparent',
+                color: mealFilter === chip ? (preferences.darkMode ? '#F0C7CF' : '#111111') : (preferences.darkMode ? '#FEFEFE' : '#111111'),
+                borderColor: mealFilter === chip ? 'transparent' : (preferences.darkMode ? '#2E2E2E' : colors.border),
                 fontSize: '12px', fontWeight: 600,
               }}>
               {chip}
@@ -190,10 +225,10 @@ export default function Recipes() {
             {filteredRecipes.length === 0 ? (
               <div className="text-center py-16">
                 <div style={{ fontSize: '48px', marginBottom: 12 }}>📖</div>
-                <p style={{ fontSize: '15px', fontWeight: 600, color: '#1F1E2E', margin: '0 0 4px 0' }}>
+                <p style={{ fontSize: '15px', fontWeight: 600, color: colors.textPrimary, margin: '0 0 4px 0' }}>
                   {recipes.length === 0 ? 'No recipes yet' : 'No matches'}
                 </p>
-                <p style={{ fontSize: '13px', color: '#A09DAB' }}>
+                <p style={{ fontSize: '13px', color: colors.textSecondary }}>
                   {recipes.length === 0 ? 'Save your first recipe to get started' : 'Try a different filter'}
                 </p>
               </div>
@@ -210,24 +245,24 @@ export default function Recipes() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0, color: '#1F1E2E' }}>{recipe.name}</h3>
+                            <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0, color: colors.textPrimary }}>{recipe.name}</h3>
                             <span className={recipe.category === 'main' ? 'chip chip-accent' : 'chip'}
                               style={{ fontSize: '9px', padding: '2px 7px' }}>
                               {recipe.category}
                             </span>
                           </div>
                           {recipe.note && (
-                            <p style={{ fontSize: '12px', color: '#7A768A', margin: '0 0 4px 0', fontStyle: 'italic' }}>
+                            <p style={{ fontSize: '12px', color: colors.textTertiary, margin: '0 0 4px 0', fontStyle: 'italic' }}>
                               "{recipe.note}"
                             </p>
                           )}
-                          <p style={{ fontSize: '11px', color: '#A09DAB', margin: 0 }} className="line-clamp-1">
+                          <p style={{ fontSize: '11px', color: colors.textSecondary, margin: 0 }} className="line-clamp-1">
                             {recipe.ingredients.join(' · ')}
                           </p>
                         </div>
                         <div className="flex gap-0.5 ml-2">
                           <button onClick={() => handleEdit(recipe)}
-                            className="p-1.5 rounded-lg bg-transparent border-none cursor-pointer" style={{ color: '#A09DAB' }}>
+                            className="p-1.5 rounded-lg bg-transparent border-none cursor-pointer" style={{ color: colors.textSecondary }}>
                             <Edit3 size={13} />
                           </button>
                           <button onClick={() => deleteRecipe(recipe.id)}
@@ -239,7 +274,7 @@ export default function Recipes() {
                       {recipe.link && (
                         <a href={recipe.link} target="_blank" rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 no-underline mt-2"
-                          style={{ fontSize: '12px', color: '#8B74D3', fontWeight: 500 }}>
+                          style={{ fontSize: '12px', color: colors.accent, fontWeight: 500 }}>
                           <ExternalLink size={10} /> View source
                         </a>
                       )}
@@ -257,8 +292,8 @@ export default function Recipes() {
             {filteredShared.length === 0 ? (
               <div className="text-center py-16">
                 <div style={{ fontSize: '48px', marginBottom: 12 }}>👥</div>
-                <p style={{ fontSize: '15px', fontWeight: 600, color: '#1F1E2E', margin: '0 0 4px 0' }}>No shared recipes</p>
-                <p style={{ fontSize: '13px', color: '#A09DAB' }}>Share your first recipe with flatmates</p>
+                <p style={{ fontSize: '15px', fontWeight: 600, color: colors.textPrimary, margin: '0 0 4px 0' }}>No shared recipes</p>
+                <p style={{ fontSize: '13px', color: colors.textSecondary }}>Share your first recipe with flatmates</p>
               </div>
             ) : (
               filteredShared.map((recipe) => (
@@ -273,27 +308,27 @@ export default function Recipes() {
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-2">
                         <div style={{
-                          width: 24, height: 24, borderRadius: 12, background: '#EFEAFF',
+                          width: 24, height: 24, borderRadius: 12, background: colors.accentLight,
                           display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: '10px', fontWeight: 700, color: '#8B74D3',
+                          fontSize: '10px', fontWeight: 700, color: colors.accent,
                         }}>
                           {recipe.sharedBy.charAt(0).toUpperCase()}
                         </div>
-                        <span style={{ fontSize: '12px', fontWeight: 600, color: '#1F1E2E' }}>{recipe.sharedBy}</span>
-                        <span style={{ fontSize: '10px', color: '#A09DAB' }}>{timeAgo(recipe.timestamp)}</span>
+                        <span style={{ fontSize: '12px', fontWeight: 600, color: colors.textPrimary }}>{recipe.sharedBy}</span>
+                        <span style={{ fontSize: '10px', color: colors.textSecondary }}>{timeAgo(recipe.timestamp)}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <SourceIcon type={recipe.sourceType} />
-                        <span style={{ fontSize: '9px', color: '#A09DAB', textTransform: 'capitalize' }}>{recipe.sourceType}</span>
+                        <span style={{ fontSize: '9px', color: colors.textSecondary, textTransform: 'capitalize' }}>{recipe.sourceType}</span>
                       </div>
                     </div>
 
-                    <h3 style={{ fontSize: '16px', fontWeight: 700, color: '#1F1E2E', margin: '0 0 4px 0' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: 700, color: colors.textPrimary, margin: '0 0 4px 0' }}>
                       {recipe.name}
                     </h3>
 
                     {recipe.note && (
-                      <p style={{ fontSize: '12px', color: '#7A768A', margin: '0 0 6px 0', fontStyle: 'italic' }}>
+                      <p style={{ fontSize: '12px', color: colors.textTertiary, margin: '0 0 6px 0', fontStyle: 'italic' }}>
                         "{recipe.note}"
                       </p>
                     )}
@@ -304,7 +339,7 @@ export default function Recipes() {
                       </span>
                     )}
 
-                    <p style={{ fontSize: '11px', color: '#A09DAB', margin: '0 0 10px 0' }} className="line-clamp-1">
+                    <p style={{ fontSize: '11px', color: colors.textSecondary, margin: '0 0 10px 0' }} className="line-clamp-1">
                       {recipe.ingredients.join(' · ')}
                     </p>
 
@@ -318,7 +353,7 @@ export default function Recipes() {
                         })
                       }}
                         className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl border-none cursor-pointer"
-                        style={{ background: '#EFEAFF', color: '#8B74D3', fontSize: '12px', fontWeight: 600 }}>
+                        style={{ background: colors.accentLight, color: colors.accent, fontSize: '12px', fontWeight: 600 }}>
                         Use this meal
                       </button>
                       <button onClick={() => shareOnWhatsApp(recipe)}
@@ -348,12 +383,12 @@ export default function Recipes() {
           <div className="w-full max-w-sm bg-white rounded-3xl p-6 max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <h3 style={{ fontSize: '20px', fontWeight: 800, margin: 0, color: '#1F1E2E' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 800, margin: 0, color: colors.textPrimary }}>
                 {editId ? 'Edit recipe' : activeTab === 'shared' ? 'Share a recipe' : 'New recipe'}
               </h3>
               <button onClick={resetForm}
                 className="w-8 h-8 rounded-full flex items-center justify-center border-none cursor-pointer"
-                style={{ background: '#EFE9E0' }}>
+                style={{ background: colors.border }}>
                 <X size={16} />
               </button>
             </div>
@@ -367,22 +402,22 @@ export default function Recipes() {
                     width: '100%', padding: '12px 16px', borderRadius: 14,
                     border: '1.5px solid #EAE4DC', fontSize: '15px', outline: 'none',
                   }}
-                  onFocus={(e) => e.target.style.borderColor = '#B8A6E6'}
-                  onBlur={(e) => e.target.style.borderColor = '#EAE4DC'} />
+                  onFocus={(e) => e.target.style.borderColor = colors.accentBorder}
+                  onBlur={(e) => e.target.style.borderColor = colors.border} />
               </div>
 
               <div>
                 <label className="section-label" style={{ display: 'block', marginBottom: 6 }}>Source link (optional)</label>
                 <div className="flex items-center gap-2">
-                  <Link2 size={16} style={{ color: '#A09DAB', flexShrink: 0 }} />
+                  <Link2 size={16} style={{ color: colors.textSecondary, flexShrink: 0 }} />
                   <input type="url" value={link} onChange={(e) => setLink(e.target.value)}
                     placeholder="YouTube or Instagram link"
                     style={{
                       flex: 1, padding: '12px 16px', borderRadius: 14,
                       border: '1.5px solid #EAE4DC', fontSize: '14px', outline: 'none',
                     }}
-                    onFocus={(e) => e.target.style.borderColor = '#B8A6E6'}
-                    onBlur={(e) => e.target.style.borderColor = '#EAE4DC'} />
+                    onFocus={(e) => e.target.style.borderColor = colors.accentBorder}
+                    onBlur={(e) => e.target.style.borderColor = colors.border} />
                 </div>
               </div>
 
@@ -393,9 +428,9 @@ export default function Recipes() {
                     <button key={mt} onClick={() => setMealType(mt)}
                       className="px-3.5 py-2 rounded-xl border cursor-pointer transition-smooth"
                       style={{
-                        background: mealType === mt ? '#EFEAFF' : '#FFF',
-                        borderColor: mealType === mt ? '#B8A6E6' : '#EAE4DC', borderWidth: '1.5px',
-                        color: mealType === mt ? '#8B74D3' : '#7A768A', fontSize: '12px', fontWeight: 600,
+                        background: mealType === mt ? colors.accentLight : colors.surface,
+                        borderColor: mealType === mt ? colors.accentBorder : colors.border, borderWidth: '1.5px',
+                        color: mealType === mt ? colors.accent : colors.textTertiary, fontSize: '12px', fontWeight: 600,
                       }}>
                       {mt.charAt(0).toUpperCase() + mt.slice(1)}
                     </button>
@@ -411,16 +446,16 @@ export default function Recipes() {
                     width: '100%', padding: '12px 16px', borderRadius: 14,
                     border: '1.5px solid #EAE4DC', fontSize: '14px', outline: 'none',
                   }}
-                  onFocus={(e) => e.target.style.borderColor = '#B8A6E6'}
-                  onBlur={(e) => e.target.style.borderColor = '#EAE4DC'} />
+                  onFocus={(e) => e.target.style.borderColor = colors.accentBorder}
+                  onBlur={(e) => e.target.style.borderColor = colors.border} />
               </div>
 
               <button onClick={() => name.trim() && setIngredients(guessIngredients(name))}
                 disabled={!name.trim()}
                 className="w-full py-2.5 rounded-xl border cursor-pointer bg-transparent flex items-center justify-center gap-2"
                 style={{
-                  borderColor: '#B8A6E6', borderStyle: 'dashed', borderWidth: '1.5px',
-                  color: '#8B74D3', fontSize: '13px', fontWeight: 600, opacity: name.trim() ? 1 : 0.4,
+                  borderColor: colors.accentBorder, borderStyle: 'dashed', borderWidth: '1.5px',
+                  color: colors.accent, fontSize: '13px', fontWeight: 600, opacity: name.trim() ? 1 : 0.4,
                 }}>
                 <Sparkles size={14} /> AI Generate Ingredients
               </button>
@@ -434,11 +469,11 @@ export default function Recipes() {
                       flex: 1, padding: '10px 14px', borderRadius: 12,
                       border: '1.5px solid #EAE4DC', fontSize: '14px', outline: 'none',
                     }}
-                    onFocus={(e) => e.target.style.borderColor = '#B8A6E6'}
-                    onBlur={(e) => e.target.style.borderColor = '#EAE4DC'} />
+                    onFocus={(e) => e.target.style.borderColor = colors.accentBorder}
+                    onBlur={(e) => e.target.style.borderColor = colors.border} />
                   <button onClick={addIng}
                     className="px-4 py-2 rounded-xl border-none cursor-pointer"
-                    style={{ background: '#EFE9E0', fontSize: '13px', fontWeight: 600, color: '#7A768A' }}>Add</button>
+                    style={{ background: colors.border, fontSize: '13px', fontWeight: 600, color: colors.textTertiary }}>Add</button>
                 </div>
                 {ingredients.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-3">
@@ -455,7 +490,7 @@ export default function Recipes() {
 
               <button onClick={handleSave} disabled={!name.trim()}
                 className="w-full py-3.5 rounded-xl border-none cursor-pointer"
-                style={{ background: '#26233A', color: '#FFF', fontSize: '14px', fontWeight: 600, opacity: name.trim() ? 1 : 0.4 }}>
+                style={{ background: colors.accent, color: colors.surface, fontSize: '14px', fontWeight: 600, opacity: name.trim() ? 1 : 0.4 }}>
                 {editId ? 'Update' : activeTab === 'shared' ? 'Share recipe' : 'Save recipe'}
               </button>
             </div>

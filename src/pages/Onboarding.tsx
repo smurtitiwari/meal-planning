@@ -76,7 +76,11 @@ export default function Onboarding() {
   const canProceed = () => {
     if (step === 0) return false
     if (step === 1) return dietary.length > 0
-    if (step === 4) return hasCook !== null
+    if (step === 4) {
+      if (hasCook === null) return false
+      if (hasCook === true) return cookName.trim().length > 0 && cookPhone.trim().length >= 10
+      return true
+    }
     return true
   }
 
@@ -90,12 +94,12 @@ export default function Onboarding() {
     <button onClick={onClick}
       className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl cursor-pointer transition-smooth"
       style={{
-        background: selected ? '#F5F0FF' : '#FFF',
-        border: selected ? '2px solid #B8A6E6' : '1.5px solid #EAE4DC',
+        background: selected ? '#F5EEEA' : '#FFF',
+        border: selected ? '2px solid #E8D8D2' : '1.5px solid #EAE4DC',
       }}>
       <span style={{ fontSize: '28px', lineHeight: 1, flexShrink: 0 }}>{emoji}</span>
       <div className="flex-1 text-left">
-        <span style={{ fontSize: '15px', fontWeight: 600, color: selected ? '#8B74D3' : '#1F1E2E', display: 'block' }}>
+        <span style={{ fontSize: '15px', fontWeight: 600, color: selected ? '#6B2E3A' : '#1F1E2E', display: 'block' }}>
           {label}
         </span>
         {desc && (
@@ -105,7 +109,7 @@ export default function Onboarding() {
       {trailing || (selected && (
         <div style={{
           width: 24, height: 24, borderRadius: 12,
-          background: '#B8A6E6', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: '#6B2E3A', display: 'flex', alignItems: 'center', justifyContent: 'center',
           flexShrink: 0,
         }}>
           <Check size={14} color="#FFF" />
@@ -119,9 +123,9 @@ export default function Onboarding() {
 
       {/* ========= STEP 0: Sign-In ========= */}
       {step === 0 && (
-        <div className="flex-1 flex flex-col justify-center px-6" style={{ paddingTop: 80, paddingBottom: 60 }}>
+        <div className="flex-1 flex flex-col px-6" style={{ paddingTop: 60, paddingBottom: 40 }}>
           {/* Text at top-center */}
-          <div style={{ marginBottom: 'auto', paddingTop: 40 }}>
+          <div style={{ marginBottom: 24 }}>
             <p style={{ fontSize: '14px', color: '#A09DAB', fontWeight: 500, margin: '0 0 10px 0' }}>
               Meal plans, sorted ✨
             </p>
@@ -132,7 +136,7 @@ export default function Onboarding() {
 
           {/* Card in center */}
           <div style={{
-            background: '#FFFFFF', borderRadius: 24,
+            background: '#F6F6F6', borderRadius: 24,
             padding: '28px 24px',
             boxShadow: '0 4px 24px rgba(31,30,46,0.06)',
             border: '1px solid #EAE4DC',
@@ -183,7 +187,7 @@ export default function Onboarding() {
             <div className="flex gap-1.5 mb-6">
               {Array.from({ length: TOTAL_STEPS - 1 }).map((_, i) => (
                 <div key={i} className="h-1 flex-1 rounded-full transition-all" style={{
-                  background: i < step ? '#C4714A' : '#E0DAD2',
+                  background: i < step ? '#6B2E3A' : '#E0DAD2',
                 }} />
               ))}
             </div>
@@ -274,22 +278,22 @@ export default function Onboarding() {
                   <button onClick={() => setHasCook(true)}
                     className="flex-1 flex flex-col items-center gap-2 py-6 rounded-2xl cursor-pointer transition-smooth"
                     style={{
-                      background: hasCook === true ? '#F5F0FF' : '#FFF',
-                      border: hasCook === true ? '2px solid #B8A6E6' : '1.5px solid #EAE4DC',
+                      background: hasCook === true ? '#F5EEEA' : '#FFF',
+                      border: hasCook === true ? '2px solid #E8D8D2' : '1.5px solid #EAE4DC',
                     }}>
                     <span style={{ fontSize: '32px', lineHeight: 1 }}>👨‍🍳</span>
-                    <span style={{ fontSize: '14px', fontWeight: 600, color: hasCook === true ? '#8B74D3' : '#1F1E2E' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 600, color: hasCook === true ? '#6B2E3A' : '#1F1E2E' }}>
                       Yes, lifesaver!
                     </span>
                   </button>
                   <button onClick={() => setHasCook(false)}
                     className="flex-1 flex flex-col items-center gap-2 py-6 rounded-2xl cursor-pointer transition-smooth"
                     style={{
-                      background: hasCook === false ? '#F5F0FF' : '#FFF',
-                      border: hasCook === false ? '2px solid #B8A6E6' : '1.5px solid #EAE4DC',
+                      background: hasCook === false ? '#F5EEEA' : '#FFF',
+                      border: hasCook === false ? '2px solid #E8D8D2' : '1.5px solid #EAE4DC',
                     }}>
                     <span style={{ fontSize: '32px', lineHeight: 1 }}>🧑‍🍳</span>
-                    <span style={{ fontSize: '14px', fontWeight: 600, color: hasCook === false ? '#8B74D3' : '#1F1E2E' }}>
+                    <span style={{ fontSize: '14px', fontWeight: 600, color: hasCook === false ? '#6B2E3A' : '#1F1E2E' }}>
                       I cook myself
                     </span>
                   </button>
@@ -306,31 +310,49 @@ export default function Onboarding() {
                     </p>
                     <div className="space-y-4">
                       <div>
-                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#7A768A', display: 'block', marginBottom: 6 }}>Cook's name</label>
+                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#7A768A', display: 'block', marginBottom: 6 }}>
+                          Cook's name <span style={{ color: '#E05A33' }}>*</span>
+                        </label>
                         <input type="text" value={cookName} onChange={(e) => setCookName(e.target.value)}
                           placeholder="What do you call them?"
                           style={{
                             width: '100%', padding: '12px 14px', borderRadius: 12,
-                            border: '1.5px solid #EAE4DC', background: '#FAFAF8', fontSize: '14px', outline: 'none',
+                            border: `1.5px solid ${cookName.trim() === '' ? '#E0DAD2' : '#E8D8D2'}`,
+                            background: '#F8F8F8', fontSize: '14px', outline: 'none',
                             fontFamily: 'inherit',
                           }}
-                          onFocus={(e) => e.target.style.borderColor = '#B8A6E6'} onBlur={(e) => e.target.style.borderColor = '#EAE4DC'} />
+                          onFocus={(e) => e.target.style.borderColor = '#E8D8D2'} onBlur={(e) => e.target.style.borderColor = cookName.trim() ? '#E8D8D2' : '#EAE4DC'} />
+                        {cookName.trim() === '' && (
+                          <p style={{ fontSize: '11px', color: '#A09DAB', margin: '4px 0 0 0', lineHeight: 1.4 }}>
+                            Required — helps identify your cook's meals
+                          </p>
+                        )}
                       </div>
                       <div>
-                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#7A768A', display: 'block', marginBottom: 6 }}>Their WhatsApp number</label>
+                        <label style={{ fontSize: '12px', fontWeight: 600, color: '#7A768A', display: 'block', marginBottom: 6 }}>
+                          Their WhatsApp number <span style={{ color: '#E05A33' }}>*</span>
+                        </label>
                         <div className="flex items-center gap-2">
                           <div className="flex items-center px-3 py-3 rounded-xl" style={{ background: '#F0ECE6', border: '1px solid #EAE4DC' }}>
                             <span style={{ fontSize: '13px', color: '#7A768A', fontWeight: 500 }}>+91</span>
                           </div>
-                          <input type="tel" value={cookPhone} onChange={(e) => setCookPhone(e.target.value)} placeholder="9876543210"
+                          <input type="tel" value={cookPhone} onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, '').slice(0, 10)
+                            setCookPhone(val)
+                          }} placeholder="9876543210"
+                            maxLength={10}
                             style={{
                               flex: 1, padding: '12px 14px', borderRadius: 12,
-                              border: '1.5px solid #EAE4DC', background: '#FAFAF8', fontSize: '14px', outline: 'none',
+                              border: `1.5px solid ${cookPhone.trim().length >= 10 ? '#E8D8D2' : '#EAE4DC'}`,
+                              background: '#F8F8F8', fontSize: '14px', outline: 'none',
                               fontFamily: 'inherit',
                             }}
-                            onFocus={(e) => e.target.style.borderColor = '#B8A6E6'} onBlur={(e) => e.target.style.borderColor = '#EAE4DC'} />
+                            onFocus={(e) => e.target.style.borderColor = '#E8D8D2'} onBlur={(e) => e.target.style.borderColor = cookPhone.trim().length >= 10 ? '#E8D8D2' : '#EAE4DC'} />
                         </div>
                         <p style={{ fontSize: '11px', color: '#A09DAB', margin: '6px 0 0 0', lineHeight: 1.4 }}>
+                          {cookPhone.trim().length > 0 && cookPhone.trim().length < 10
+                            ? `Enter ${10 - cookPhone.trim().length} more digit${10 - cookPhone.trim().length > 1 ? 's' : ''} — `
+                            : ''}
                           We'll open WhatsApp on your phone — never send messages ourselves.
                         </p>
                       </div>
@@ -356,17 +378,17 @@ export default function Onboarding() {
                       <button key={app.id} onClick={() => toggle(groceryApps, app.id, setGroceryApps)}
                         className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl cursor-pointer transition-smooth"
                         style={{
-                          background: sel ? '#F5F0FF' : '#FFF',
-                          border: sel ? '2px solid #B8A6E6' : '1.5px solid #EAE4DC',
+                          background: sel ? '#F5EEEA' : '#FFF',
+                          border: sel ? '2px solid #E8D8D2' : '1.5px solid #EAE4DC',
                         }}>
                         <span style={{ fontSize: '28px', lineHeight: 1, flexShrink: 0 }}>{app.emoji}</span>
-                        <span className="flex-1 text-left" style={{ fontSize: '15px', fontWeight: 600, color: sel ? '#8B74D3' : '#1F1E2E' }}>
+                        <span className="flex-1 text-left" style={{ fontSize: '15px', fontWeight: 600, color: sel ? '#6B2E3A' : '#1F1E2E' }}>
                           {app.name}
                         </span>
                         {sel ? (
                           <div style={{
                             width: 24, height: 24, borderRadius: 12,
-                            background: '#B8A6E6', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            background: '#6B2E3A', display: 'flex', alignItems: 'center', justifyContent: 'center',
                             flexShrink: 0,
                           }}>
                             <Check size={14} color="#FFF" />

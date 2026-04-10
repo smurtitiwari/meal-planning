@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 import BottomNav from '../components/BottomNav'
-import { ChevronRight, Moon, Sun, LogOut, User, Mail, ChefHat, ShoppingCart, Utensils, X, Check, Send } from 'lucide-react'
+import { ChevronRight, Moon, Sun, LogOut, ChefHat, ShoppingCart, Utensils, X, Check, Send, Globe } from 'lucide-react'
 
 const DIETARY_OPTIONS = ['Vegetarian', 'Non-Vegetarian', 'Eggetarian', 'Vegan', 'High Protein']
 const AVOID_OPTIONS = ['Dairy', 'Gluten', 'Nuts', 'Spicy food', 'Onion & Garlic', 'Seafood']
@@ -13,11 +13,16 @@ const GROCERY_APPS: { id: 'blinkit' | 'zepto' | 'swiggy' | 'bigbasket' | 'dunzo'
   { id: 'bigbasket', name: 'BigBasket' },
   { id: 'dunzo', name: 'Dunzo' },
 ]
+const LANGUAGE_LABELS: Record<'english' | 'hindi' | 'hinglish', string> = {
+  english: 'English',
+  hindi: 'Hindi',
+  hinglish: 'Hinglish',
+}
 
 export default function Profile() {
   const navigate = useNavigate()
   const { preferences, setPreferences, signOut } = useStore()
-  const [editModal, setEditModal] = useState<'dietary' | 'avoidances' | 'cook' | 'grocery' | null>(null)
+  const [editModal, setEditModal] = useState<'dietary' | 'avoidances' | 'cook' | 'grocery' | 'language' | null>(null)
 
   // Editable state
   const [dietary, setDietary] = useState<string[]>(preferences.dietaryPreferences)
@@ -26,6 +31,7 @@ export default function Profile() {
   const [cookName, setCookName] = useState(preferences.cookName)
   const [cookPhone, setCookPhone] = useState(preferences.cookPhone)
   const [groceryApp, setGroceryApp] = useState(preferences.preferredGroceryApp)
+  const [msgLang, setMsgLang] = useState<'english' | 'hindi' | 'hinglish'>((preferences as any).cookMessageLanguage || 'hinglish')
 
   const toggleDark = () => setPreferences({ darkMode: !preferences.darkMode })
 
@@ -37,6 +43,7 @@ export default function Profile() {
     if (editModal === 'avoidances') setPreferences({ avoidances })
     if (editModal === 'cook') setPreferences({ hasCook, cookName, cookPhone })
     if (editModal === 'grocery') setPreferences({ preferredGroceryApp: groceryApp })
+    if (editModal === 'language') setPreferences({ cookMessageLanguage: msgLang } as any)
     setEditModal(null)
   }
 
@@ -48,9 +55,38 @@ export default function Profile() {
   const groceryAppName = preferences.preferredGroceryApp
     ? preferences.preferredGroceryApp.charAt(0).toUpperCase() + preferences.preferredGroceryApp.slice(1)
     : 'Not set'
+  const lightColors = {
+    accent: '#3C151A',
+    accentLight: '#FBF5F6',
+    accentBorder: '#D9D9D9',
+    accentText: '#3C151A',
+    surface: '#FFFFFF',
+    pageSurface: '#FFFFFF',
+    card: '#F6F6F6',
+    border: '#F4F4F4',
+    elevated: '#FBFBFB',
+    textPrimary: '#111111',
+    textSecondary: '#8A8A8A',
+    textTertiary: '#8A8A8A',
+  }
+  const darkColors = {
+    accent: '#9A4D5A',
+    accentLight: 'rgba(154, 77, 90, 0.18)',
+    accentBorder: '#6A2B34',
+    surface: '#121212',
+    pageSurface: '#121212',
+    card: '#1B1B1B',
+    border: '#2E2E2E',
+    elevated: '#111111',
+    textPrimary: '#FEFEFE',
+    textSecondary: '#D6D1D3',
+    textTertiary: '#A9A0A3',
+    accentText: '#F0C7CF',
+  }
+  const colors = preferences.darkMode ? darkColors : lightColors
 
   return (
-    <div className="min-h-screen pb-24" style={{ background: '#F7F3EE' }}>
+    <div className="min-h-screen pb-24" style={{ background: colors.pageSurface }}>
       {/* Header */}
       <div className="px-5 pt-14 pb-6">
         <div className="flex items-center gap-4">
@@ -58,19 +94,22 @@ export default function Profile() {
             <img src={preferences.profileImage} alt="" style={{ width: 56, height: 56, borderRadius: 28, objectFit: 'cover' }} />
           ) : (
             <div style={{
-              width: 56, height: 56, borderRadius: 28, background: '#EFEAFF',
+              width: 56, height: 56, borderRadius: 28,
+              background: preferences.darkMode ? colors.accentLight : colors.accentLight,
+              border: preferences.darkMode ? `1px solid ${colors.accentBorder}` : `1px solid ${colors.border}`,
+              boxShadow: preferences.darkMode ? '0 6px 18px rgba(0,0,0,0.18)' : 'none',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '22px', fontWeight: 700, color: '#8B74D3',
+              fontSize: '22px', fontWeight: 700, color: colors.accentText,
             }}>
               {(preferences.name || 'U').charAt(0).toUpperCase()}
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#1F1E2E', margin: 0, letterSpacing: '-0.02em' }}>
+            <h1 style={{ fontSize: '22px', fontWeight: 800, color: colors.textPrimary, margin: 0, letterSpacing: '-0.02em' }}>
               {preferences.name || 'User'}
             </h1>
             {preferences.email && (
-              <p style={{ fontSize: '13px', color: '#A09DAB', margin: '2px 0 0 0' }}>
+              <p style={{ fontSize: '13px', color: colors.textTertiary, margin: '2px 0 0 0' }}>
                 {preferences.email}
               </p>
             )}
@@ -86,12 +125,12 @@ export default function Profile() {
             <button onClick={toggleDark}
               className="w-full flex items-center justify-between px-4 py-3.5 bg-transparent border-none cursor-pointer">
               <div className="flex items-center gap-3">
-                {preferences.darkMode ? <Moon size={18} style={{ color: '#8B74D3' }} /> : <Sun size={18} style={{ color: '#A09DAB' }} />}
-                <span style={{ fontSize: '14px', fontWeight: 600, color: '#1F1E2E' }}>Dark mode</span>
+                {preferences.darkMode ? <Moon size={18} style={{ color: colors.accentText }} /> : <Sun size={18} style={{ color: colors.textTertiary }} />}
+                <span style={{ fontSize: '14px', fontWeight: 600, color: colors.textPrimary }}>Dark mode</span>
               </div>
               <div style={{
                 width: 44, height: 26, borderRadius: 13, padding: 3,
-                background: preferences.darkMode ? '#B8A6E6' : '#EAE4DC',
+                background: preferences.darkMode ? colors.accent : '#EAE4DC',
                 transition: 'background 0.2s',
               }}>
                 <div style={{
@@ -111,30 +150,30 @@ export default function Profile() {
           <div className="card overflow-hidden">
             <button onClick={() => { setDietary(preferences.dietaryPreferences); setEditModal('dietary') }}
               className="w-full flex items-center justify-between px-4 py-3.5 bg-transparent border-none cursor-pointer"
-              style={{ borderBottom: '1px solid #EAE4DC' }}>
+              style={{ borderBottom: `1px solid ${colors.border}` }}>
               <div className="flex items-center gap-3">
-                <Utensils size={18} style={{ color: '#A09DAB' }} />
+                <Utensils size={18} style={{ color: colors.textTertiary }} />
                 <div className="text-left">
-                  <span style={{ fontSize: '14px', fontWeight: 600, color: '#1F1E2E', display: 'block' }}>Dietary style</span>
-                  <span style={{ fontSize: '12px', color: '#A09DAB' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: colors.textPrimary, display: 'block' }}>Dietary style</span>
+                  <span style={{ fontSize: '12px', color: colors.textTertiary }}>
                     {preferences.dietaryPreferences.length > 0 ? preferences.dietaryPreferences.join(', ') : 'Not set'}
                   </span>
                 </div>
               </div>
-              <ChevronRight size={16} style={{ color: '#D5D1DC' }} />
+              <ChevronRight size={16} style={{ color: colors.textTertiary }} />
             </button>
             <button onClick={() => { setAvoidances(preferences.avoidances); setEditModal('avoidances') }}
               className="w-full flex items-center justify-between px-4 py-3.5 bg-transparent border-none cursor-pointer">
               <div className="flex items-center gap-3">
                 <span style={{ fontSize: '18px' }}>🚫</span>
                 <div className="text-left">
-                  <span style={{ fontSize: '14px', fontWeight: 600, color: '#1F1E2E', display: 'block' }}>Avoidances</span>
-                  <span style={{ fontSize: '12px', color: '#A09DAB' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: colors.textPrimary, display: 'block' }}>Avoidances</span>
+                  <span style={{ fontSize: '12px', color: colors.textTertiary }}>
                     {preferences.avoidances.length > 0 ? preferences.avoidances.join(', ') : 'None'}
                   </span>
                 </div>
               </div>
-              <ChevronRight size={16} style={{ color: '#D5D1DC' }} />
+              <ChevronRight size={16} style={{ color: colors.textTertiary }} />
             </button>
           </div>
         </div>
@@ -146,17 +185,37 @@ export default function Profile() {
             <button onClick={() => { setHasCook(preferences.hasCook); setCookName(preferences.cookName); setCookPhone(preferences.cookPhone); setEditModal('cook') }}
               className="w-full flex items-center justify-between px-4 py-3.5 bg-transparent border-none cursor-pointer">
               <div className="flex items-center gap-3">
-                <ChefHat size={18} style={{ color: '#A09DAB' }} />
+                <ChefHat size={18} style={{ color: colors.textTertiary }} />
                 <div className="text-left">
-                  <span style={{ fontSize: '14px', fontWeight: 600, color: '#1F1E2E', display: 'block' }}>
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: colors.textPrimary, display: 'block' }}>
                     {preferences.hasCook ? preferences.cookName || 'Cook' : 'No cook'}
                   </span>
-                  <span style={{ fontSize: '12px', color: '#A09DAB' }}>
+                  <span style={{ fontSize: '12px', color: colors.textTertiary }}>
                     {preferences.hasCook && preferences.cookPhone ? `+91 ${preferences.cookPhone}` : 'Tap to edit'}
                   </span>
                 </div>
               </div>
-              <ChevronRight size={16} style={{ color: '#D5D1DC' }} />
+              <ChevronRight size={16} style={{ color: colors.textTertiary }} />
+            </button>
+          </div>
+        </div>
+
+        {/* Message Language — E: moved from Home screen */}
+        <div className="mb-6">
+          <p className="section-label" style={{ margin: '0 0 10px 0' }}>Message language</p>
+          <div className="card">
+            <button onClick={() => { setMsgLang((preferences as any).cookMessageLanguage || 'hinglish'); setEditModal('language') }}
+              className="w-full flex items-center justify-between px-4 py-3.5 bg-transparent border-none cursor-pointer">
+              <div className="flex items-center gap-3">
+                <Globe size={18} style={{ color: colors.textTertiary }} />
+                <div className="text-left">
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: colors.textPrimary, display: 'block' }}>Cook message language</span>
+                  <span style={{ fontSize: '12px', color: colors.textTertiary }}>
+                    {LANGUAGE_LABELS[(preferences.cookMessageLanguage || 'hinglish') as 'english' | 'hindi' | 'hinglish']}
+                  </span>
+                </div>
+              </div>
+              <ChevronRight size={16} style={{ color: colors.textTertiary }} />
             </button>
           </div>
         </div>
@@ -168,21 +227,21 @@ export default function Profile() {
             <button onClick={() => { setGroceryApp(preferences.preferredGroceryApp); setEditModal('grocery') }}
               className="w-full flex items-center justify-between px-4 py-3.5 bg-transparent border-none cursor-pointer">
               <div className="flex items-center gap-3">
-                <ShoppingCart size={18} style={{ color: '#A09DAB' }} />
+                <ShoppingCart size={18} style={{ color: colors.textTertiary }} />
                 <div className="text-left">
-                  <span style={{ fontSize: '14px', fontWeight: 600, color: '#1F1E2E', display: 'block' }}>Preferred app</span>
-                  <span style={{ fontSize: '12px', color: '#A09DAB' }}>{groceryAppName}</span>
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: colors.textPrimary, display: 'block' }}>Preferred app</span>
+                  <span style={{ fontSize: '12px', color: colors.textTertiary }}>{groceryAppName}</span>
                 </div>
               </div>
-              <ChevronRight size={16} style={{ color: '#D5D1DC' }} />
+              <ChevronRight size={16} style={{ color: colors.textTertiary }} />
             </button>
           </div>
         </div>
 
         {/* Sign Out */}
         <button onClick={handleSignOut}
-          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl border cursor-pointer mb-8"
-          style={{ background: 'transparent', borderColor: '#EAE4DC', color: '#D9534F', fontSize: '14px', fontWeight: 600 }}>
+          className="flex items-center gap-1 bg-transparent border cursor-pointer px-4 py-2 rounded-full mb-8"
+          style={{ color: preferences.darkMode ? colors.accentText : colors.accent, borderColor: colors.border, fontSize: '13px', fontWeight: 600 }}>
           <LogOut size={16} /> Sign out
         </button>
       </div>
@@ -191,18 +250,20 @@ export default function Profile() {
       {editModal && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-5"
           onClick={() => setEditModal(null)}>
-          <div className="w-full max-w-sm bg-white rounded-3xl p-6 max-h-[80vh] overflow-y-auto"
+          <div className="w-full max-w-sm rounded-3xl p-6 max-h-[80vh] overflow-y-auto"
+            style={{ background: colors.card }}
             onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-5">
-              <h3 style={{ fontSize: '20px', fontWeight: 800, margin: 0, color: '#1F1E2E' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 800, margin: 0, color: colors.textPrimary }}>
                 {editModal === 'dietary' && 'Dietary style'}
                 {editModal === 'avoidances' && 'Avoidances'}
                 {editModal === 'cook' && 'Cook details'}
+                {editModal === 'language' && 'Message language'}
                 {editModal === 'grocery' && 'Grocery app'}
               </h3>
               <button onClick={() => setEditModal(null)}
                 className="w-8 h-8 rounded-full flex items-center justify-center border-none cursor-pointer"
-                style={{ background: '#EFE9E0' }}>
+                style={{ background: colors.elevated, color: colors.textSecondary }}>
                 <X size={16} />
               </button>
             </div>
@@ -214,9 +275,9 @@ export default function Profile() {
                   return (
                     <button key={opt} onClick={() => toggle(dietary, opt, setDietary)}
                       className="w-full flex items-center justify-between px-4 py-3 rounded-2xl border cursor-pointer transition-smooth"
-                      style={{ background: sel ? '#EFEAFF' : '#FFF', borderColor: sel ? '#B8A6E6' : '#EAE4DC', borderWidth: '1.5px' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 600, color: sel ? '#8B74D3' : '#1F1E2E' }}>{opt}</span>
-                      {sel && <Check size={16} style={{ color: '#8B74D3' }} />}
+                      style={{ background: sel ? colors.accentLight : colors.card, borderColor: sel ? colors.accentBorder : colors.border, borderWidth: '1.5px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: sel ? (preferences.darkMode ? colors.accentText : colors.accent) : colors.textPrimary }}>{opt}</span>
+                      {sel && <Check size={16} style={{ color: colors.accent }} />}
                     </button>
                   )
                 })}
@@ -230,9 +291,9 @@ export default function Profile() {
                   return (
                     <button key={opt} onClick={() => toggle(avoidances, opt, setAvoidances)}
                       className="w-full flex items-center justify-between px-4 py-3 rounded-2xl border cursor-pointer transition-smooth"
-                      style={{ background: sel ? '#EFEAFF' : '#FFF', borderColor: sel ? '#B8A6E6' : '#EAE4DC', borderWidth: '1.5px' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 600, color: sel ? '#8B74D3' : '#1F1E2E' }}>{opt}</span>
-                      {sel && <Check size={16} style={{ color: '#8B74D3' }} />}
+                      style={{ background: sel ? colors.accentLight : colors.card, borderColor: sel ? colors.accentBorder : colors.border, borderWidth: '1.5px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: sel ? (preferences.darkMode ? colors.accentText : colors.accent) : colors.textPrimary }}>{opt}</span>
+                      {sel && <Check size={16} style={{ color: colors.accent }} />}
                     </button>
                   )
                 })}
@@ -246,9 +307,9 @@ export default function Profile() {
                     <button key={String(val)} onClick={() => setHasCook(val)}
                       className="flex-1 py-3 rounded-xl border cursor-pointer transition-smooth"
                       style={{
-                        background: hasCook === val ? '#26233A' : '#FFF',
-                        borderColor: hasCook === val ? '#26233A' : '#EAE4DC', borderWidth: '1.5px',
-                        color: hasCook === val ? '#FFF' : '#1F1E2E', fontSize: '14px', fontWeight: 600,
+                        background: hasCook === val ? colors.accent : colors.card,
+                        borderColor: hasCook === val ? colors.accent : colors.border, borderWidth: '1.5px',
+                        color: hasCook === val ? '#FFF' : colors.textPrimary, fontSize: '14px', fontWeight: 600,
                       }}>
                       {label}
                     </button>
@@ -259,23 +320,46 @@ export default function Profile() {
                     <div>
                       <label className="section-label" style={{ display: 'block', marginBottom: 6 }}>Cook's name</label>
                       <input type="text" value={cookName} onChange={(e) => setCookName(e.target.value)} placeholder="e.g. Ramu bhaiya"
-                        style={{ width: '100%', padding: '12px 16px', borderRadius: 14, border: '1.5px solid #EAE4DC', fontSize: '15px', outline: 'none' }}
-                        onFocus={(e) => e.target.style.borderColor = '#B8A6E6'} onBlur={(e) => e.target.style.borderColor = '#EAE4DC'} />
+                        style={{ width: '100%', padding: '12px 16px', borderRadius: 14, border: `1.5px solid ${colors.border}`, fontSize: '15px', outline: 'none', background: colors.elevated, color: colors.textPrimary }}
+                        onFocus={(e) => e.target.style.borderColor = colors.accentBorder} onBlur={(e) => e.target.style.borderColor = colors.border} />
                     </div>
                     <div>
                       <label className="section-label" style={{ display: 'block', marginBottom: 6 }}>WhatsApp number</label>
                       <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1.5 px-3 py-3 rounded-xl" style={{ background: '#EFE9E0' }}>
+                        <div className="flex items-center gap-1.5 px-3 py-3 rounded-xl" style={{ background: colors.elevated, border: `1px solid ${colors.border}` }}>
                           <Send size={14} style={{ color: '#25D366' }} />
-                          <span style={{ fontSize: '14px', color: '#7A768A' }}>+91</span>
+                          <span style={{ fontSize: '14px', color: colors.textSecondary }}>+91</span>
                         </div>
                         <input type="tel" value={cookPhone} onChange={(e) => setCookPhone(e.target.value)} placeholder="9876543210"
-                          style={{ flex: 1, padding: '12px 16px', borderRadius: 14, border: '1.5px solid #EAE4DC', fontSize: '15px', outline: 'none' }}
-                          onFocus={(e) => e.target.style.borderColor = '#B8A6E6'} onBlur={(e) => e.target.style.borderColor = '#EAE4DC'} />
+                          style={{ flex: 1, padding: '12px 16px', borderRadius: 14, border: `1.5px solid ${colors.border}`, fontSize: '15px', outline: 'none', background: colors.elevated, color: colors.textPrimary }}
+                          onFocus={(e) => e.target.style.borderColor = colors.accentBorder} onBlur={(e) => e.target.style.borderColor = colors.border} />
                       </div>
                     </div>
                   </>
                 )}
+              </div>
+            )}
+
+            {editModal === 'language' && (
+              <div className="space-y-2.5">
+                {([
+                  { id: 'english' as const, label: 'English', desc: 'Today\'s Meal Plan — Breakfast, Lunch, Dinner' },
+                  { id: 'hindi' as const, label: 'Hindi', desc: 'Aaj ka Khana — Nashta, Dopahar ka khana, Raat ka khana' },
+                  { id: 'hinglish' as const, label: 'Hinglish', desc: 'Aaj ka Meal Plan — Breakfast, Lunch, Dinner' },
+                ]).map((opt) => {
+                  const sel = msgLang === opt.id
+                  return (
+                    <button key={opt.id} onClick={() => setMsgLang(opt.id)}
+                      className="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border cursor-pointer transition-smooth"
+                      style={{ background: sel ? colors.accentLight : colors.card, borderColor: sel ? colors.accentBorder : colors.border, borderWidth: '1.5px' }}>
+                      <div className="text-left">
+                        <span style={{ fontSize: '14px', fontWeight: 600, color: sel ? (preferences.darkMode ? colors.accentText : colors.accent) : colors.textPrimary, display: 'block' }}>{opt.label}</span>
+                        <span style={{ fontSize: '11px', color: colors.textTertiary, display: 'block', marginTop: 2 }}>{opt.desc}</span>
+                      </div>
+                      {sel && <Check size={16} style={{ color: colors.accent, flexShrink: 0 }} />}
+                    </button>
+                  )
+                })}
               </div>
             )}
 
@@ -286,9 +370,9 @@ export default function Profile() {
                   return (
                     <button key={app.id} onClick={() => setGroceryApp(app.id)}
                       className="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border cursor-pointer transition-smooth"
-                      style={{ background: sel ? '#EFEAFF' : '#FFF', borderColor: sel ? '#B8A6E6' : '#EAE4DC', borderWidth: '1.5px' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 600, color: sel ? '#8B74D3' : '#1F1E2E' }}>{app.name}</span>
-                      {sel && <Check size={16} style={{ color: '#8B74D3' }} />}
+                      style={{ background: sel ? colors.accentLight : colors.card, borderColor: sel ? colors.accentBorder : colors.border, borderWidth: '1.5px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: 600, color: sel ? (preferences.darkMode ? colors.accentText : colors.accent) : colors.textPrimary }}>{app.name}</span>
+                      {sel && <Check size={16} style={{ color: colors.accent }} />}
                     </button>
                   )
                 })}
@@ -297,7 +381,7 @@ export default function Profile() {
 
             <button onClick={saveModal}
               className="w-full py-3.5 rounded-xl border-none cursor-pointer mt-5"
-              style={{ background: '#26233A', color: '#FFF', fontSize: '14px', fontWeight: 600 }}>
+              style={{ background: colors.accent, color: '#FFF', fontSize: '14px', fontWeight: 600 }}>
               Save
             </button>
           </div>

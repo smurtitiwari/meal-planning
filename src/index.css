@@ -1,27 +1,27 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #F7F3EE;
-  --color-bg-card: #FFFFFF;
-  --color-bg-warm: #EFE9E0;
-  --color-fg: #1F1E2E;
-  --color-fg-secondary: #7A768A;
-  --color-fg-tertiary: #A09DAB;
-  --color-border: #EAE4DC;
-  --color-accent: #B8A6E6;
-  --color-accent-light: #EFEAFF;
+  --color-bg: #FFFFFF;
+  --color-bg-card: #F6F6F6;
+  --color-bg-warm: #FBFBFB;
+  --color-fg: #111111;
+  --color-fg-secondary: #8A8A8A;
+  --color-fg-tertiary: #8A8A8A;
+  --color-border: #D9D9D9;
+  --color-accent: #3C151A;
+  --color-accent-light: #9A4D5A;
   --color-success: #5FB07A;
   --color-danger: #D9534F;
   --color-whatsapp: #25D366;
-  --color-cta: #26233A;
+  --color-cta: #3C151A;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-serif: 'DM Serif Display', 'Georgia', serif;
 }
 
 body {
   margin: 0;
-  background: #F7F3EE;
-  color: #1F1E2E;
+  background: #FFFFFF;
+  color: #111111;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -38,10 +38,10 @@ input, textarea, select, button { font-family: inherit; }
 
 /* Premium card */
 .card {
-  background: #FFFFFF;
-  border-radius: 20px;
-  border: 1px solid #EAE4DC;
-  box-shadow: 0 1px 3px rgba(31,30,46,0.03);
+  background: #F6F6F6;
+  border-radius: 22px;
+  border: 1.5px solid #E5E5E5;
+  box-shadow: 0 6px 18px rgba(25, 18, 18, 0.03);
 }
 
 /* Image card with overlay */
@@ -49,7 +49,7 @@ input, textarea, select, button { font-family: inherit; }
   border-radius: 20px;
   overflow: hidden;
   position: relative;
-  background: #EFE9E0;
+  background: #F6F6F6;
 }
 
 .img-card img {
@@ -79,13 +79,14 @@ input, textarea, select, button { font-family: inherit; }
   border-radius: 100px;
   font-size: 11px;
   font-weight: 500;
-  background: #EFE9E0;
-  color: #7A768A;
+  background: #FBF5F6;
+  color: #111111;
+  border: 1px solid #F6F6F6;
 }
 
 .chip-accent {
-  background: #EFEAFF;
-  color: #8B74D3;
+  background: #3C151A;
+  color: #FFFFFF;
 }
 
 /* Floating action bar */
@@ -99,25 +100,47 @@ input, textarea, select, button { font-family: inherit; }
   background: rgba(255,255,255,0.96);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-top: 1px solid #EAE4DC;
+  border-top: 1px solid #D9D9D9;
 }
 
 /* Section label */
 .section-label {
   font-size: 11px;
   font-weight: 600;
-  color: #A09DAB;
+  color: #8A8A8A;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
 
 /* Smooth transitions */
 .transition-smooth {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.38s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* No-tap highlight */
 button, a { -webkit-tap-highlight-color: transparent; }
+
+.dark-mode {
+  background: #121212 !important;
+}
+
+.dark-mode .card {
+  background: #1B1B1B;
+  border-color: #3A3A3A;
+  border-width: 1.5px;
+  box-shadow: none;
+}
+
+.dark-mode .chip {
+  background: #1B1B1B;
+  color: #D6D1D3;
+  border-color: #2E2E2E;
+}
+
+.dark-mode .chip-accent {
+  background: #9A4D5A;
+  color: #FFFFFF;
+}
 
 /* Line clamp utility */
 .line-clamp-1 {
