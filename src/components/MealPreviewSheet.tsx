@@ -51,7 +51,7 @@ interface MealPreviewSheetProps {
 
 const HERO_HEIGHT = 360
 
-export default function MealPreviewSheet({ meal, onClose, userName, darkMode, preferredGroceryApp, preferredGroceryApps, hasCook, cookPhone }: MealPreviewSheetProps) {
+export default function MealPreviewSheet({ meal, onClose, userName, darkMode, preferredGroceryApp, preferredGroceryApps, hasCook }: MealPreviewSheetProps) {
   const colors = darkMode ? darkColors : lightColors
   const [checkedIngredients, setCheckedIngredients] = useState<string[]>([])
   const [imgError, setImgError] = useState(false)

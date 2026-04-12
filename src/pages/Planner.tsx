@@ -1,12 +1,12 @@
 import { useEffect, useState, useMemo } from 'react'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { useStore, DAYS, generateId, getMealPool } from '../store/useStore'
 import type { GroceryItem, Meal } from '../store/useStore'
 import BottomNav from '../components/BottomNav'
 import SegmentedControl from '../components/SegmentedControl'
 import MealPreviewSheet from '../components/MealPreviewSheet'
 import { X, Plus, Check, Trash2, RefreshCw, Repeat2, ShoppingCart } from 'lucide-react'
-import { GROCERY_CATEGORIES, GROCERY_CATEGORY_EMOJI, getCategoryForItem } from '../utils/groceryCategories'
+import { GROCERY_CATEGORY_EMOJI, getCategoryForItem } from '../utils/groceryCategories'
 
 const serifFont = "'DM Serif Display', Georgia, serif"
 const mealLabel: Record<string, string> = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' }
@@ -41,7 +41,6 @@ function formatGroceryItem(item: GroceryItem) {
 }
 
 export default function Planner() {
-  const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const { weeklyPlan, initWeeklyPlan, rotateMeal, setDayPlan, groceryList, addGroceryItem, toggleGroceryItem, removeGroceryItem, syncGroceryWithPlans, recipes, preferences } = useStore()
   const [selectedDate, setSelectedDate] = useState('')

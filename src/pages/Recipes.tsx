@@ -4,7 +4,7 @@ import { useStore, generateId, guessIngredients, detectSourceType } from '../sto
 import type { Recipe, SharedRecipe } from '../store/useStore'
 import BottomNav from '../components/BottomNav'
 import SegmentedControl from '../components/SegmentedControl'
-import { Plus, X, Link2, Sparkles, Trash2, Edit3, UtensilsCrossed, Check, BookOpen, Users } from 'lucide-react'
+import { Plus, X, Link2, Sparkles, Trash2, UtensilsCrossed, Check, BookOpen, Users } from 'lucide-react'
 
 const MEAL_TYPE_FILTERS = ['All', 'Breakfast', 'Lunch', 'Dinner', 'Snacks']
 

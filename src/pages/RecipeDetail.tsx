@@ -96,17 +96,6 @@ export default function RecipeDetail() {
     setCheckedIngredients((prev) => prev.includes(ing) ? prev.filter((i) => i !== ing) : [...prev, ing])
   }
 
-  const getGroceryUrl = () => {
-    const urls: Record<string, string> = {
-      blinkit: 'https://blinkit.com',
-      zepto: 'https://www.zeptonow.com',
-      swiggy: 'https://www.swiggy.com/instamart',
-      bigbasket: 'https://www.bigbasket.com',
-      dunzo: 'https://www.dunzo.com',
-    }
-    return urls[preferences.preferredGroceryApp] || urls.blinkit
-  }
-
   // Zoom image on scroll
   const HERO_HEIGHT = 360
   const zoomProgress = Math.min(Math.max(-scrollY / 260, 0), 0.6)

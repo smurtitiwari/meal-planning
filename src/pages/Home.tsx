@@ -5,7 +5,7 @@ import type { Meal } from '../store/useStore'
 import BottomNav from '../components/BottomNav'
 import CookMessage from '../components/CookMessage'
 import MealPreviewSheet from '../components/MealPreviewSheet'
-import { ChefHat, Sparkles, CalendarDays, X, User } from 'lucide-react'
+import { ChefHat, Sparkles, X, User } from 'lucide-react'
 
 const mealLabel: Record<string, string> = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' }
 const allMealTypes: ('breakfast' | 'lunch' | 'dinner')[] = ['breakfast', 'lunch', 'dinner']
@@ -40,11 +40,6 @@ export default function Home() {
   useEffect(() => { initWeeklyPlan() }, [initWeeklyPlan])
 
   const todayPlan = useMemo(() => weeklyPlan.find((d) => d.date === today), [weeklyPlan, today])
-
-  const totalCalories = useMemo(() => {
-    if (!todayPlan) return 0
-    return allMealTypes.reduce((sum, type) => sum + (todayPlan[type]?.calories || 0), 0)
-  }, [todayPlan])
 
   const todayLabel = useMemo(() => {
     const d = new Date()

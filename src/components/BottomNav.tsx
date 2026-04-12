@@ -62,7 +62,7 @@ export default function BottomNav() {
         borderTop: `1px solid ${darkMode ? '#2E2E2E' : '#ECE8E4'}`,
       }}>
         <div className="max-w-md mx-auto flex justify-around items-center h-16 px-2">
-          {tabs.map((tab, i) => {
+          {tabs.map((tab) => {
             if (tab.isFab) {
               return (
                 <button
@@ -90,7 +90,7 @@ export default function BottomNav() {
                 className="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl no-underline transition-smooth"
                 style={{ color: active ? activeColor : inactiveColor, background: 'transparent' }}
               >
-                {active ? <FilledIcon label={label!} color={activeColor} /> : <Icon size={21} strokeWidth={1.7} />}
+                {active ? <FilledIcon label={label} color={activeColor} /> : Icon && <Icon size={21} strokeWidth={1.7} />}
                 <span style={{
                   fontSize: '10px',
                   fontWeight: active ? 700 : 500,
