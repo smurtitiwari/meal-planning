@@ -5,7 +5,7 @@ import type { Meal } from '../store/useStore'
 import BottomNav from '../components/BottomNav'
 import CookMessage from '../components/CookMessage'
 import MealPreviewSheet from '../components/MealPreviewSheet'
-import { ChefHat, Sparkles, CalendarDays, X } from 'lucide-react'
+import { ChefHat, Sparkles, CalendarDays, X, User } from 'lucide-react'
 
 const mealLabel: Record<string, string> = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' }
 const allMealTypes: ('breakfast' | 'lunch' | 'dinner')[] = ['breakfast', 'lunch', 'dinner']
@@ -58,14 +58,28 @@ export default function Home() {
         <div className="flex items-center justify-between">
           <div
             style={{
-              width: 36, height: 36, borderRadius: 12,
+              width: 40, height: 40, borderRadius: 14,
               background: colors.accentPurple,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 6px 14px rgba(60,21,26,0.25)',
+              boxShadow: '0 8px 20px rgba(60,21,26,0.25)',
             }}
           >
-            <ChefHat size={18} color="#FFF" />
+            <ChefHat size={22} color="#FFF" />
           </div>
+
+          <button 
+            onClick={() => navigate('/profile')}
+            className="border-none bg-transparent outline-none cursor-pointer p-0 flex items-center justify-center transition-transform hover:scale-95"
+            aria-label="Profile"
+          >
+            {preferences.profileImage ? (
+              <img src={preferences.profileImage} alt="Profile" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${preferences.darkMode ? '#2E2E2E' : '#ECE8E4'}` }} />
+            ) : (
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: preferences.darkMode ? '#1B1B1B' : '#F6F6F6', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${preferences.darkMode ? '#2E2E2E' : '#ECE8E4'}` }}>
+                <User size={20} color={colors.textSecondary} />
+              </div>
+            )}
+          </button>
         </div>
 
         <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: colors.textSecondary, margin: '18px 0 6px 0' }}>
@@ -92,26 +106,6 @@ export default function Home() {
               />
             )
           })}
-          {/* Week plan secondary CTA (left-aligned) */}
-          <button
-            onClick={() => navigate('/planner')}
-            className="flex items-center gap-1.5 cursor-pointer outline-none"
-            style={{
-              alignSelf: 'flex-start',
-              background: colors.card,
-              border: `1px solid ${preferences.darkMode ? colors.border : '#F4F4F4'}`,
-              color: colors.textPrimary,
-              fontSize: '13px',
-              fontWeight: 700,
-              padding: '10px 14px',
-              borderRadius: 12,
-              minHeight: 44,
-              marginTop: 4,
-            }}
-          >
-            <CalendarDays size={14} />
-            View week plan
-          </button>
         </div>
       )}
 
@@ -125,7 +119,7 @@ export default function Home() {
         }}
       >
         <QuickAction
-          icon={<span aria-hidden>🛒</span>}
+          icon={<span style={{ fontSize: 24 }}>🛍️</span>}
           title="Grocery list"
           subtitle="Ready to shop"
           colors={colors}
@@ -133,9 +127,9 @@ export default function Home() {
         />
         {preferences.hasCook && (
           <QuickAction
-            icon={<span aria-hidden>💬</span>}
+            icon={<span style={{ fontSize: 24 }}>✨</span>}
             title="Meal plan message"
-            subtitle="AI generated message to send to the cook"
+            subtitle="AI generated draft for cook"
             colors={colors}
             onClick={() => setShowCookMessage(true)}
           />
@@ -151,7 +145,7 @@ export default function Home() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md"
+            className="w-full max-w-md animate-slide-up"
             style={{
               background: colors.pageSurface,
               borderRadius: '28px 28px 0 0',

@@ -29,6 +29,7 @@ export default function AskChef() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isTyping, setIsTyping] = useState(false)
+  const [introTyping, setIntroTyping] = useState(true)
   const [savedRecipes, setSavedRecipes] = useState<Set<string>>(new Set())
   const [toast, setToast] = useState<string | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -68,10 +69,10 @@ export default function AskChef() {
   const colors = preferences.darkMode ? darkColors : lightColors
 
   const suggestions = [
-    { label: 'American 🍔', query: 'I want an American style burger recipe' },
-    { label: 'Low Carb 🥦', query: 'Suggest a low carb recipe' },
-    { label: 'Healthy 🥗', query: 'Give me a healthy salad recipe' },
-    { label: 'High Protein 🥩', query: 'High protein dinner ideas' },
+    { label: 'Chicken & rice 🍗', query: 'What can I make with chicken and rice?' },
+    { label: 'Vegetarian under 15 min 🥗', query: 'Quick vegetarian recipe under 15 mins' },
+    { label: 'High protein dinner 🍳', query: 'High protein dinner ideas' },
+    { label: 'Something sweet 🍓', query: 'Suggest a healthy dessert' },
   ]
 
   const mockResponse = (_query: string) => {
@@ -127,7 +128,15 @@ export default function AskChef() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages, isTyping])
+  }, [messages, isTyping, introTyping])
+
+  useEffect(() => {
+    if (messages.length === 0) {
+      setIntroTyping(true)
+      const timer = setTimeout(() => setIntroTyping(false), 1400)
+      return () => clearTimeout(timer)
+    }
+  }, [messages.length])
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: colors.pageSurface }}>
@@ -148,34 +157,43 @@ export default function AskChef() {
 
       <div className="flex-1 overflow-y-auto px-5 pb-32">
         {messages.length === 0 ? (
-          <div className="mt-4">
-            <p style={{ fontSize: '16px', lineHeight: 1.5, color: colors.textPrimary, fontWeight: 500, margin: '0 0 24px 0' }}>
-              <span style={{ fontWeight: 800 }}>Hey, {userName}!</span> Looking for something a little different?
-              Tell Chef what you're in the mood for and we'll put together a dish, just for you.
-            </p>
-
-            <p style={{ fontSize: '13px', fontWeight: 700, color: colors.textPrimary, margin: '0 0 12px 0' }}>
-              Need some inspiration? Try these
-            </p>
-
-            <div className="flex gap-2 flex-wrap">
-              {suggestions.map((s, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleSend(s.query)}
-                  className="px-4 rounded-full cursor-pointer transition-smooth"
-                  style={{
-                    background: preferences.darkMode ? '#1B1B1B' : '#F6F6F6',
-                    border: `1px solid ${preferences.darkMode ? 'rgba(255,255,255,0.08)' : '#F4F4F4'}`,
-                    color: colors.textPrimary,
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    minHeight: 44,
-                  }}
-                >
-                  {s.label}
-                </button>
-              ))}
+          <div className="mt-4 space-y-6">
+            <div className="flex justify-start">
+              {introTyping ? (
+                <div className="px-0 py-3">
+                  <div className="flex gap-1" style={{ marginLeft: 4 }}>
+                    <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              ) : (
+                <div className="max-w-[92%] w-full">
+                  <p style={{ fontSize: '16px', lineHeight: 1.5, color: colors.textPrimary, margin: '0 0 18px 0', animation: 'fadeIn 0.3s ease-out' }}>
+                    Hey, <span style={{ fontWeight: 800 }}>{userName}</span>. I am here to make your today's meal planning simpler. Share the ingredients you have or select the pre-generated suggestions.
+                  </p>
+                  <div className="flex gap-2 flex-wrap" style={{ animation: 'fadeIn 0.4s ease-out' }}>
+                    {suggestions.map((s, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleSend(s.query)}
+                        className="px-4 rounded-full cursor-pointer transition-smooth outline-none border"
+                        style={{
+                          background: preferences.darkMode ? '#1B1B1B' : '#F6F6F6',
+                          borderColor: preferences.darkMode ? 'rgba(255,255,255,0.08)' : '#ECE8E4',
+                          color: colors.textPrimary,
+                          fontSize: '13px',
+                          fontWeight: 600,
+                          minHeight: 40,
+                          boxShadow: preferences.darkMode ? 'none' : '0 2px 6px rgba(0,0,0,0.03)',
+                        }}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         ) : (

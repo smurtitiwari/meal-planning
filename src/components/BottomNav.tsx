@@ -1,13 +1,13 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
-import { Home, CalendarDays, BookOpen, User, Sparkles } from 'lucide-react'
+import { Home, CalendarDays, BookOpen, Sparkles, Plus } from 'lucide-react'
 
 const tabs = [
   { href: '/home', icon: Home, label: 'Home' },
   { href: '/planner', icon: CalendarDays, label: 'Planner' },
+  { isFab: true },
   { href: '/ask', icon: Sparkles, label: 'Ask Chef' },
   { href: '/recipes', icon: BookOpen, label: 'Recipes' },
-  { href: '/profile', icon: User, label: 'Profile' },
 ]
 
 function FilledIcon({ label, color }: { label: string; color: string }) {
@@ -48,38 +48,60 @@ function FilledIcon({ label, color }: { label: string; color: string }) {
 
 export default function BottomNav() {
   const { pathname } = useLocation()
+  const navigate = useNavigate()
   const darkMode = useStore((s) => s.preferences.darkMode)
   const activeColor = darkMode ? '#F0C7CF' : '#3C151A'
   const inactiveColor = darkMode ? '#A9A0A3' : '#7A746D'
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50" style={{
-      background: darkMode ? 'rgba(17,17,17,0.96)' : 'rgba(255,255,255,0.96)',
-      backdropFilter: 'blur(24px)',
-      WebkitBackdropFilter: 'blur(24px)',
-      borderTop: `1px solid ${darkMode ? '#2E2E2E' : '#ECE8E4'}`,
-    }}>
-      <div className="max-w-md mx-auto flex justify-around items-center h-16 px-2">
-        {tabs.map(({ href, icon: Icon, label }) => {
-          const active = pathname === href || (href === '/home' && pathname.startsWith('/meal/'))
-          return (
-            <Link
-              key={href}
-              to={href}
-              className="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl no-underline transition-smooth"
-              style={{ color: active ? activeColor : inactiveColor, background: 'transparent' }}
-            >
-              {active ? <FilledIcon label={label} color={activeColor} /> : <Icon size={21} strokeWidth={1.7} />}
-              <span style={{
-                fontSize: '10px',
-                fontWeight: active ? 700 : 500,
-                letterSpacing: '0.02em',
-              }}>{label}</span>
-              {/* D: removed active dot indicator — profile in nav makes it redundant */}
-            </Link>
-          )
-        })}
-      </div>
-    </nav>
+    <>
+      <nav className="fixed bottom-0 left-0 right-0 z-40" style={{
+        background: darkMode ? 'rgba(17,17,17,0.96)' : 'rgba(255,255,255,0.96)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)',
+        borderTop: `1px solid ${darkMode ? '#2E2E2E' : '#ECE8E4'}`,
+      }}>
+        <div className="max-w-md mx-auto flex justify-around items-center h-16 px-2">
+          {tabs.map((tab, i) => {
+            if (tab.isFab) {
+              return (
+                <button
+                  key="fab"
+                  onClick={() => navigate('/recipes', { state: { openTypePicker: true } })}
+                  className="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl border-none cursor-pointer outline-none transition-smooth bg-transparent"
+                  style={{ color: inactiveColor }}
+                >
+                  <Plus size={21} strokeWidth={1.7} />
+                  <span style={{
+                    fontSize: '10px',
+                    fontWeight: 500,
+                    letterSpacing: '0.02em',
+                  }}>Add</span>
+                </button>
+              )
+            }
+
+            const { href, icon: Icon, label } = tab
+            const active = pathname === href || (href === '/home' && pathname.startsWith('/meal/'))
+            return (
+              <Link
+                key={href}
+                to={href!}
+                className="flex flex-col items-center gap-0.5 px-4 py-2 rounded-2xl no-underline transition-smooth"
+                style={{ color: active ? activeColor : inactiveColor, background: 'transparent' }}
+              >
+                {active ? <FilledIcon label={label!} color={activeColor} /> : <Icon size={21} strokeWidth={1.7} />}
+                <span style={{
+                  fontSize: '10px',
+                  fontWeight: active ? 700 : 500,
+                  letterSpacing: '0.02em',
+                }}>{label}</span>
+              </Link>
+            )
+          })}
+        </div>
+      </nav>
+
+    </>
   )
 }

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Clock, ExternalLink, ShoppingCart, Sparkles, Check, Square, CheckSquare2 } from 'lucide-react'
+import { ArrowLeft, Clock, ExternalLink, ShoppingCart, Sparkles, Check, Square, CheckSquare2, Edit3 } from 'lucide-react'
 import { useStore, DEFAULT_MEALS, generateId } from '../store/useStore'
 import CookMessage from '../components/CookMessage'
 
@@ -32,6 +32,7 @@ export default function RecipeDetail() {
   const [checkedIngredients, setCheckedIngredients] = useState<string[]>([])
   const [scrollY, setScrollY] = useState(0)
   const [showCookModal, setShowCookModal] = useState(false)
+  const [toast, setToast] = useState<string | null>(null)
 
   useEffect(() => {
     const onScroll = () => setScrollY(window.scrollY)
@@ -62,9 +63,11 @@ export default function RecipeDetail() {
         cookTime: stateRecipe.cookTime,
         calories: stateRecipe.calories,
         link: stateRecipe.videoUrl || stateRecipe.link,
-        category: 'main',
-        mealType: 'lunch',
-        source: 'chat',
+        category: stateRecipe.category || 'main',
+        mealType: stateRecipe.mealType || 'lunch',
+        note: stateRecipe.note,
+        sharedBy: stateRecipe.sharedBy,
+        source: stateRecipe.source || 'chat',
       }
     }
     return null
@@ -73,6 +76,8 @@ export default function RecipeDetail() {
   if (!recipe) {
     return <div className="min-h-screen flex items-center justify-center" style={{ background: colors.page, color: colors.muted }}>Recipe not found</div>
   }
+
+  const addedBy = recipe?.source === 'shared' ? recipe.sharedBy : (recipe?.source === 'mine' ? (preferences.name || 'You') : null)
 
   const addSharedToMine = () => {
     addRecipe({
@@ -196,19 +201,74 @@ export default function RecipeDetail() {
           padding: '26px 22px 120px',
         }}
       >
-        <h1 style={{
-          margin: 0,
-          fontSize: '26px',
-          fontWeight: 800,
-          color: colors.text,
-          lineHeight: 1.2,
-          letterSpacing: '-0.02em',
-        }}>
-          {recipe.name}
-        </h1>
+        <div className="flex items-start justify-between">
+          <h1 style={{
+            margin: 0,
+            fontSize: '26px',
+            fontWeight: 800,
+            color: colors.text,
+            lineHeight: 1.2,
+            letterSpacing: '-0.02em',
+            flex: 1,
+          }}>
+            {recipe.name}
+          </h1>
+        </div>
 
-        {/* Meta row: cook time + kcal pill */}
+        <div className="flex items-center gap-3 mt-2 flex-wrap">
+          {addedBy && (
+            <span style={{ fontSize: '13px', color: colors.muted, fontWeight: 500 }}>
+              Added by: <span style={{ color: colors.text, fontWeight: 600 }}>{addedBy}</span>
+            </span>
+          )}
+          {(recipe.link || recipe.videoLink) && (
+            <a
+              href={recipe.link || recipe.videoLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 no-underline bg-transparent"
+              style={{ color: colors.accent, fontSize: '12px', fontWeight: 700 }}
+            >
+              <ExternalLink size={12} /> Source
+            </a>
+          )}
+        </div>
+
+        {/* Meta row: meal type, edit, cook time, kcal pill */}
         <div className="flex items-center gap-3 mt-3 flex-wrap">
+          {recipe.mealType && (
+            <span
+              style={{
+                padding: '5px 11px',
+                borderRadius: 999,
+                fontSize: '12px',
+                fontWeight: 700,
+                background: colors.card,
+                border: `1px solid ${colors.border}`,
+                color: colors.text,
+                textTransform: 'capitalize'
+              }}
+            >
+              {recipe.mealType}
+            </span>
+          )}
+          {recipe.source === 'mine' && (
+            <button
+              onClick={() => navigate('/recipes', { state: { editRecipe: recipe } })}
+              className="flex items-center gap-1.5 cursor-pointer bg-transparent outline-none"
+              style={{
+                padding: '5px 11px',
+                borderRadius: 999,
+                fontSize: '12px',
+                fontWeight: 700,
+                background: colors.kcalBg,
+                border: `1px solid ${preferences.darkMode ? 'rgba(240, 199, 207, 0.24)' : 'rgba(60, 21, 26, 0.14)'}`,
+                color: preferences.darkMode ? '#F0C7CF' : colors.accent,
+              }}
+            >
+              <Edit3 size={12} /> Edit
+            </button>
+          )}
           {recipe.cookTime && (
             <span className="flex items-center gap-1" style={{ fontSize: '13px', color: colors.muted, fontWeight: 500 }}>
               <Clock size={14} />
@@ -255,7 +315,7 @@ export default function RecipeDetail() {
           </div>
         )}
 
-        <div style={{ height: 1, background: colors.border, margin: '22px 0 18px 0' }} />
+        <div style={{ margin: '22px 0 18px 0' }} />
 
         {/* ── Ingredients checklist (no card layout) ── */}
         <h3 style={{ fontSize: '15px', fontWeight: 700, margin: '0 0 12px 0', color: colors.text }}>
@@ -272,7 +332,7 @@ export default function RecipeDetail() {
                   className="w-full flex items-center gap-3 cursor-pointer bg-transparent border-none outline-none text-left"
                   style={{
                     padding: '12px 4px',
-                    borderBottom: i < (recipe.ingredients.length - 1) ? `1px solid ${colors.border}` : 'none',
+                    borderBottom: 'none',
                   }}
                 >
                   {sel ? (
@@ -299,7 +359,20 @@ export default function RecipeDetail() {
         {/* Order grocery CTA at end of ingredient list */}
         {(recipe.ingredients || []).length > 0 && (
           <button
-            onClick={() => window.open(getGroceryUrl(), '_blank')}
+            onClick={() => {
+              const today = new Date().toISOString().split('T')[0];
+              recipe.ingredients.forEach((ing: string) => {
+                useStore.getState().addGroceryItem({
+                  id: generateId(),
+                  name: ing,
+                  checked: false,
+                  forDates: [today],
+                  source: 'manual'
+                })
+              });
+              setToast('Ingredients added to today\'s grocery list');
+              setTimeout(() => setToast(null), 2500);
+            }}
             className="w-full flex items-center justify-center gap-2 rounded-2xl cursor-pointer border-none outline-none mt-5"
             style={{
               background: colors.accent,
@@ -311,22 +384,8 @@ export default function RecipeDetail() {
             }}
           >
             <ShoppingCart size={16} />
-            Order grocery
+            Add to grocery
           </button>
-        )}
-
-        {/* View source CTA */}
-        {(recipe.link || recipe.videoLink) && (
-          <a
-            href={recipe.link || recipe.videoLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-5 inline-flex items-center gap-1.5 no-underline"
-            style={{ color: colors.accent, fontSize: '13px', fontWeight: 700 }}
-          >
-            <ExternalLink size={14} />
-            View source
-          </a>
         )}
 
         {/* Message cook CTA (tertiary) */}
@@ -365,7 +424,7 @@ export default function RecipeDetail() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md"
+            className="w-full max-w-md animate-slide-up"
             style={{
               background: colors.page,
               borderRadius: '28px 28px 0 0',
@@ -436,6 +495,15 @@ export default function RecipeDetail() {
                 title={`Message for ${recipe.name}`}
               />
             </div>
+          </div>
+        </div>
+      )}
+
+      {toast && (
+        <div className="fixed left-0 right-0 flex justify-center pointer-events-none z-50" style={{ bottom: 32 }}>
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-full" style={{ background: colors.text, color: colors.page, fontSize: '13px', fontWeight: 600, boxShadow: '0 8px 24px rgba(0,0,0,0.18)' }}>
+            <Check size={14} />
+            {toast}
           </div>
         </div>
       )}

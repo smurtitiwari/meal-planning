@@ -144,6 +144,15 @@ button, a { -webkit-tap-highlight-color: transparent; }
   color: #FFFFFF;
 }
 
+/* Bottom sheet slide-up animation */
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.animate-slide-up {
+  animation: slide-up 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 /* Line clamp utility */
 .line-clamp-1 {
   overflow: hidden;

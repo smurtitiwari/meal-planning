@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useStore, generateId, guessIngredients, detectSourceType } from '../store/useStore'
 import type { Recipe, SharedRecipe } from '../store/useStore'
 import BottomNav from '../components/BottomNav'
@@ -35,12 +35,14 @@ const SAMPLE_SHARED: SharedRecipe[] = [
 
 export default function Recipes() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { recipes, addRecipe, updateRecipe, deleteRecipe, sharedRecipes, addSharedRecipe, preferences } = useStore()
   const [activeTab, setActiveTab] = useState<'mine' | 'shared'>('mine')
   const [mealFilter, setMealFilter] = useState('All')
   const [showAdd, setShowAdd] = useState(false)
   const [showTypePicker, setShowTypePicker] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
   
   // Form state
   const [name, setName] = useState('')
@@ -93,6 +95,24 @@ export default function Recipes() {
     setIngredients([]); setNewIngredient(''); setNote(''); setEditId(null); setShowAdd(false)
   }
 
+  // Handle edit requests coming from RecipeDetail
+  useEffect(() => {
+    if ((location.state as any)?.editRecipe) {
+      const r = (location.state as any).editRecipe
+      handleEdit(r)
+      window.history.replaceState({}, document.title)
+    }
+    if ((location.state as any)?.openNewRecipe) {
+      const type = (location.state as any).openNewRecipe
+      pickType(type)
+      window.history.replaceState({}, document.title)
+    }
+    if ((location.state as any)?.openTypePicker) {
+      openTypePicker()
+      window.history.replaceState({}, document.title)
+    }
+  }, [location.state])
+
   const openTypePicker = () => {
     resetForm()
     setShowTypePicker(true)
@@ -137,17 +157,18 @@ export default function Recipes() {
     }
   }
 
-  const filterByMealType = <T extends { mealType?: string; tags?: string[] }>(items: T[]): T[] => {
-    if (mealFilter === 'All') return items
-    return items.filter((r) =>
-      r.mealType === mealFilter.toLowerCase() ||
-      r.tags?.some(t => t.toLowerCase() === mealFilter.toLowerCase())
-    )
+  const filterByMealTypeAndSearch = <T extends { name: string; ingredients?: string[]; mealType?: string; tags?: string[] }>(items: T[]): T[] => {
+    return items.filter((r) => {
+      const matchMeal = mealFilter === 'All' || r.mealType?.toLowerCase() === mealFilter.toLowerCase() || r.tags?.some(t => t.toLowerCase() === mealFilter.toLowerCase());
+      const query = searchQuery.toLowerCase();
+      const matchSearch = !query || r.name.toLowerCase().includes(query) || (r.ingredients && r.ingredients.some(i => i.toLowerCase().includes(query)));
+      return matchMeal && matchSearch;
+    })
   }
 
-  const filteredRecipes = filterByMealType(recipes)
+  const filteredRecipes = filterByMealTypeAndSearch(recipes)
   const allShared = sharedRecipes.length > 0 ? sharedRecipes : SAMPLE_SHARED
-  const filteredShared = filterByMealType(allShared)
+  const filteredShared = filterByMealTypeAndSearch(allShared)
 
   const recipeImage = (r: { image?: string; name: string }) => {
     if (r.image) return r.image
@@ -186,6 +207,18 @@ export default function Recipes() {
           activeBackground={preferences.darkMode ? '#2E2E2E' : colors.surface}
           activeText={preferences.darkMode ? '#FEFEFE' : '#111111'}
           inactiveText={preferences.darkMode ? '#A9A0A3' : '#7A746D'}
+          activeBorder={preferences.darkMode ? '#3A3A3A' : '#DDD8D3'}
+          inactiveBorder={preferences.darkMode ? 'rgba(255,255,255,0.08)' : '#E0DCD8'}
+        />
+      </div>
+
+      <div className="px-5 mb-3">
+        <input 
+          type="search" 
+          placeholder="Search recipes or ingredients..." 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{ width: '100%', padding: '10px 16px', borderRadius: 14, border: `1.5px solid ${preferences.darkMode ? colors.border : '#F4F4F4'}`, background: preferences.darkMode ? 'transparent' : '#F6F6F6', outline: 'none', color: colors.textPrimary, fontSize: '14px' }}
         />
       </div>
 
@@ -258,11 +291,8 @@ export default function Recipes() {
                         {recipe.ingredients.join(', ')}
                       </p>
                       <div className="flex items-center gap-3 mt-auto" style={{ pointerEvents: 'auto' }}>
-                        <button onClick={(e) => { e.stopPropagation(); handleEdit(recipe) }} className="flex items-center gap-1.5 p-0 bg-transparent border-none cursor-pointer outline-none" style={{ color: colors.textSecondary, fontSize: '12px', fontWeight: 600 }}>
-                          <Edit3 size={12} /> Edit
-                        </button>
                         <button onClick={(e) => { e.stopPropagation(); deleteRecipe(recipe.id) }} className="flex items-center gap-1.5 p-0 bg-transparent border-none cursor-pointer outline-none" style={{ color: '#D9534F', fontSize: '12px', fontWeight: 600 }}>
-                          <Trash2 size={12} /> Delete
+                          <Trash2 size={12} /> Remove recipe
                         </button>
                       </div>
                     </div>
@@ -286,7 +316,7 @@ export default function Recipes() {
               filteredShared.map((recipe) => (
                 <div key={recipe.id} style={{ background: colors.card, border: `1px solid ${preferences.darkMode ? colors.border : '#F4F4F4'}`, borderRadius: 18, boxShadow: preferences.darkMode ? 'none' : '0 8px 22px rgba(27,18,18,0.05)', overflow: 'hidden' }}>
                   <div style={{ display: 'flex', alignItems: 'center', padding: '12px', gap: '12px', position: 'relative' }}>
-                    <button onClick={() => navigate(`/recipe/${recipe.id}`)} className="absolute inset-0 w-full h-full border-none bg-transparent cursor-pointer z-0 outline-none" aria-label={`View ${recipe.name}`}></button>
+                    <button onClick={() => navigate(`/recipe/${recipe.id}`, { state: { recipe: { ...recipe, source: 'shared' } } })} className="absolute inset-0 w-full h-full border-none bg-transparent cursor-pointer z-0 outline-none" aria-label={`View ${recipe.name}`}></button>
                     <div style={{ width: 80, height: 80, flexShrink: 0, borderRadius: 14, overflow: 'hidden', background: colors.surface, zIndex: 1, pointerEvents: 'none' }}>
                       <img src={recipe.image || recipeImage(recipe)} alt={recipe.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </div>
@@ -305,11 +335,6 @@ export default function Recipes() {
                       <p style={{ fontSize: '11px', color: colors.textSecondary, margin: '0 0 4px 0', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                         {recipe.ingredients.join(', ')}
                       </p>
-                      {recipe.cookApproved && (
-                        <span style={{ alignSelf: 'flex-start', background: preferences.darkMode ? 'rgba(255,255,255,0.1)' : '#F1F2F4', border: `1px solid ${preferences.darkMode ? 'rgba(255,255,255,0.22)' : '#ECE8E4'}`, color: preferences.darkMode ? '#F0C7CF' : colors.accentText, fontWeight: 600, fontSize: '10px', padding: '3px 7px', borderRadius: 999 }}>
-                          Cook Approved
-                        </span>
-                      )}
                     </div>
                   </div>
                   <div style={{ padding: '2px 14px 10px', display: 'flex', gap: 10, alignItems: 'center', justifyContent: 'flex-start' }}>
@@ -345,7 +370,7 @@ export default function Recipes() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md"
+            className="w-full max-w-md animate-slide-up"
             style={{
               background: colors.pageSurface,
               borderRadius: '28px 28px 0 0',
@@ -435,7 +460,7 @@ export default function Recipes() {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md"
+            className="w-full max-w-md animate-slide-up"
             style={{
               background: colors.pageSurface,
               borderRadius: '28px 28px 0 0',
@@ -481,7 +506,7 @@ export default function Recipes() {
             </div>
 
             {/* Scrollable body */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '18px 22px 120px' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: '18px 22px 32px' }}>
               <div className="space-y-4">
                 <div>
                   <label className="section-label" style={{ display: 'block', marginBottom: 6, color: colors.textSecondary }}>Recipe name</label>
@@ -606,38 +631,27 @@ export default function Recipes() {
                   )}
                 </div>
               </div>
-            </div>
 
-            {/* Floating CTA footer */}
-            <div
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                padding: '14px 22px 22px',
-                background: `linear-gradient(180deg, ${preferences.darkMode ? 'rgba(18,18,18,0)' : 'rgba(255,255,255,0)'} 0%, ${colors.pageSurface} 38%)`,
-                pointerEvents: 'none',
-              }}
-            >
-              <button
-                onClick={handleSave}
-                disabled={!name.trim()}
-                className="w-full flex items-center justify-center gap-2 rounded-2xl border-none cursor-pointer outline-none"
-                style={{
-                  background: colors.accentPurple,
-                  color: preferences.darkMode ? '#111111' : '#FFFFFF',
-                  height: 54,
-                  fontSize: '15px',
-                  fontWeight: 700,
-                  opacity: name.trim() ? 1 : 0.45,
-                  boxShadow: preferences.darkMode ? 'none' : '0 12px 28px rgba(60,21,26,0.22)',
-                  pointerEvents: 'auto',
-                }}
-              >
-                {editId ? <Check size={16} /> : <Plus size={16} />}
-                {editId ? 'Update recipe' : activeTab === 'shared' ? 'Share recipe' : 'Save recipe'}
-              </button>
+              {/* Save button — at end of form */}
+              <div style={{ paddingTop: 16 }}>
+                <button
+                  onClick={handleSave}
+                  disabled={!name.trim()}
+                  className="w-full flex items-center justify-center gap-2 rounded-2xl border-none cursor-pointer outline-none"
+                  style={{
+                    background: colors.accentPurple,
+                    color: preferences.darkMode ? '#111111' : '#FFFFFF',
+                    height: 54,
+                    fontSize: '15px',
+                    fontWeight: 700,
+                    opacity: name.trim() ? 1 : 0.45,
+                    boxShadow: preferences.darkMode ? 'none' : '0 12px 28px rgba(60,21,26,0.22)',
+                  }}
+                >
+                  {editId ? <Check size={16} /> : <Plus size={16} />}
+                  {editId ? 'Update recipe' : activeTab === 'shared' ? 'Share recipe' : 'Save recipe'}
+                </button>
+              </div>
             </div>
           </div>
         </div>

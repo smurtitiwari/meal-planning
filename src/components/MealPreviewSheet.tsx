@@ -242,7 +242,7 @@ export default function MealPreviewSheet({ meal, onClose, userName, darkMode, pr
           </div>
 
           {/* Ingredients */}
-          <div style={{ padding: '16px 22px 96px' }}>
+          <div style={{ padding: '16px 22px 32px' }}>
             <h3 style={{
               fontSize: '15px', fontWeight: 700, margin: '0 0 14px 0',
               color: colors.textPrimary, display: 'flex', alignItems: 'center', gap: 6,
@@ -308,40 +308,32 @@ export default function MealPreviewSheet({ meal, onClose, userName, darkMode, pr
               ))}
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Footer — fixed above bottom nav */}
-      <div
-        className="max-w-md mx-auto"
-        style={{
-          position: 'fixed', bottom: 72, left: 0, right: 0,
-          padding: '14px 20px 16px', zIndex: 51,
-          background: darkMode ? 'rgba(18,18,18,0.96)' : 'rgba(255,255,255,0.96)',
-          backdropFilter: 'blur(12px)',
-        }}
-      >
-        <button
-          onClick={() => setShowOrderModal(true)}
-          className="w-full flex items-center justify-center gap-2 rounded-2xl cursor-pointer border-none outline-none"
-          style={{
-            height: 48, fontSize: '14px', fontWeight: 700,
-            background: colors.accent,
-            color: darkMode ? '#111111' : '#FFFFFF',
-            boxShadow: darkMode ? 'none' : '0 8px 20px rgba(60,21,26,0.16)',
-          }}
-        >
-          <ShoppingCart size={16} /> Order grocery
-        </button>
-        {hasCook && (
-          <button
-            onClick={() => setShowCookModal(true)}
-            className="w-full flex items-center justify-center gap-1.5 bg-transparent border-none cursor-pointer outline-none mt-3"
-            style={{ color: colors.accent, fontSize: '13px', fontWeight: 700 }}
-          >
-            <Sparkles size={14} /> Generate message to cook
-          </button>
-        )}
+          {/* Action buttons — after ingredients */}
+          <div style={{ padding: '0 22px 100px' }}>
+            <button
+              onClick={() => setShowOrderModal(true)}
+              className="w-full flex items-center justify-center gap-2 rounded-2xl cursor-pointer border-none outline-none"
+              style={{
+                height: 48, fontSize: '14px', fontWeight: 700,
+                background: colors.accent,
+                color: darkMode ? '#111111' : '#FFFFFF',
+                boxShadow: darkMode ? 'none' : '0 8px 20px rgba(60,21,26,0.16)',
+              }}
+            >
+              <ShoppingCart size={16} /> Order grocery
+            </button>
+            {hasCook && (
+              <button
+                onClick={() => setShowCookModal(true)}
+                className="w-full flex items-center justify-center gap-1.5 bg-transparent border-none cursor-pointer outline-none mt-3"
+                style={{ color: colors.accent, fontSize: '13px', fontWeight: 700 }}
+              >
+                <Sparkles size={14} /> Generate message to cook
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Order grocery modal */}
@@ -421,7 +413,7 @@ export default function MealPreviewSheet({ meal, onClose, userName, darkMode, pr
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md"
+            className="w-full max-w-md animate-slide-up"
             style={{
               background: colors.surface,
               borderRadius: '28px 28px 0 0',

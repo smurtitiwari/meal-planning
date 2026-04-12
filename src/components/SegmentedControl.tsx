@@ -49,8 +49,10 @@ export default function SegmentedControl<T extends string>({
               borderBottomRightRadius: 0,
               border: selected
                 ? (activeBorder ? `1px solid ${activeBorder}` : '1px solid transparent')
-                : (inactiveBorder ? `1px solid ${inactiveBorder}` : '1px solid transparent'),
-              borderBottom: 'none',
+                : '1px solid transparent',
+              borderBottom: selected
+                ? '2px solid transparent'
+                : (inactiveBorder ? `2px solid ${inactiveBorder}` : '2px solid transparent'),
               outline: 'none',
               boxShadow: 'none',
             }}

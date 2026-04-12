@@ -4,7 +4,6 @@ import { useStore, DAYS, generateId, getMealPool } from '../store/useStore'
 import type { GroceryItem, Meal } from '../store/useStore'
 import BottomNav from '../components/BottomNav'
 import SegmentedControl from '../components/SegmentedControl'
-import CookMessage from '../components/CookMessage'
 import MealPreviewSheet from '../components/MealPreviewSheet'
 import { X, Plus, Check, Trash2, RefreshCw, Repeat2, ShoppingCart } from 'lucide-react'
 import { GROCERY_CATEGORIES, GROCERY_CATEGORY_EMOJI, getCategoryForItem } from '../utils/groceryCategories'
@@ -180,7 +179,8 @@ export default function Planner() {
           railBackground={preferences.darkMode ? '#1B1B1B' : '#F2F3F5'}
           activeBackground={preferences.darkMode ? '#2E2E2E' : '#FFFFFF'}
           activeText={colors.textPrimary} inactiveText={colors.textSecondary}
-          inactiveBorder={preferences.darkMode ? 'rgba(255,255,255,0.08)' : '#F4F4F4'}
+          activeBorder={preferences.darkMode ? '#3A3A3A' : '#DDD8D3'}
+          inactiveBorder={preferences.darkMode ? 'rgba(255,255,255,0.08)' : '#E0DCD8'}
         />
       </div>
 
@@ -224,11 +224,6 @@ export default function Planner() {
             )
           })}
           
-          {(selectedDate === today || selectedDate > today) && selectedPlan && (
-            <div className="mt-6 mb-2">
-              <CookMessage todayPlan={selectedPlan} colors={colors} title="Message the Cook" />
-            </div>
-          )}
         </div>
       ) : (
         <div className="px-5">
@@ -385,11 +380,6 @@ export default function Planner() {
             </button>
           )}
 
-          {(selectedDate === today || selectedDate > today) && selectedPlan && (
-            <div className="mt-6 mb-2">
-              <CookMessage todayPlan={selectedPlan} groceryItems={filteredGrocery} colors={colors} title="Message the Cook" />
-            </div>
-          )}
         </div>
       )}
 
