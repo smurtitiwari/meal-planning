@@ -4,14 +4,26 @@ import { useStore } from '../store/useStore'
 import BottomNav from '../components/BottomNav'
 import { ChevronRight, Moon, Sun, LogOut, ChefHat, ShoppingCart, Utensils, X, Check, Send, Globe } from 'lucide-react'
 
-const DIETARY_OPTIONS = ['Vegetarian', 'Non-Vegetarian', 'Eggetarian', 'Vegan', 'High Protein']
-const AVOID_OPTIONS = ['Dairy', 'Gluten', 'Nuts', 'Spicy food', 'Onion & Garlic', 'Seafood']
-const GROCERY_APPS: { id: 'blinkit' | 'zepto' | 'swiggy' | 'bigbasket' | 'dunzo'; name: string }[] = [
-  { id: 'blinkit', name: 'Blinkit' },
-  { id: 'zepto', name: 'Zepto' },
-  { id: 'swiggy', name: 'Swiggy Instamart' },
-  { id: 'bigbasket', name: 'BigBasket' },
-  { id: 'dunzo', name: 'Dunzo' },
+const DIETARY_OPTIONS: { label: string; emoji: string }[] = [
+  { label: 'Vegetarian', emoji: '🥬' },
+  { label: 'Non-Vegetarian', emoji: '🍗' },
+  { label: 'Eggetarian', emoji: '🥚' },
+  { label: 'Vegan', emoji: '🌱' },
+]
+const AVOID_OPTIONS: { label: string; emoji: string }[] = [
+  { label: 'Dairy', emoji: '🥛' },
+  { label: 'Gluten', emoji: '🌾' },
+  { label: 'Nuts', emoji: '🥜' },
+  { label: 'Spicy food', emoji: '🌶️' },
+  { label: 'Onion & Garlic', emoji: '🧅' },
+  { label: 'Seafood', emoji: '🦐' },
+]
+const GROCERY_APPS: { id: 'blinkit' | 'zepto' | 'swiggy' | 'bigbasket' | 'dunzo'; name: string; emoji: string }[] = [
+  { id: 'blinkit', name: 'Blinkit', emoji: '⚡' },
+  { id: 'zepto', name: 'Zepto', emoji: '🟣' },
+  { id: 'swiggy', name: 'Swiggy Instamart', emoji: '🧡' },
+  { id: 'bigbasket', name: 'BigBasket', emoji: '🟢' },
+  { id: 'dunzo', name: 'Dunzo', emoji: '📦' },
 ]
 const LANGUAGE_LABELS: Record<'english' | 'hindi' | 'hinglish', string> = {
   english: 'English',
@@ -57,17 +69,17 @@ export default function Profile() {
     : 'Not set'
   const lightColors = {
     accent: '#3C151A',
-    accentLight: '#FBF5F6',
-    accentBorder: '#D9D9D9',
+    accentLight: '#F2F3F5',
+    accentBorder: '#ECE8E4',
     accentText: '#3C151A',
     surface: '#FFFFFF',
     pageSurface: '#FFFFFF',
     card: '#F6F6F6',
-    border: '#F4F4F4',
-    elevated: '#FBFBFB',
+    border: '#ECE8E4',
+    elevated: '#F4F5F7',
     textPrimary: '#111111',
-    textSecondary: '#8A8A8A',
-    textTertiary: '#8A8A8A',
+    textSecondary: '#7A746D',
+    textTertiary: '#7A746D',
   }
   const darkColors = {
     accent: '#9A4D5A',
@@ -130,7 +142,7 @@ export default function Profile() {
               </div>
               <div style={{
                 width: 44, height: 26, borderRadius: 13, padding: 3,
-                background: preferences.darkMode ? colors.accent : '#EAE4DC',
+                background: preferences.darkMode ? colors.accent : '#ECE8E4',
                 transition: 'background 0.2s',
               }}>
                 <div style={{
@@ -271,12 +283,16 @@ export default function Profile() {
             {editModal === 'dietary' && (
               <div className="space-y-2.5">
                 {DIETARY_OPTIONS.map((opt) => {
-                  const sel = dietary.includes(opt)
+                  const sel = dietary.includes(opt.label)
                   return (
-                    <button key={opt} onClick={() => toggle(dietary, opt, setDietary)}
-                      className="w-full flex items-center justify-between px-4 py-3 rounded-2xl border cursor-pointer transition-smooth"
-                      style={{ background: sel ? colors.accentLight : colors.card, borderColor: sel ? colors.accentBorder : colors.border, borderWidth: '1.5px' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 600, color: sel ? (preferences.darkMode ? colors.accentText : colors.accent) : colors.textPrimary }}>{opt}</span>
+                    <button key={opt.label} onClick={() => toggle(dietary, opt.label, setDietary)}
+                      className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl cursor-pointer transition-smooth"
+                      style={{
+                        background: sel ? '#F8F6F3' : '#F6F6F6',
+                        border: sel ? '1.5px solid rgba(60, 21, 26, 0.5)' : '1px solid #F4F4F4',
+                      }}>
+                      <span style={{ fontSize: '22px', lineHeight: 1, flexShrink: 0 }}>{opt.emoji}</span>
+                      <span className="flex-1 text-left" style={{ fontSize: '14px', fontWeight: 600, color: sel ? (preferences.darkMode ? colors.accentText : colors.accent) : colors.textPrimary }}>{opt.label}</span>
                       {sel && <Check size={16} style={{ color: colors.accent }} />}
                     </button>
                   )
@@ -287,12 +303,16 @@ export default function Profile() {
             {editModal === 'avoidances' && (
               <div className="space-y-2.5">
                 {AVOID_OPTIONS.map((opt) => {
-                  const sel = avoidances.includes(opt)
+                  const sel = avoidances.includes(opt.label)
                   return (
-                    <button key={opt} onClick={() => toggle(avoidances, opt, setAvoidances)}
-                      className="w-full flex items-center justify-between px-4 py-3 rounded-2xl border cursor-pointer transition-smooth"
-                      style={{ background: sel ? colors.accentLight : colors.card, borderColor: sel ? colors.accentBorder : colors.border, borderWidth: '1.5px' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 600, color: sel ? (preferences.darkMode ? colors.accentText : colors.accent) : colors.textPrimary }}>{opt}</span>
+                    <button key={opt.label} onClick={() => toggle(avoidances, opt.label, setAvoidances)}
+                      className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl cursor-pointer transition-smooth"
+                      style={{
+                        background: sel ? '#F8F6F3' : '#F6F6F6',
+                        border: sel ? '1.5px solid rgba(60, 21, 26, 0.5)' : '1px solid #F4F4F4',
+                      }}>
+                      <span style={{ fontSize: '22px', lineHeight: 1, flexShrink: 0 }}>{opt.emoji}</span>
+                      <span className="flex-1 text-left" style={{ fontSize: '14px', fontWeight: 600, color: sel ? (preferences.darkMode ? colors.accentText : colors.accent) : colors.textPrimary }}>{opt.label}</span>
                       {sel && <Check size={16} style={{ color: colors.accent }} />}
                     </button>
                   )
@@ -369,9 +389,13 @@ export default function Profile() {
                   const sel = groceryApp === app.id
                   return (
                     <button key={app.id} onClick={() => setGroceryApp(app.id)}
-                      className="w-full flex items-center justify-between px-4 py-3.5 rounded-2xl border cursor-pointer transition-smooth"
-                      style={{ background: sel ? colors.accentLight : colors.card, borderColor: sel ? colors.accentBorder : colors.border, borderWidth: '1.5px' }}>
-                      <span style={{ fontSize: '14px', fontWeight: 600, color: sel ? (preferences.darkMode ? colors.accentText : colors.accent) : colors.textPrimary }}>{app.name}</span>
+                      className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl cursor-pointer transition-smooth"
+                      style={{
+                        background: sel ? '#F8F6F3' : '#F6F6F6',
+                        border: sel ? '1.5px solid rgba(60, 21, 26, 0.5)' : '1px solid #F4F4F4',
+                      }}>
+                      <span style={{ fontSize: '22px', lineHeight: 1, flexShrink: 0 }}>{app.emoji}</span>
+                      <span className="flex-1 text-left" style={{ fontSize: '14px', fontWeight: 600, color: sel ? (preferences.darkMode ? colors.accentText : colors.accent) : colors.textPrimary }}>{app.name}</span>
                       {sel && <Check size={16} style={{ color: colors.accent }} />}
                     </button>
                   )

@@ -35,7 +35,7 @@ export default function MealDetail() {
   if (!meal) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#FFFFFF' }}>
-        <p style={{ color: '#8A8A8A' }}>Meal not found</p>
+        <p style={{ color: '#7A746D' }}>Meal not found</p>
       </div>
     )
   }
@@ -60,11 +60,11 @@ export default function MealDetail() {
 
   const mealLabel: Record<string, string> = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' }
   const colors = {
-    textSecondary: '#8A8A8A',
-    textTertiary: '#8A8A8A',
+    textSecondary: '#7A746D',
+    textTertiary: '#7A746D',
     accent: '#3C151A',
-    accentLight: '#FBF5F6',
-    borderAccent: '#D9D9D9',
+    accentLight: '#F2F3F5',
+    borderAccent: '#ECE8E4',
   }
 
   const toggleIngredient = (ingredient: string) => {
@@ -131,7 +131,7 @@ export default function MealDetail() {
             </div>
           )}
 
-          <div style={{ height: 1, background: '#F4F4F4', margin: '0 0 24px 0' }} />
+          <div style={{ height: 1, background: '#ECE8E4', margin: '0 0 24px 0' }} />
 
           <div className="mb-6">
             <h3 style={{ fontSize: '15px', fontWeight: 700, margin: '0 0 14px 0', color: '#111111' }}>
@@ -143,7 +143,7 @@ export default function MealDetail() {
                   key={i}
                   onClick={() => toggleIngredient(ing)}
                   className="w-full flex items-center justify-between gap-3 py-3 px-4 rounded-xl border cursor-pointer text-left"
-                  style={{ background: '#F6F6F6', border: '1px solid #F4F4F4' }}
+                  style={{ background: '#F6F6F6', border: '1px solid #ECE8E4' }}
                 >
                   <div className="flex items-center gap-3">
                     {checkedIngredients.includes(ing) ? (
@@ -187,7 +187,7 @@ export default function MealDetail() {
 
           <button onClick={() => window.open(getGroceryUrl(), '_blank')}
             className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl cursor-pointer mb-6"
-            style={{ background: '#F6F6F6', color: '#111111', border: '1px solid #F4F4F4', fontSize: '14px', fontWeight: 600 }}>
+            style={{ background: '#F6F6F6', color: '#111111', border: '1px solid #ECE8E4', fontSize: '14px', fontWeight: 600 }}>
             <ShoppingCart size={15} style={{ color: colors.textSecondary }} />
             Order on {preferences.preferredGroceryApp
               ? preferences.preferredGroceryApp.charAt(0).toUpperCase() + preferences.preferredGroceryApp.slice(1)
@@ -201,7 +201,7 @@ export default function MealDetail() {
               </h3>
               <div style={{
                 padding: '14px 16px', borderRadius: 16,
-                background: '#F6F6F6', border: '1px solid #F4F4F4',
+                background: '#F6F6F6', border: '1px solid #ECE8E4',
                 fontSize: '13px', color: colors.textSecondary, lineHeight: 1.6,
               }}>
                 Prepare {meal.name.toLowerCase()} with fresh ingredients. Serve hot.
@@ -230,17 +230,18 @@ export default function MealDetail() {
               </h3>
               <button onClick={() => setShowReplace(false)}
                 className="w-8 h-8 rounded-full flex items-center justify-center border-none cursor-pointer"
-                style={{ background: '#EFE9E0' }}>
+                style={{ background: '#F1F2F4', color: '#7A746D' }}>
                 <X size={16} />
               </button>
             </div>
             <div className="px-5 pb-8 space-y-2">
               {DEFAULT_MEALS[resolvedMealType].map((m) => (
                 <button key={m.id} onClick={() => handleSwap(m)}
-                  className="w-full flex items-center gap-3 p-3 rounded-2xl cursor-pointer bg-white border transition-smooth"
+                  className="w-full flex items-center gap-3 p-3 rounded-2xl cursor-pointer border transition-smooth"
                   style={{
-                    borderColor: m.id === meal.id ? colors.borderAccent : '#F4F4F4',
-                    borderWidth: m.id === meal.id ? 2 : 1,
+                    background: m.id === meal.id ? '#F6F6F6' : '#FFFFFF',
+                    borderColor: m.id === meal.id ? '#3C151A' : '#ECE8E4',
+                    borderWidth: m.id === meal.id ? 1.5 : 1,
                   }}>
                   <div style={{ width: 60, height: 60, borderRadius: 14, overflow: 'hidden', flexShrink: 0 }}>
                     <img src={m.image} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -248,8 +249,8 @@ export default function MealDetail() {
                   <div className="flex-1 text-left">
                     <p style={{ fontSize: '14px', fontWeight: 700, margin: '0 0 2px 0', color: '#111111' }}>{m.name}</p>
                     <div className="flex items-center gap-2">
-                      {m.cookTime && <span style={{ fontSize: '11px', color: '#8A8A8A' }}>{m.cookTime}</span>}
-                      {m.calories && <span style={{ fontSize: '11px', color: '#8A8A8A' }}>{m.calories} kcal</span>}
+                      {m.cookTime && <span style={{ fontSize: '11px', color: '#7A746D' }}>{m.cookTime}</span>}
+                      {m.calories && <span style={{ fontSize: '11px', color: '#7A746D' }}>{m.calories} kcal</span>}
                     </div>
                   </div>
                   {m.id === meal.id && (

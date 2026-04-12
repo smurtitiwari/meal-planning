@@ -3,11 +3,13 @@
 @theme {
   --color-bg: #FFFFFF;
   --color-bg-card: #F6F6F6;
-  --color-bg-warm: #FBFBFB;
+  --color-bg-warm: #F4F5F7;
+  --color-bg-soft: #F2F3F5;
+  --color-bg-cool: #F1F2F4;
   --color-fg: #111111;
-  --color-fg-secondary: #8A8A8A;
-  --color-fg-tertiary: #8A8A8A;
-  --color-border: #D9D9D9;
+  --color-fg-secondary: #7A746D;
+  --color-fg-tertiary: #7A746D;
+  --color-border: #ECE8E4;
   --color-accent: #3C151A;
   --color-accent-light: #9A4D5A;
   --color-success: #5FB07A;
@@ -39,14 +41,14 @@ input, textarea, select, button { font-family: inherit; }
 /* Premium card */
 .card {
   background: #F6F6F6;
-  border-radius: 22px;
-  border: 1.5px solid #E5E5E5;
+  border-radius: 18px;
+  border: 1px solid #ECE8E4;
   box-shadow: 0 6px 18px rgba(25, 18, 18, 0.03);
 }
 
 /* Image card with overlay */
 .img-card {
-  border-radius: 20px;
+  border-radius: 18px;
   overflow: hidden;
   position: relative;
   background: #F6F6F6;
@@ -79,9 +81,9 @@ input, textarea, select, button { font-family: inherit; }
   border-radius: 100px;
   font-size: 11px;
   font-weight: 500;
-  background: #FBF5F6;
-  color: #111111;
-  border: 1px solid #F6F6F6;
+  background: #F1F2F4;
+  color: #3C151A;
+  border: 1px solid #ECE8E4;
 }
 
 .chip-accent {
@@ -132,9 +134,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .dark-mode .chip {
-  background: #1B1B1B;
-  color: #D6D1D3;
-  border-color: #2E2E2E;
+  background: rgba(255,255,255,0.1);
+  color: #F0C7CF;
+  border-color: rgba(255,255,255,0.22);
 }
 
 .dark-mode .chip-accent {

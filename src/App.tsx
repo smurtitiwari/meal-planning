@@ -6,7 +6,8 @@ import MealDetail from './pages/MealDetail'
 import Planner from './pages/Planner'
 import Recipes from './pages/Recipes'
 import Profile from './pages/Profile'
-import AskJulienne from './pages/AskJulienne'
+import AskChef from './pages/AskChef'
+import RecipeDetail from './pages/RecipeDetail'
 
 export default function App() {
   const onboardingComplete = useStore((s) => s.preferences.onboardingComplete)
@@ -23,9 +24,10 @@ export default function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/meal/:date/:type" element={<MealDetail />} />
         <Route path="/recipe-view" element={<MealDetail />} />
+        <Route path="/recipe/:id" element={<RecipeDetail />} />
         <Route path="/planner" element={<Planner />} />
         <Route path="/recipes" element={<Recipes />} />
-        <Route path="/ask" element={<AskJulienne />} />
+        <Route path="/ask" element={<AskChef />} />
         <Route path="/profile" element={<Profile />} />
       </Routes>
     </div>

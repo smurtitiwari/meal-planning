@@ -5,7 +5,7 @@ import { Home, CalendarDays, BookOpen, User, Sparkles } from 'lucide-react'
 const tabs = [
   { href: '/home', icon: Home, label: 'Home' },
   { href: '/planner', icon: CalendarDays, label: 'Planner' },
-  { href: '/ask', icon: Sparkles, label: 'Chef' },
+  { href: '/ask', icon: Sparkles, label: 'Ask Chef' },
   { href: '/recipes', icon: BookOpen, label: 'Recipes' },
   { href: '/profile', icon: User, label: 'Profile' },
 ]
@@ -25,7 +25,7 @@ function FilledIcon({ label, color }: { label: string; color: string }) {
       </svg>
     )
   }
-  if (label === 'Chef') {
+  if (label === 'Ask Chef') {
     return (
       <svg width="21" height="21" viewBox="0 0 24 24" fill={color} aria-hidden="true">
         <path d="M12 2l2.4 7.6 7.6 2.4-7.6 2.4L12 22l-2.4-7.6-7.6-2.4 7.6-2.4L12 2Z" />
@@ -50,14 +50,14 @@ export default function BottomNav() {
   const { pathname } = useLocation()
   const darkMode = useStore((s) => s.preferences.darkMode)
   const activeColor = darkMode ? '#F0C7CF' : '#3C151A'
-  const inactiveColor = darkMode ? '#A9A0A3' : '#8A8A8A'
+  const inactiveColor = darkMode ? '#A9A0A3' : '#7A746D'
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50" style={{
       background: darkMode ? 'rgba(17,17,17,0.96)' : 'rgba(255,255,255,0.96)',
       backdropFilter: 'blur(24px)',
       WebkitBackdropFilter: 'blur(24px)',
-      borderTop: `1px solid ${darkMode ? '#2E2E2E' : '#D9D9D9'}`,
+      borderTop: `1px solid ${darkMode ? '#2E2E2E' : '#ECE8E4'}`,
     }}>
       <div className="max-w-md mx-auto flex justify-around items-center h-16 px-2">
         {tabs.map(({ href, icon: Icon, label }) => {
