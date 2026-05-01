@@ -93,7 +93,7 @@ export default function Home() {
             if (!meal) return null
             return (
               <MealCard
-                key={type} colors={colors} darkMode={preferences.darkMode} type={type} name={meal.name}
+                key={type} colors={colors} type={type} name={meal.name}
                 ingredients={meal.ingredients} image={meal.image} isCurrent={type === currentType}
                 isDone={todayPlan.done?.[type]} isSkipped={todayPlan.skipped?.[type]}
                 cookTime={meal.cookTime}
@@ -292,9 +292,9 @@ function QuickAction({
 }
 
 function MealCard({
-  colors, darkMode, type, name, ingredients, image, isCurrent, isDone, cookTime, onClick,
+  colors, type, name, ingredients, image, isCurrent, isDone, cookTime, onClick,
 }: {
-  colors: typeof lightColors, darkMode: boolean, type: string, name: string, ingredients: string[], image: string
+  colors: typeof lightColors, type: string, name: string, ingredients: string[], image: string
   isCurrent: boolean, isDone?: boolean, isSkipped?: boolean, cookTime?: string, onClick: () => void
 }) {
   const [imgError, setImgError] = useState(false)

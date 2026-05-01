@@ -5,15 +5,6 @@
 import { supabase } from './supabase'
 import type { Database } from './database.types'
 
-type Profile       = Database['public']['Tables']['profiles']['Row']
-type Group         = Database['public']['Tables']['groups']['Row']
-type GroupMember   = Database['public']['Tables']['group_members']['Row']
-type Recipe        = Database['public']['Tables']['recipes']['Row']
-type SharedRecipe  = Database['public']['Tables']['shared_recipes']['Row']
-type MealPlan      = Database['public']['Tables']['meal_plans']['Row']
-type GroceryItem   = Database['public']['Tables']['grocery_items']['Row']
-type Friend        = Database['public']['Tables']['friends']['Row']
-
 // ─── Profile ──────────────────────────────────────────────────────────────────
 
 export const getProfile = (userId: string) =>

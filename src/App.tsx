@@ -19,25 +19,62 @@ export default function App() {
   const loadUserData = useStore((s) => s.loadUserData)
 
   useEffect(() => {
-    const syncUser = (user: { id: string; email?: string; user_metadata?: Record<string, string> }) => {
-      // Immediately set name/email/avatar from OAuth metadata so they're available during onboarding
+    const syncUser = (
+      event: string,
+      user: { id: string; email?: string; user_metadata?: Record<string, string> },
+    ) => {
+      const googleName   = user.user_metadata?.full_name   || user.user_metadata?.name    || ''
+      const googleEmail  = user.email                      || ''
+      const googleAvatar = user.user_metadata?.avatar_url  || user.user_metadata?.picture || ''
+
+      // Immediately hydrate the store with OAuth metadata so UI renders correctly
       useStore.getState().setPreferences({
         userId: user.id,
-        name: user.user_metadata?.full_name || user.user_metadata?.name || '',
-        email: user.email || '',
-        profileImage: user.user_metadata?.avatar_url || user.user_metadata?.picture || '',
+        name: googleName,
+        email: googleEmail,
+        profileImage: googleAvatar,
       })
+
+      // On a fresh OAuth sign-in, also write metadata to DB so it is always recorded.
+      // We use upsert with ignoreDuplicates so we never overwrite existing onboarding prefs.
+      if (event === 'SIGNED_IN' && googleName) {
+        supabase
+          .from('profiles')
+          .upsert(
+            {
+              id:                      user.id,
+              name:                    googleName,
+              email:                   googleEmail,
+              profile_image:           googleAvatar,
+              dietary_preferences:     [],
+              avoidances:              [],
+              meal_count:              3,
+              has_cook:                false,
+              cook_name:               null,
+              cook_phone:              null,
+              preferred_grocery_app:   null,
+              preferred_grocery_apps:  [],
+              onboarding_complete:     false,
+              dark_mode:               false,
+              cook_message_language:   'hinglish',
+              share_recipes_with_group: true,
+            },
+            { onConflict: 'id', ignoreDuplicates: true },
+          )
+          .then(null, console.error)
+      }
+
       loadUserData(user.id)
     }
 
     // Load data for any existing session on first render
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) syncUser(session.user)
+      if (session?.user) syncUser('INITIAL_SESSION', session.user)
     })
 
     // Keep in sync whenever auth state changes (login / logout / token refresh)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) syncUser(session.user)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) syncUser(event, session.user)
     })
 
     return () => subscription.unsubscribe()

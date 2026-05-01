@@ -467,7 +467,7 @@ function upsertMealSlot(
     meal_data: meal as any,
     is_done: isDone,
     is_skipped: isSkipped,
-  }).catch(console.error)
+  }).then(null, console.error)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -498,7 +498,7 @@ export const useStore = create<AppState>()(
           } else if (profileErr?.code === 'PGRST116') {
             // Row not found — create one from current prefs
             const prefs = { ...get().preferences, userId }
-            await api.upsertProfile(preferencesToDb(prefs)).catch(console.error)
+            await api.upsertProfile(preferencesToDb(prefs)).then(null, console.error)
             set((s) => ({ preferences: { ...s.preferences, userId } }))
           }
 
@@ -600,7 +600,7 @@ export const useStore = create<AppState>()(
         set((s) => ({ preferences: { ...s.preferences, ...prefs } }))
         const updated = get().preferences
         if (isRealUser(updated.userId)) {
-          api.upsertProfile(preferencesToDb(updated)).catch(console.error)
+          api.upsertProfile(preferencesToDb(updated)).then(null, console.error)
         }
       },
 
@@ -649,7 +649,7 @@ export const useStore = create<AppState>()(
                 }))
               }
             })
-            .catch(console.error)
+            .then(null, console.error)
         }
       },
 
@@ -672,12 +672,12 @@ export const useStore = create<AppState>()(
         set((s) => ({ preferences: { ...s.preferences, onboardingComplete: true } }))
         const prefs = get().preferences
         if (isRealUser(prefs.userId)) {
-          api.upsertProfile(preferencesToDb(prefs)).catch(console.error)
+          api.upsertProfile(preferencesToDb(prefs)).then(null, console.error)
         }
       },
 
       signOut: () => {
-        supabase.auth.signOut().catch(console.error)
+        supabase.auth.signOut().then(null, console.error)
         set({
           preferences: { ...DEFAULT_PREFERENCES },
           weeklyPlan: [],
@@ -835,7 +835,7 @@ export const useStore = create<AppState>()(
             note: recipe.note ?? null,
             image: recipe.image ?? null,
             meal_type: recipe.mealType ?? null,
-          }).catch(console.error)
+          }).then(null, console.error)
         }
       },
 
@@ -856,7 +856,7 @@ export const useStore = create<AppState>()(
               note: updated.note ?? null,
               image: updated.image ?? null,
               meal_type: updated.mealType ?? null,
-            }).catch(console.error)
+            }).then(null, console.error)
           }
         }
       },
@@ -865,7 +865,7 @@ export const useStore = create<AppState>()(
         set((s) => ({ recipes: s.recipes.filter((r) => r.id !== id) }))
         const { userId } = get().preferences
         if (isRealUser(userId)) {
-          api.deleteRecipe(id).catch(console.error)
+          api.deleteRecipe(id).then(null, console.error)
         }
       },
 
@@ -897,7 +897,7 @@ export const useStore = create<AppState>()(
                 ),
               }))
             }
-          }).catch(console.error)
+          }).then(null, console.error)
         }
       },
 
@@ -905,7 +905,7 @@ export const useStore = create<AppState>()(
         set((s) => ({ sharedRecipes: s.sharedRecipes.filter((r) => r.id !== id) }))
         const { userId } = get().preferences
         if (isRealUser(userId)) {
-          api.deleteSharedRecipe(id).catch(console.error)
+          api.deleteSharedRecipe(id).then(null, console.error)
         }
       },
 
@@ -914,7 +914,7 @@ export const useStore = create<AppState>()(
         set((s) => ({ groceryList: [...s.groceryList, item] }))
         const { userId } = get().preferences
         if (isRealUser(userId)) {
-          api.upsertGroceryItem(groceryToDb(item, userId)).catch(console.error)
+          api.upsertGroceryItem(groceryToDb(item, userId)).then(null, console.error)
         }
       },
 
@@ -925,7 +925,7 @@ export const useStore = create<AppState>()(
         const { userId } = get().preferences
         if (isRealUser(userId)) {
           const item = get().groceryList.find((g) => g.id === id)
-          if (item) api.upsertGroceryItem(groceryToDb(item, userId)).catch(console.error)
+          if (item) api.upsertGroceryItem(groceryToDb(item, userId)).then(null, console.error)
         }
       },
 
@@ -933,7 +933,7 @@ export const useStore = create<AppState>()(
         set((s) => ({ groceryList: s.groceryList.filter((g) => g.id !== id) }))
         const { userId } = get().preferences
         if (isRealUser(userId)) {
-          api.deleteGroceryItem(id).catch(console.error)
+          api.deleteGroceryItem(id).then(null, console.error)
         }
       },
 
@@ -973,7 +973,7 @@ export const useStore = create<AppState>()(
         const { userId } = get().preferences
         if (isRealUser(userId)) {
           newList.forEach((item) => {
-            api.upsertGroceryItem(groceryToDb(item, userId)).catch(console.error)
+            api.upsertGroceryItem(groceryToDb(item, userId)).then(null, console.error)
           })
         }
       },
@@ -996,7 +996,7 @@ export const useStore = create<AppState>()(
           const { userId } = get().preferences
           if (isRealUser(userId)) {
             newItems.forEach((item) => {
-              api.upsertGroceryItem(groceryToDb(item, userId)).catch(console.error)
+              api.upsertGroceryItem(groceryToDb(item, userId)).then(null, console.error)
             })
           }
         }
@@ -1021,7 +1021,7 @@ export const useStore = create<AppState>()(
           const { userId } = get().preferences
           if (isRealUser(userId)) {
             newItems.forEach((item) => {
-              api.upsertGroceryItem(groceryToDb(item, userId)).catch(console.error)
+              api.upsertGroceryItem(groceryToDb(item, userId)).then(null, console.error)
             })
           }
         }
@@ -1032,7 +1032,7 @@ export const useStore = create<AppState>()(
         set((s) => ({ friends: [...s.friends, friend] }))
         const { userId } = get().preferences
         if (isRealUser(userId)) {
-          api.upsertFriend({ id: friend.id, user_id: userId, name: friend.name, phone: friend.phone || null }).catch(console.error)
+          api.upsertFriend({ id: friend.id, user_id: userId, name: friend.name, phone: friend.phone || null }).then(null, console.error)
         }
       },
 
@@ -1040,7 +1040,7 @@ export const useStore = create<AppState>()(
         set((s) => ({ friends: s.friends.filter((f) => f.id !== id) }))
         const { userId } = get().preferences
         if (isRealUser(userId)) {
-          api.deleteFriend(id).catch(console.error)
+          api.deleteFriend(id).then(null, console.error)
         }
       },
     }),
