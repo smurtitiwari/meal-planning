@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
+import { supabase, signInWithGoogle, signInWithApple } from '../lib/supabase'
 import { ArrowLeft, Check } from 'lucide-react'
 
 const DIETARY_OPTIONS = [
@@ -68,10 +69,19 @@ export default function Onboarding() {
   const toggle = (arr: string[], item: string, setter: (v: string[]) => void) =>
     setter(arr.includes(item) ? arr.filter((d) => d !== item) : [...arr, item])
 
-  const handleSignIn = () => {
-    setPreferences({ name: 'Ayush', email: 'ayush@gmail.com', profileImage: '' })
-    setStep(1)
-  }
+  // If user already has a session (returned from OAuth), skip step 0
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        const prefs = useStore.getState().preferences
+        if (prefs.onboardingComplete) {
+          navigate('/home', { replace: true })
+        } else {
+          setStep(1)
+        }
+      }
+    })
+  }, [navigate])
 
   const handleFinish = () => {
     setPreferences({
@@ -165,7 +175,7 @@ export default function Onboarding() {
             </p>
 
             {/* Continue with Apple */}
-            <button onClick={handleSignIn}
+            <button onClick={() => signInWithApple()}
               className="w-full flex items-center justify-center gap-3 rounded-2xl cursor-pointer transition-smooth"
               style={{ background: '#1C1B1F', border: 'none', height: 46, marginBottom: 10 }}>
               <svg width="17" height="20" viewBox="0 0 17 21" fill="white">
@@ -175,7 +185,7 @@ export default function Onboarding() {
             </button>
 
             {/* Continue with Google */}
-            <button onClick={handleSignIn}
+            <button onClick={() => signInWithGoogle()}
               className="w-full flex items-center justify-center gap-3 rounded-2xl cursor-pointer transition-smooth"
               style={{ background: T.card, border: `1px solid ${T.border}`, height: 46, marginBottom: 16 }}>
               <svg width="18" height="18" viewBox="0 0 24 24">

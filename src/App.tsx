@@ -19,18 +19,25 @@ export default function App() {
   const loadUserData = useStore((s) => s.loadUserData)
 
   useEffect(() => {
+    const syncUser = (user: { id: string; email?: string; user_metadata?: Record<string, string> }) => {
+      // Immediately set name/email/avatar from OAuth metadata so they're available during onboarding
+      useStore.getState().setPreferences({
+        userId: user.id,
+        name: user.user_metadata?.full_name || user.user_metadata?.name || '',
+        email: user.email || '',
+        profileImage: user.user_metadata?.avatar_url || user.user_metadata?.picture || '',
+      })
+      loadUserData(user.id)
+    }
+
     // Load data for any existing session on first render
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        loadUserData(session.user.id)
-      }
+      if (session?.user) syncUser(session.user)
     })
 
     // Keep in sync whenever auth state changes (login / logout / token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        loadUserData(session.user.id)
-      }
+      if (session?.user) syncUser(session.user)
     })
 
     return () => subscription.unsubscribe()
