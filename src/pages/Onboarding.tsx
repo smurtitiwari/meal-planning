@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
-import { supabase, signInWithGoogle, signInWithApple } from '../lib/supabase'
+import { supabase } from '../lib/supabase'
 import { ArrowLeft, Check } from 'lucide-react'
 
 const DIETARY_OPTIONS = [
@@ -218,36 +218,6 @@ export default function Onboarding() {
             <p style={{ fontSize: '13px', color: T.textSecondary, lineHeight: 1.55, margin: '0 0 22px 0' }}>
               Plan your week, share meals with your cook, and order groceries in minutes.
             </p>
-
-            {/* Continue with Apple */}
-            <button onClick={() => signInWithApple()}
-              className="w-full flex items-center justify-center gap-3 rounded-2xl cursor-pointer transition-smooth"
-              style={{ background: '#1C1B1F', border: 'none', height: 46, marginBottom: 10 }}>
-              <svg width="17" height="20" viewBox="0 0 17 21" fill="white">
-                <path d="M13.34 10.95c-.02-2.16 1.76-3.2 1.84-3.25-1-1.47-2.57-1.67-3.12-1.7-1.33-.13-2.59.78-3.27.78-.67 0-1.72-.76-2.82-.74-1.45.02-2.79.85-3.54 2.15-1.51 2.62-.39 6.51 1.08 8.64.72 1.04 1.58 2.21 2.71 2.17 1.09-.04 1.5-.7 2.81-.7 1.32 0 1.69.7 2.83.68 1.17-.02 1.91-1.06 2.62-2.11.83-1.21 1.17-2.38 1.19-2.44-.03-.01-2.28-.87-2.33-3.48zM11.18 4.36c.6-.72 1-1.73.89-2.73-.86.04-1.9.57-2.52 1.29-.55.64-1.03 1.66-.9 2.64.96.07 1.94-.49 2.53-1.2z"/>
-              </svg>
-              <span style={{ fontSize: '15px', fontWeight: 600, color: '#FFF' }}>Continue with Apple</span>
-            </button>
-
-            {/* Continue with Google */}
-            <button onClick={() => signInWithGoogle()}
-              className="w-full flex items-center justify-center gap-3 rounded-2xl cursor-pointer transition-smooth"
-              style={{ background: T.card, border: `1px solid ${T.border}`, height: 46, marginBottom: 16 }}>
-              <svg width="18" height="18" viewBox="0 0 24 24">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-              </svg>
-              <span style={{ fontSize: '15px', fontWeight: 600, color: T.textPrimary }}>Continue with Google</span>
-            </button>
-
-            {/* Divider */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16 }}>
-              <div style={{ flex: 1, height: 1, background: T.border }} />
-              <span style={{ fontSize: '12px', color: T.textSecondary, fontWeight: 500 }}>or</span>
-              <div style={{ flex: 1, height: 1, background: T.border }} />
-            </div>
 
             {/* WhatsApp OTP */}
             {!otpSent ? (
