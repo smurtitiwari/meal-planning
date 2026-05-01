@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { supabase } from '../lib/supabase'
+import * as api from '../lib/api'
 
 export interface Meal {
   id: string
@@ -36,6 +38,7 @@ export interface Recipe {
 
 export interface SharedRecipe {
   id: string
+  groupId?: string
   name: string
   sharedBy: string
   link?: string
@@ -64,7 +67,22 @@ export interface Friend {
   phone: string
 }
 
+export interface GroupMember {
+  id: string
+  groupId: string
+  name: string
+  role: 'owner' | 'member'
+}
+
+export interface Group {
+  id: string
+  name: string
+  inviteCode: string
+  role: 'owner' | 'member'
+}
+
 export interface UserPreferences {
+  userId: string
   name: string
   email: string
   profileImage: string
@@ -79,6 +97,11 @@ export interface UserPreferences {
   onboardingComplete: boolean
   darkMode: boolean
   cookMessageLanguage: 'english' | 'hindi' | 'hinglish'
+  groupEnabled: boolean
+  groupId: string
+  groupName: string
+  groupInviteCode: string
+  shareRecipesWithGroup: boolean
 }
 
 interface AppState {
@@ -88,8 +111,14 @@ interface AppState {
   sharedRecipes: SharedRecipe[]
   groceryList: GroceryItem[]
   friends: Friend[]
+  groups: Group[]
+  groupMembers: GroupMember[]
+
+  loadUserData: (userId: string) => Promise<void>
 
   setPreferences: (prefs: Partial<UserPreferences>) => void
+  createGroup: (groupName: string, cookName?: string) => void
+  setActiveGroup: (groupId: string) => void
   completeOnboarding: () => void
   signOut: () => void
 
@@ -119,7 +148,6 @@ interface AppState {
 
 export const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
-// High-quality Unsplash food images mapped to meals
 const MEAL_IMAGES: Record<string, string> = {
   poha: 'https://images.unsplash.com/photo-1645177628172-a94c1f96e6db?w=800&q=80',
   'idli sambar': 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=800&q=80',
@@ -174,10 +202,7 @@ export const DEFAULT_MEALS: Record<string, Meal[]> = {
   ],
 }
 
-function findDefaultMeal(
-  name: string,
-  type?: 'breakfast' | 'lunch' | 'dinner'
-): Meal | undefined {
+function findDefaultMeal(name: string, type?: 'breakfast' | 'lunch' | 'dinner'): Meal | undefined {
   const target = name.trim().toLowerCase()
   const pools = type ? [DEFAULT_MEALS[type]] : Object.values(DEFAULT_MEALS)
   return pools.flat().find((meal) => meal.name.trim().toLowerCase() === target)
@@ -218,14 +243,10 @@ function recipeToMeal(recipe: Recipe, type: 'breakfast' | 'lunch' | 'dinner'): M
   }
 }
 
-export function getMealPool(
-  recipes: Recipe[],
-  type: 'breakfast' | 'lunch' | 'dinner'
-): Meal[] {
+export function getMealPool(recipes: Recipe[], type: 'breakfast' | 'lunch' | 'dinner'): Meal[] {
   const personalMeals = recipes
     .filter((recipe) => recipe.mealType === type)
     .map((recipe) => recipeToMeal(recipe, type))
-
   return [...DEFAULT_MEALS[type], ...personalMeals]
 }
 
@@ -301,6 +322,7 @@ export function getNextMealTypes(): ('breakfast' | 'lunch' | 'dinner')[] {
 }
 
 const DEFAULT_PREFERENCES: UserPreferences = {
+  userId: 'user_owner',
   name: '',
   email: '',
   profileImage: '',
@@ -315,7 +337,140 @@ const DEFAULT_PREFERENCES: UserPreferences = {
   onboardingComplete: false,
   darkMode: false,
   cookMessageLanguage: 'hinglish',
+  groupEnabled: false,
+  groupId: '',
+  groupName: '',
+  groupInviteCode: '',
+  shareRecipesWithGroup: true,
 }
+
+// ── Supabase helpers ──────────────────────────────────────────────────────────
+
+function isRealUser(userId: string): boolean {
+  return !!userId && userId !== 'user_owner' && userId.length > 10
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function dbToRecipe(row: any): Recipe {
+  return {
+    id: row.id,
+    name: row.name,
+    link: row.link ?? undefined,
+    ingredients: row.ingredients ?? [],
+    category: (row.category as 'main' | 'additional') ?? 'main',
+    tags: row.tags ?? [],
+    note: row.note ?? undefined,
+    image: row.image ?? undefined,
+    mealType: (row.meal_type as Recipe['mealType']) ?? undefined,
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function dbToPreferences(row: any, userId: string): Partial<UserPreferences> {
+  return {
+    userId,
+    name: row.name ?? '',
+    email: row.email ?? '',
+    profileImage: row.profile_image ?? '',
+    dietaryPreferences: row.dietary_preferences ?? [],
+    avoidances: row.avoidances ?? [],
+    mealCount: row.meal_count ?? 3,
+    hasCook: row.has_cook ?? false,
+    cookName: row.cook_name ?? '',
+    cookPhone: row.cook_phone ?? '',
+    preferredGroceryApp: (row.preferred_grocery_app ?? '') as UserPreferences['preferredGroceryApp'],
+    preferredGroceryApps: row.preferred_grocery_apps ?? [],
+    onboardingComplete: row.onboarding_complete ?? false,
+    darkMode: row.dark_mode ?? false,
+    cookMessageLanguage: (row.cook_message_language ?? 'hinglish') as UserPreferences['cookMessageLanguage'],
+    shareRecipesWithGroup: row.share_recipes_with_group ?? true,
+  }
+}
+
+function preferencesToDb(prefs: UserPreferences) {
+  return {
+    id: prefs.userId,
+    name: prefs.name,
+    email: prefs.email,
+    profile_image: prefs.profileImage,
+    dietary_preferences: prefs.dietaryPreferences,
+    avoidances: prefs.avoidances,
+    meal_count: prefs.mealCount,
+    has_cook: prefs.hasCook,
+    cook_name: prefs.cookName,
+    cook_phone: prefs.cookPhone,
+    preferred_grocery_app: prefs.preferredGroceryApp || null,
+    preferred_grocery_apps: prefs.preferredGroceryApps,
+    onboarding_complete: prefs.onboardingComplete,
+    dark_mode: prefs.darkMode,
+    cook_message_language: prefs.cookMessageLanguage,
+    share_recipes_with_group: prefs.shareRecipesWithGroup,
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function dbRowsToDayPlans(rows: any[]): DayPlan[] {
+  const byDate = new Map<string, DayPlan>()
+  for (const row of rows) {
+    // Postgres date type returns as string 'YYYY-MM-DD'
+    const dateStr: string = typeof row.date === 'string' ? row.date : String(row.date)
+    if (!byDate.has(dateStr)) {
+      byDate.set(dateStr, { date: dateStr, breakfast: null, lunch: null, dinner: null, done: {}, skipped: {} })
+    }
+    const plan = byDate.get(dateStr)!
+    const slot = row.slot as 'breakfast' | 'lunch' | 'dinner'
+    plan[slot] = row.meal_data as Meal
+    plan.done![slot] = row.is_done
+    plan.skipped![slot] = row.is_skipped
+  }
+  return Array.from(byDate.values())
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function dbToGroceryItem(row: any): GroceryItem {
+  return {
+    id: row.id,
+    name: row.name,
+    unit: row.unit ?? undefined,
+    checked: row.checked,
+    forDates: row.for_dates ?? [],
+    source: (row.source as GroceryItem['source']) ?? 'manual',
+  }
+}
+
+function groceryToDb(item: GroceryItem, userId: string) {
+  return {
+    id: item.id,
+    user_id: userId,
+    name: item.name,
+    unit: item.unit ?? null,
+    checked: item.checked,
+    for_dates: item.forDates ?? [],
+    source: item.source ?? 'manual',
+  }
+}
+
+function upsertMealSlot(
+  userId: string,
+  date: string,
+  slot: 'breakfast' | 'lunch' | 'dinner',
+  meal: Meal,
+  isDone: boolean,
+  isSkipped: boolean
+) {
+  api.upsertMealPlan({
+    user_id: userId,
+    date,
+    slot,
+    meal_name: meal.name,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    meal_data: meal as any,
+    is_done: isDone,
+    is_skipped: isSkipped,
+  }).catch(console.error)
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 export const useStore = create<AppState>()(
   persist(
@@ -326,14 +481,203 @@ export const useStore = create<AppState>()(
       sharedRecipes: [],
       groceryList: [],
       friends: [],
+      groups: [],
+      groupMembers: [],
 
-      setPreferences: (prefs) =>
-        set((s) => ({ preferences: { ...s.preferences, ...prefs } })),
+      // ── Load all user data from Supabase ─────────────────────────────────
+      loadUserData: async (userId: string) => {
+        if (!isRealUser(userId)) return
 
-      completeOnboarding: () =>
-        set((s) => ({ preferences: { ...s.preferences, onboardingComplete: true } })),
+        try {
+          // 1. Profile
+          const { data: profile, error: profileErr } = await api.getProfile(userId)
+          if (profile) {
+            set((s) => ({
+              preferences: { ...s.preferences, ...dbToPreferences(profile, userId) },
+            }))
+          } else if (profileErr?.code === 'PGRST116') {
+            // Row not found — create one from current prefs
+            const prefs = { ...get().preferences, userId }
+            await api.upsertProfile(preferencesToDb(prefs)).catch(console.error)
+            set((s) => ({ preferences: { ...s.preferences, userId } }))
+          }
 
-      signOut: () =>
+          // 2. Recipes
+          const { data: recipes } = await api.getRecipes(userId)
+          if (recipes) {
+            set({ recipes: recipes.map(dbToRecipe) })
+          }
+
+          // 3. Meal plans (current week)
+          const dates = getWeekDates()
+          const { data: plans } = await api.getMealPlans(userId, dates[0], dates[6])
+          if (plans && plans.length > 0) {
+            const dbPlans = dbRowsToDayPlans(plans)
+            const dbDates = new Set(dbPlans.map((d) => d.date))
+            const localOnly = get().weeklyPlan.filter((d) => !dbDates.has(d.date))
+            set({
+              weeklyPlan: [...dbPlans, ...localOnly].sort((a, b) => a.date.localeCompare(b.date)),
+            })
+          }
+
+          // 4. Grocery items
+          const { data: groceries } = await api.getGroceryItems(userId)
+          if (groceries) {
+            set({ groceryList: groceries.map(dbToGroceryItem) })
+          }
+
+          // 5. Friends
+          const { data: friends } = await api.getFriends(userId)
+          if (friends) {
+            set({
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              friends: friends.map((f: any) => ({ id: f.id, name: f.name, phone: f.phone ?? '' })),
+            })
+          }
+
+          // 6. Groups & members
+          const { data: groupData } = await api.getMyGroups(userId)
+          if (groupData && groupData.length > 0) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const groups: Group[] = groupData.map((gm: any) => ({
+              id: gm.groups.id,
+              name: gm.groups.name,
+              inviteCode: gm.groups.invite_code,
+              role: gm.role as 'owner' | 'member',
+            }))
+            set({ groups })
+
+            const firstGroup = groups[0]
+            set((s) => ({
+              preferences: {
+                ...s.preferences,
+                groupEnabled: true,
+                groupId: firstGroup.id,
+                groupName: firstGroup.name,
+                groupInviteCode: firstGroup.inviteCode,
+              },
+            }))
+
+            const { data: members } = await api.getGroupMembers(firstGroup.id)
+            if (members) {
+              const groupMembers: GroupMember[] = members.map((m: any) => ({
+                id: m.id,
+                groupId: firstGroup.id,
+                name: m.profiles?.name ?? 'Member',
+                role: m.role as 'owner' | 'member',
+              }))
+              set({ groupMembers })
+
+              // 7. Shared recipes
+              const { data: shared } = await api.getSharedRecipes(firstGroup.id)
+              if (shared) {
+                const sharedRecipes: SharedRecipe[] = shared.map((r: any) => ({
+                  id: r.id,
+                  groupId: r.group_id,
+                  name: r.name,
+                  sharedBy: r.shared_by ?? '',
+                  link: r.link ?? undefined,
+                  sourceType: (r.source_type as SharedRecipe['sourceType']) ?? 'manual',
+                  ingredients: r.ingredients ?? [],
+                  tags: r.tags ?? [],
+                  note: r.note ?? undefined,
+                  timestamp: new Date(r.created_at).getTime(),
+                  image: r.image ?? undefined,
+                  cookApproved: r.cook_approved ?? false,
+                  mealType: (r.meal_type as SharedRecipe['mealType']) ?? undefined,
+                }))
+                set({ sharedRecipes })
+              }
+            }
+          }
+        } catch (err) {
+          console.error('[loadUserData]', err)
+        }
+      },
+
+      // ── Preferences ──────────────────────────────────────────────────────
+      setPreferences: (prefs) => {
+        set((s) => ({ preferences: { ...s.preferences, ...prefs } }))
+        const updated = get().preferences
+        if (isRealUser(updated.userId)) {
+          api.upsertProfile(preferencesToDb(updated)).catch(console.error)
+        }
+      },
+
+      createGroup: (groupName, cookName) => {
+        set((s) => {
+          const groupId = s.groups.find((g) => g.name === groupName.trim())?.id || `grp_${generateId()}`
+          const inviteCode = `SMRUTI-${groupId.slice(-6).toUpperCase()}`
+          const ownerName = s.preferences.name || 'You'
+          const existingGroups = s.groups.filter((g) => g.id !== groupId)
+          return {
+            preferences: {
+              ...s.preferences,
+              groupEnabled: true,
+              groupId,
+              groupName: groupName.trim() || 'Flat 503 Kitchen',
+              cookName: cookName?.trim() || s.preferences.cookName,
+              groupInviteCode: inviteCode,
+              shareRecipesWithGroup: true,
+            },
+            groups: [
+              ...existingGroups,
+              { id: groupId, name: groupName.trim() || 'Flat 503 Kitchen', inviteCode, role: 'owner' },
+            ],
+            groupMembers: [
+              { id: s.preferences.userId, groupId, name: ownerName, role: 'owner' },
+              ...s.groupMembers.filter((m) => !(m.id === s.preferences.userId && m.groupId === groupId)),
+            ],
+          }
+        })
+        const { userId } = get().preferences
+        if (isRealUser(userId)) {
+          api.createGroup(userId, groupName.trim() || 'Flat 503 Kitchen')
+            .then(({ data, error }) => {
+              if (data && !error) {
+                set((s) => ({
+                  preferences: {
+                    ...s.preferences,
+                    groupId: data.id,
+                    groupInviteCode: data.invite_code,
+                  },
+                  groups: s.groups.map((g) =>
+                    g.name === (groupName.trim() || 'Flat 503 Kitchen')
+                      ? { ...g, id: data.id, inviteCode: data.invite_code }
+                      : g
+                  ),
+                }))
+              }
+            })
+            .catch(console.error)
+        }
+      },
+
+      setActiveGroup: (groupId) =>
+        set((s) => {
+          const group = s.groups.find((g) => g.id === groupId)
+          if (!group) return {}
+          return {
+            preferences: {
+              ...s.preferences,
+              groupEnabled: true,
+              groupId: group.id,
+              groupName: group.name,
+              groupInviteCode: group.inviteCode,
+            },
+          }
+        }),
+
+      completeOnboarding: () => {
+        set((s) => ({ preferences: { ...s.preferences, onboardingComplete: true } }))
+        const prefs = get().preferences
+        if (isRealUser(prefs.userId)) {
+          api.upsertProfile(preferencesToDb(prefs)).catch(console.error)
+        }
+      },
+
+      signOut: () => {
+        supabase.auth.signOut().catch(console.error)
         set({
           preferences: { ...DEFAULT_PREFERENCES },
           weeklyPlan: [],
@@ -341,8 +685,12 @@ export const useStore = create<AppState>()(
           sharedRecipes: [],
           groceryList: [],
           friends: [],
-        }),
+          groups: [],
+          groupMembers: [],
+        })
+      },
 
+      // ── Weekly plan ──────────────────────────────────────────────────────
       initWeeklyPlan: () => {
         const dates = getWeekDates()
         const existing = get().weeklyPlan
@@ -367,16 +715,30 @@ export const useStore = create<AppState>()(
           }))
         if (newPlans.length > 0) {
           set({
-            weeklyPlan: [...normalizedExisting, ...newPlans].sort(
-              (a, b) => a.date.localeCompare(b.date)
+            weeklyPlan: [...normalizedExisting, ...newPlans].sort((a, b) =>
+              a.date.localeCompare(b.date)
             ),
           })
-        } else if (normalizedExisting.length !== existing.length || normalizedExisting.some((day, index) => day !== existing[index])) {
+          // Sync new days to Supabase
+          const { userId } = get().preferences
+          if (isRealUser(userId)) {
+            newPlans.forEach((day) => {
+              const slots: ('breakfast' | 'lunch' | 'dinner')[] = ['breakfast', 'lunch', 'dinner']
+              slots.forEach((slot) => {
+                const meal = day[slot]
+                if (meal) upsertMealSlot(userId, day.date, slot, meal, false, false)
+              })
+            })
+          }
+        } else if (
+          normalizedExisting.length !== existing.length ||
+          normalizedExisting.some((day, index) => day !== existing[index])
+        ) {
           set({ weeklyPlan: normalizedExisting.sort((a, b) => a.date.localeCompare(b.date)) })
         }
       },
 
-      setDayPlan: (date, meal) =>
+      setDayPlan: (date, meal) => {
         set((s) => ({
           weeklyPlan: s.weeklyPlan.map((d) =>
             d.date === date
@@ -389,9 +751,26 @@ export const useStore = create<AppState>()(
                 }
               : d
           ),
-        })),
+        }))
+        const { userId } = get().preferences
+        if (isRealUser(userId)) {
+          const updatedDay = get().weeklyPlan.find((d) => d.date === date)
+          if (!updatedDay) return
+          const slots: ('breakfast' | 'lunch' | 'dinner')[] = ['breakfast', 'lunch', 'dinner']
+          slots.forEach((slot) => {
+            const mealData = updatedDay[slot]
+            if (mealData) {
+              upsertMealSlot(
+                userId, date, slot, mealData,
+                updatedDay.done?.[slot] ?? false,
+                updatedDay.skipped?.[slot] ?? false
+              )
+            }
+          })
+        }
+      },
 
-      rotateMeal: (date, type) =>
+      rotateMeal: (date, type) => {
         set((s) => {
           const meals = getMealPool(s.recipes, type)
           const dayPlan = s.weeklyPlan.find((d) => d.date === date)
@@ -403,36 +782,161 @@ export const useStore = create<AppState>()(
               d.date === date ? { ...d, [type]: newMeal } : d
             ),
           }
-        }),
+        })
+        const { userId } = get().preferences
+        if (isRealUser(userId)) {
+          const day = get().weeklyPlan.find((d) => d.date === date)
+          const meal = day?.[type]
+          if (meal) upsertMealSlot(userId, date, type, meal, day?.done?.[type] ?? false, day?.skipped?.[type] ?? false)
+        }
+      },
 
-      skipMeal: (date, type) =>
+      skipMeal: (date, type) => {
         set((s) => ({
           weeklyPlan: s.weeklyPlan.map((d) =>
             d.date === date ? { ...d, skipped: { ...d.skipped, [type]: true } } : d
           ),
-        })),
+        }))
+        const { userId } = get().preferences
+        if (isRealUser(userId)) {
+          const day = get().weeklyPlan.find((d) => d.date === date)
+          const meal = day?.[type]
+          if (meal) upsertMealSlot(userId, date, type, meal, day?.done?.[type] ?? false, true)
+        }
+      },
 
-      markDone: (date, type) =>
+      markDone: (date, type) => {
         set((s) => ({
           weeklyPlan: s.weeklyPlan.map((d) =>
             d.date === date ? { ...d, done: { ...d.done, [type]: true } } : d
           ),
-        })),
+        }))
+        const { userId } = get().preferences
+        if (isRealUser(userId)) {
+          const day = get().weeklyPlan.find((d) => d.date === date)
+          const meal = day?.[type]
+          if (meal) upsertMealSlot(userId, date, type, meal, true, day?.skipped?.[type] ?? false)
+        }
+      },
 
-      addRecipe: (recipe) => set((s) => ({ recipes: [...s.recipes, recipe] })),
-      updateRecipe: (id, data) =>
-        set((s) => ({ recipes: s.recipes.map((r) => (r.id === id ? { ...r, ...data } : r)) })),
-      deleteRecipe: (id) => set((s) => ({ recipes: s.recipes.filter((r) => r.id !== id) })),
+      // ── Recipes ──────────────────────────────────────────────────────────
+      addRecipe: (recipe) => {
+        set((s) => ({ recipes: [...s.recipes, recipe] }))
+        const { userId } = get().preferences
+        if (isRealUser(userId)) {
+          api.upsertRecipe({
+            id: recipe.id,
+            user_id: userId,
+            name: recipe.name,
+            link: recipe.link ?? null,
+            ingredients: recipe.ingredients,
+            category: recipe.category,
+            tags: recipe.tags ?? [],
+            note: recipe.note ?? null,
+            image: recipe.image ?? null,
+            meal_type: recipe.mealType ?? null,
+          }).catch(console.error)
+        }
+      },
 
-      addSharedRecipe: (recipe) => set((s) => ({ sharedRecipes: [recipe, ...s.sharedRecipes] })),
-      removeSharedRecipe: (id) => set((s) => ({ sharedRecipes: s.sharedRecipes.filter((r) => r.id !== id) })),
+      updateRecipe: (id, data) => {
+        set((s) => ({ recipes: s.recipes.map((r) => (r.id === id ? { ...r, ...data } : r)) }))
+        const { userId } = get().preferences
+        if (isRealUser(userId)) {
+          const updated = get().recipes.find((r) => r.id === id)
+          if (updated) {
+            api.upsertRecipe({
+              id: updated.id,
+              user_id: userId,
+              name: updated.name,
+              link: updated.link ?? null,
+              ingredients: updated.ingredients,
+              category: updated.category,
+              tags: updated.tags ?? [],
+              note: updated.note ?? null,
+              image: updated.image ?? null,
+              meal_type: updated.mealType ?? null,
+            }).catch(console.error)
+          }
+        }
+      },
 
-      addGroceryItem: (item) => set((s) => ({ groceryList: [...s.groceryList, item] })),
-      toggleGroceryItem: (id) =>
+      deleteRecipe: (id) => {
+        set((s) => ({ recipes: s.recipes.filter((r) => r.id !== id) }))
+        const { userId } = get().preferences
+        if (isRealUser(userId)) {
+          api.deleteRecipe(id).catch(console.error)
+        }
+      },
+
+      // ── Shared recipes ───────────────────────────────────────────────────
+      addSharedRecipe: (recipe) => {
+        set((s) => ({ sharedRecipes: [recipe, ...s.sharedRecipes] }))
+        const { userId, groupId } = get().preferences
+        const targetGroupId = recipe.groupId || groupId
+        if (isRealUser(userId) && targetGroupId) {
+          api.shareRecipe({
+            id: recipe.id,
+            group_id: targetGroupId,
+            shared_by_id: userId,
+            shared_by: recipe.sharedBy,
+            name: recipe.name,
+            link: recipe.link ?? null,
+            source_type: recipe.sourceType,
+            ingredients: recipe.ingredients,
+            tags: recipe.tags,
+            note: recipe.note ?? null,
+            image: recipe.image ?? null,
+            meal_type: recipe.mealType ?? null,
+            cook_approved: recipe.cookApproved ?? false,
+          }).then(({ data, error }) => {
+            if (data && !error && data.id !== recipe.id) {
+              set((s) => ({
+                sharedRecipes: s.sharedRecipes.map((r) =>
+                  r.id === recipe.id ? { ...r, id: data.id } : r
+                ),
+              }))
+            }
+          }).catch(console.error)
+        }
+      },
+
+      removeSharedRecipe: (id) => {
+        set((s) => ({ sharedRecipes: s.sharedRecipes.filter((r) => r.id !== id) }))
+        const { userId } = get().preferences
+        if (isRealUser(userId)) {
+          api.deleteSharedRecipe(id).catch(console.error)
+        }
+      },
+
+      // ── Grocery ──────────────────────────────────────────────────────────
+      addGroceryItem: (item) => {
+        set((s) => ({ groceryList: [...s.groceryList, item] }))
+        const { userId } = get().preferences
+        if (isRealUser(userId)) {
+          api.upsertGroceryItem(groceryToDb(item, userId)).catch(console.error)
+        }
+      },
+
+      toggleGroceryItem: (id) => {
         set((s) => ({
           groceryList: s.groceryList.map((g) => (g.id === id ? { ...g, checked: !g.checked } : g)),
-        })),
-      removeGroceryItem: (id) => set((s) => ({ groceryList: s.groceryList.filter((g) => g.id !== id) })),
+        }))
+        const { userId } = get().preferences
+        if (isRealUser(userId)) {
+          const item = get().groceryList.find((g) => g.id === id)
+          if (item) api.upsertGroceryItem(groceryToDb(item, userId)).catch(console.error)
+        }
+      },
+
+      removeGroceryItem: (id) => {
+        set((s) => ({ groceryList: s.groceryList.filter((g) => g.id !== id) }))
+        const { userId } = get().preferences
+        if (isRealUser(userId)) {
+          api.deleteGroceryItem(id).catch(console.error)
+        }
+      },
+
       syncGroceryWithPlans: () => {
         const plans = get().weeklyPlan
         const currentItems = get().groceryList
@@ -442,9 +946,7 @@ export const useStore = create<AppState>()(
             .filter((item) => item.source === 'auto')
             .map((item) => [item.name.toLowerCase(), item])
         )
-
         const autoMap = new Map<string, GroceryItem>()
-
         plans.forEach((day) => {
           ;[day.breakfast, day.lunch, day.dinner].forEach((meal) => {
             meal?.ingredients.forEach((ingredient) => {
@@ -454,7 +956,6 @@ export const useStore = create<AppState>()(
                 if (!existing.forDates?.includes(day.date)) existing.forDates = [...(existing.forDates || []), day.date]
                 return
               }
-
               const previous = previousAutoByName.get(key)
               autoMap.set(key, {
                 id: `auto:${key.replace(/[^a-z0-9]+/g, '-')}`,
@@ -466,9 +967,17 @@ export const useStore = create<AppState>()(
             })
           })
         })
-
-        set({ groceryList: [...manualItems, ...Array.from(autoMap.values())] })
+        const newList = [...manualItems, ...Array.from(autoMap.values())]
+        set({ groceryList: newList })
+        // Sync all auto items to Supabase
+        const { userId } = get().preferences
+        if (isRealUser(userId)) {
+          newList.forEach((item) => {
+            api.upsertGroceryItem(groceryToDb(item, userId)).catch(console.error)
+          })
+        }
       },
+
       generateGroceryForDate: (date) => {
         const dayPlan = get().weeklyPlan.find((d) => d.date === date)
         if (!dayPlan) return
@@ -484,6 +993,12 @@ export const useStore = create<AppState>()(
         })
         if (newItems.length > 0) {
           set((s) => ({ groceryList: [...s.groceryList, ...newItems] }))
+          const { userId } = get().preferences
+          if (isRealUser(userId)) {
+            newItems.forEach((item) => {
+              api.upsertGroceryItem(groceryToDb(item, userId)).catch(console.error)
+            })
+          }
         }
       },
 
@@ -503,11 +1018,31 @@ export const useStore = create<AppState>()(
         })
         if (newItems.length > 0) {
           set((s) => ({ groceryList: [...s.groceryList, ...newItems] }))
+          const { userId } = get().preferences
+          if (isRealUser(userId)) {
+            newItems.forEach((item) => {
+              api.upsertGroceryItem(groceryToDb(item, userId)).catch(console.error)
+            })
+          }
         }
       },
 
-      addFriend: (friend) => set((s) => ({ friends: [...s.friends, friend] })),
-      removeFriend: (id) => set((s) => ({ friends: s.friends.filter((f) => f.id !== id) })),
+      // ── Friends ──────────────────────────────────────────────────────────
+      addFriend: (friend) => {
+        set((s) => ({ friends: [...s.friends, friend] }))
+        const { userId } = get().preferences
+        if (isRealUser(userId)) {
+          api.upsertFriend({ id: friend.id, user_id: userId, name: friend.name, phone: friend.phone || null }).catch(console.error)
+        }
+      },
+
+      removeFriend: (id) => {
+        set((s) => ({ friends: s.friends.filter((f) => f.id !== id) }))
+        const { userId } = get().preferences
+        if (isRealUser(userId)) {
+          api.deleteFriend(id).catch(console.error)
+        }
+      },
     }),
     { name: 'smruticode-store' }
   )

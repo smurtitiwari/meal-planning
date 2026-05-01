@@ -12,12 +12,12 @@ const serifFont = "'DM Serif Display', Georgia, serif"
 const mealLabel: Record<string, string> = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' }
 
 const lightColors = {
-  textPrimary: '#111111', textSecondary: '#7A746D', textTertiary: '#7A746D', textMuted: '#7A746D',
-  accentPurple: '#3C151A', accentPurpleLight: '#9A4D5A', accentText: '#3C151A',
-  surface: '#FFFFFF', pageSurface: '#FFFFFF', card: '#F6F6F6',
-  border: '#ECE8E4', borderActive: 'rgba(60, 21, 26, 0.24)',
-  secondarySurface: '#F6F6F6', elevatedSurface: '#F4F5F7',
-  accentSoft: '#F2F3F5', tertiaryAction: '#3C151A', warmSurface: '#F4F5F7', iconSurface: '#F1F2F4'
+  textPrimary: '#1C1B1F', textSecondary: '#6F6B73', textTertiary: '#6F6B73', textMuted: '#6F6B73',
+  accentPurple: '#4A1F23', accentPurpleLight: '#9A4D5A', accentText: '#4A1F23',
+  surface: '#F7F4EF', pageSurface: '#F7F4EF', card: '#FFFFFF',
+  border: '#E6E0D8', borderActive: 'rgba(74, 31, 35, 0.22)',
+  secondarySurface: '#F2EEE9', elevatedSurface: '#F2EEE9',
+  accentSoft: 'rgba(74, 31, 35, 0.06)', tertiaryAction: '#4A1F23', warmSurface: '#F2EEE9', iconSurface: '#F2EEE9'
 }
 const darkColors = {
   textPrimary: '#FEFEFE', textSecondary: '#D6D1D3', textTertiary: '#A9A0A3', textMuted: '#B9B1B4',
@@ -77,16 +77,16 @@ export default function Planner() {
   }
   const colors = preferences.darkMode ? darkColors : lightColors
   const selectedSecondaryChipStyles = {
-    background: preferences.darkMode ? 'rgba(154, 77, 90, 0.18)' : '#F8F6F3',
+    background: preferences.darkMode ? 'rgba(154, 77, 90, 0.18)' : 'rgba(74, 31, 35, 0.06)',
     color: colors.accentText,
     boxShadow: 'none',
-    border: '1.5px solid rgba(236, 232, 228, 0.5)',
+    border: `1.5px solid ${preferences.darkMode ? 'rgba(240,199,207,0.4)' : 'rgba(74, 31, 35, 0.2)'}`,
   }
   const inactiveSecondaryChipStyles = {
-    background: preferences.darkMode ? '#1B1B1B' : '#F6F6F6',
+    background: preferences.darkMode ? '#1B1B1B' : '#FFFFFF',
     color: colors.textPrimary,
     boxShadow: 'none',
-    border: '1px solid rgba(236, 232, 228, 0.5)',
+    border: `1px solid ${colors.border}`,
   }
 
   useEffect(() => {
@@ -175,11 +175,11 @@ export default function Planner() {
         <SegmentedControl
           options={[ { value: 'meals', label: 'Meals' }, { value: 'grocery', label: `Grocery (${unchecked.length})` } ]}
           value={activeTab} onChange={setActiveTab}
-          railBackground={preferences.darkMode ? '#1B1B1B' : '#F2F3F5'}
+          railBackground={preferences.darkMode ? '#1B1B1B' : '#F2EEE9'}
           activeBackground={preferences.darkMode ? '#2E2E2E' : '#FFFFFF'}
           activeText={colors.textPrimary} inactiveText={colors.textSecondary}
-          activeBorder={preferences.darkMode ? '#3A3A3A' : '#DDD8D3'}
-          inactiveBorder={preferences.darkMode ? 'rgba(255,255,255,0.08)' : '#E0DCD8'}
+          activeBorder={preferences.darkMode ? '#3A3A3A' : '#E6E0D8'}
+          inactiveBorder={preferences.darkMode ? 'rgba(255,255,255,0.08)' : '#E6E0D8'}
         />
       </div>
 
@@ -193,11 +193,11 @@ export default function Planner() {
               <button key={day.date} onClick={() => setSelectedDate(day.date)}
                 className="flex flex-col items-center min-w-[46px] py-2 px-2 rounded-2xl cursor-pointer transition-smooth outline-none"
                 style={{
-                  background: isSel ? (preferences.darkMode ? colors.elevatedSurface : '#ECE8E4') : (preferences.darkMode ? '#1B1B1B' : '#F6F6F6'),
+                  background: isSel ? (preferences.darkMode ? colors.elevatedSurface : 'rgba(74,31,35,0.07)') : (preferences.darkMode ? '#1B1B1B' : '#FFFFFF'),
                   color: isSel ? colors.accentText : colors.textPrimary,
                   border: isSel
-                    ? '1px solid transparent'
-                    : `1px solid ${preferences.darkMode ? 'rgba(255,255,255,0.08)' : '#F4F4F4'}`,
+                    ? `1px solid ${preferences.darkMode ? colors.accentPurple : 'rgba(74,31,35,0.2)'}`
+                    : `1px solid ${colors.border}`,
                   boxShadow: 'none',
                 }}>
                 <span style={{ fontSize: '10px', fontWeight: 600, opacity: isSel ? 0.72 : 0.82, textTransform: 'uppercase' }}>{DAYS[i]}</span>
@@ -368,10 +368,9 @@ export default function Planner() {
               style={{
                 background: colors.accentPurple,
                 color: '#FFF',
-                height: 52,
+                height: 46,
                 fontSize: '14px',
-                fontWeight: 700,
-                boxShadow: preferences.darkMode ? 'none' : '0 10px 24px rgba(60,21,26,0.16)',
+                fontWeight: 600,
               }}
             >
               <ShoppingCart size={16} />
@@ -410,7 +409,7 @@ export default function Planner() {
               })}
             </div>
             <div style={{ position: 'sticky', bottom: 0, background: preferences.darkMode ? 'rgba(17,17,17,0.96)' : 'rgba(255,255,255,0.96)', backdropFilter: 'blur(12px)', borderTop: `1px solid ${colors.border}`, padding: '14px 20px 18px' }}>
-              <button onClick={handleSaveSwap} disabled={!pendingMeal} className="w-full rounded-2xl border-none cursor-pointer outline-none" style={{ height: 48, background: colors.accentPurple, color: '#FFF', fontSize: '14px', fontWeight: 600, opacity: pendingMeal ? 1 : 0.4 }}>Save meal change</button>
+              <button onClick={handleSaveSwap} disabled={!pendingMeal} className="w-full rounded-2xl border-none cursor-pointer outline-none" style={{ height: 46, borderRadius: 18, background: colors.accentPurple, color: '#FFF', fontSize: '14px', fontWeight: 600, opacity: pendingMeal ? 1 : 0.4 }}>Save meal change</button>
             </div>
           </div>
         </div>
@@ -478,7 +477,7 @@ export default function Planner() {
             </div>
             <div className="flex gap-2">
               <button onClick={() => setShowAddGrocery(false)} className="flex-1 py-3 rounded-xl cursor-pointer outline-none" style={{ border: `1px solid ${colors.border}`, background: colors.card, fontSize: '14px', fontWeight: 600, color: colors.textTertiary }}>Cancel</button>
-              <button onClick={handleAddGrocery} disabled={!newGroceryName.trim()} className="flex-1 py-3 rounded-xl border-none cursor-pointer outline-none" style={{ background: colors.accentPurple, color: '#FFF', fontSize: '14px', fontWeight: 600, opacity: newGroceryName.trim() ? 1 : 0.4 }}>Add</button>
+              <button onClick={handleAddGrocery} disabled={!newGroceryName.trim()} className="flex-1 border-none cursor-pointer outline-none" style={{ height: 46, borderRadius: 14, background: colors.accentPurple, color: '#FFF', fontSize: '14px', fontWeight: 600, opacity: newGroceryName.trim() ? 1 : 0.4 }}>Add</button>
             </div>
           </div>
         </div>
@@ -508,7 +507,7 @@ function PlannerMealCard({ colors, type, meal, isDone, isSkipped: _isSkipped, on
   const showImage = meal.image && !imgError
 
   return (
-    <div style={{ position: 'relative', background: colors.card, borderRadius: 18, border: `1px solid ${colors.pageSurface === '#121212' ? colors.border : '#F4F4F4'}`, overflow: 'hidden', boxShadow: colors.pageSurface === '#121212' ? 'none' : '0 8px 22px rgba(27,18,18,0.06)' }}>
+    <div style={{ position: 'relative', background: colors.card, borderRadius: 16, border: `1px solid ${colors.border}`, overflow: 'hidden' }}>
       <button
         onClick={(e) => { e.stopPropagation(); onRotate() }}
         className="flex items-center gap-1.5 cursor-pointer border-none outline-none bg-transparent p-0"

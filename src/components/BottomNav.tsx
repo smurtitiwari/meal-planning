@@ -1,13 +1,13 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
-import { Home, CalendarDays, BookOpen, Sparkles, Plus } from 'lucide-react'
+import { Home, CalendarDays, BookOpen, Plus, Users } from 'lucide-react'
 
 const tabs = [
   { href: '/home', icon: Home, label: 'Home' },
   { href: '/planner', icon: CalendarDays, label: 'Planner' },
   { isFab: true },
-  { href: '/ask', icon: Sparkles, label: 'Ask Chef' },
   { href: '/recipes', icon: BookOpen, label: 'Recipes' },
+  { href: '/group', icon: Users, label: 'Group' },
 ]
 
 function FilledIcon({ label, color }: { label: string; color: string }) {
@@ -25,10 +25,10 @@ function FilledIcon({ label, color }: { label: string; color: string }) {
       </svg>
     )
   }
-  if (label === 'Ask Chef') {
+  if (label === 'Group') {
     return (
       <svg width="21" height="21" viewBox="0 0 24 24" fill={color} aria-hidden="true">
-        <path d="M12 2l2.4 7.6 7.6 2.4-7.6 2.4L12 22l-2.4-7.6-7.6-2.4 7.6-2.4L12 2Z" />
+        <path d="M8.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm7-1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM2.5 20.2C2.5 16.9 5.2 14 8.5 14s6 2.9 6 6.2c0 .44-.36.8-.8.8H3.3a.8.8 0 0 1-.8-.8Zm12.8.8h5.4c.44 0 .8-.36.8-.8 0-2.7-2.1-5.1-4.8-5.6.6 1.05.95 2.27.95 3.6 0 1.22-.96 2.8-2.35 2.8Z" />
       </svg>
     )
   }
@@ -50,16 +50,16 @@ export default function BottomNav() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const darkMode = useStore((s) => s.preferences.darkMode)
-  const activeColor = darkMode ? '#F0C7CF' : '#3C151A'
-  const inactiveColor = darkMode ? '#A9A0A3' : '#7A746D'
+  const activeColor = darkMode ? '#F0C7CF' : '#4A1F23'
+  const inactiveColor = darkMode ? '#A9A0A3' : '#6F6B73'
 
   return (
     <>
       <nav className="fixed bottom-0 left-0 right-0 z-40" style={{
-        background: darkMode ? 'rgba(17,17,17,0.96)' : 'rgba(255,255,255,0.96)',
+        background: darkMode ? 'rgba(17,17,17,0.97)' : 'rgba(247,244,239,0.97)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
-        borderTop: `1px solid ${darkMode ? '#2E2E2E' : '#ECE8E4'}`,
+        borderTop: `1px solid ${darkMode ? '#2E2E2E' : '#E6E0D8'}`,
       }}>
         <div className="max-w-md mx-auto flex justify-around items-center h-16 px-2">
           {tabs.map((tab) => {

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 import BottomNav from '../components/BottomNav'
-import { ChevronRight, Moon, Sun, LogOut, ChefHat, ShoppingCart, Utensils, X, Check, Send, Globe } from 'lucide-react'
+import { ChevronRight, Moon, Sun, LogOut, ChefHat, ShoppingCart, Utensils, X, Check, Send, Globe, Users } from 'lucide-react'
 
 const DIETARY_OPTIONS: { label: string; emoji: string }[] = [
   { label: 'Vegetarian', emoji: '🥬' },
@@ -33,7 +33,7 @@ const LANGUAGE_LABELS: Record<'english' | 'hindi' | 'hinglish', string> = {
 
 export default function Profile() {
   const navigate = useNavigate()
-  const { preferences, setPreferences, signOut } = useStore()
+  const { preferences, setPreferences, signOut, groupMembers } = useStore()
   const [editModal, setEditModal] = useState<'dietary' | 'avoidances' | 'cook' | 'grocery' | 'language' | null>(null)
 
   // Editable state
@@ -68,18 +68,18 @@ export default function Profile() {
     ? preferences.preferredGroceryApp.charAt(0).toUpperCase() + preferences.preferredGroceryApp.slice(1)
     : 'Not set'
   const lightColors = {
-    accent: '#3C151A',
-    accentLight: '#F2F3F5',
-    accentBorder: '#ECE8E4',
-    accentText: '#3C151A',
-    surface: '#FFFFFF',
-    pageSurface: '#FFFFFF',
-    card: '#F6F6F6',
-    border: '#ECE8E4',
-    elevated: '#F4F5F7',
-    textPrimary: '#111111',
-    textSecondary: '#7A746D',
-    textTertiary: '#7A746D',
+    accent: '#4A1F23',
+    accentLight: 'rgba(74, 31, 35, 0.06)',
+    accentBorder: 'rgba(74, 31, 35, 0.22)',
+    accentText: '#4A1F23',
+    surface: '#F7F4EF',
+    pageSurface: '#F7F4EF',
+    card: '#FFFFFF',
+    border: '#E6E0D8',
+    elevated: '#F2EEE9',
+    textPrimary: '#1C1B1F',
+    textSecondary: '#6F6B73',
+    textTertiary: '#6F6B73',
   }
   const darkColors = {
     accent: '#9A4D5A',
@@ -212,6 +212,28 @@ export default function Profile() {
           </div>
         </div>
 
+        {/* Meal Group */}
+        <div className="mb-6">
+          <p className="section-label" style={{ margin: '0 0 10px 0' }}>Meal group</p>
+          <div className="card">
+            <button onClick={() => navigate('/group')}
+              className="w-full flex items-center justify-between px-4 py-3.5 bg-transparent border-none cursor-pointer">
+              <div className="flex items-center gap-3">
+                <Users size={18} style={{ color: colors.textTertiary }} />
+                <div className="text-left">
+                  <span style={{ fontSize: '14px', fontWeight: 600, color: colors.textPrimary, display: 'block' }}>
+                    {preferences.groupEnabled ? preferences.groupName || 'Home food circle' : 'No group'}
+                  </span>
+                  <span style={{ fontSize: '12px', color: colors.textTertiary }}>
+                    {preferences.groupEnabled ? `${groupMembers.length || 1} member${(groupMembers.length || 1) === 1 ? '' : 's'}` : 'Create a shared recipe circle'}
+                  </span>
+                </div>
+              </div>
+              <ChevronRight size={16} style={{ color: colors.textTertiary }} />
+            </button>
+          </div>
+        </div>
+
         {/* Message Language — E: moved from Home screen */}
         <div className="mb-6">
           <p className="section-label" style={{ margin: '0 0 10px 0' }}>Message language</p>
@@ -288,8 +310,8 @@ export default function Profile() {
                     <button key={opt.label} onClick={() => toggle(dietary, opt.label, setDietary)}
                       className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl cursor-pointer transition-smooth"
                       style={{
-                        background: sel ? '#F8F6F3' : '#F6F6F6',
-                        border: sel ? '1.5px solid rgba(60, 21, 26, 0.5)' : '1px solid #F4F4F4',
+                        background: sel ? 'rgba(74, 31, 35, 0.06)' : '#FFFFFF',
+                        border: sel ? '1.5px solid rgba(74, 31, 35, 0.22)' : `1px solid ${colors.border}`,
                       }}>
                       <span style={{ fontSize: '22px', lineHeight: 1, flexShrink: 0 }}>{opt.emoji}</span>
                       <span className="flex-1 text-left" style={{ fontSize: '14px', fontWeight: 600, color: sel ? (preferences.darkMode ? colors.accentText : colors.accent) : colors.textPrimary }}>{opt.label}</span>
@@ -308,8 +330,8 @@ export default function Profile() {
                     <button key={opt.label} onClick={() => toggle(avoidances, opt.label, setAvoidances)}
                       className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl cursor-pointer transition-smooth"
                       style={{
-                        background: sel ? '#F8F6F3' : '#F6F6F6',
-                        border: sel ? '1.5px solid rgba(60, 21, 26, 0.5)' : '1px solid #F4F4F4',
+                        background: sel ? 'rgba(74, 31, 35, 0.06)' : '#FFFFFF',
+                        border: sel ? '1.5px solid rgba(74, 31, 35, 0.22)' : `1px solid ${colors.border}`,
                       }}>
                       <span style={{ fontSize: '22px', lineHeight: 1, flexShrink: 0 }}>{opt.emoji}</span>
                       <span className="flex-1 text-left" style={{ fontSize: '14px', fontWeight: 600, color: sel ? (preferences.darkMode ? colors.accentText : colors.accent) : colors.textPrimary }}>{opt.label}</span>
@@ -391,8 +413,8 @@ export default function Profile() {
                     <button key={app.id} onClick={() => setGroceryApp(app.id)}
                       className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl cursor-pointer transition-smooth"
                       style={{
-                        background: sel ? '#F8F6F3' : '#F6F6F6',
-                        border: sel ? '1.5px solid rgba(60, 21, 26, 0.5)' : '1px solid #F4F4F4',
+                        background: sel ? 'rgba(74, 31, 35, 0.06)' : '#FFFFFF',
+                        border: sel ? '1.5px solid rgba(74, 31, 35, 0.22)' : `1px solid ${colors.border}`,
                       }}>
                       <span style={{ fontSize: '22px', lineHeight: 1, flexShrink: 0 }}>{app.emoji}</span>
                       <span className="flex-1 text-left" style={{ fontSize: '14px', fontWeight: 600, color: sel ? (preferences.darkMode ? colors.accentText : colors.accent) : colors.textPrimary }}>{app.name}</span>
@@ -404,8 +426,8 @@ export default function Profile() {
             )}
 
             <button onClick={saveModal}
-              className="w-full py-3.5 rounded-xl border-none cursor-pointer mt-5"
-              style={{ background: colors.accent, color: '#FFF', fontSize: '14px', fontWeight: 600 }}>
+              className="w-full border-none cursor-pointer mt-5"
+              style={{ height: 46, borderRadius: 18, background: colors.accent, color: '#FFF', fontSize: '14px', fontWeight: 600 }}>
               Save
             </button>
           </div>

@@ -1,32 +1,46 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #FFFFFF;
-  --color-bg-card: #F6F6F6;
-  --color-bg-warm: #F4F5F7;
-  --color-bg-soft: #F2F3F5;
-  --color-bg-cool: #F1F2F4;
-  --color-fg: #111111;
-  --color-fg-secondary: #7A746D;
-  --color-fg-tertiary: #7A746D;
-  --color-border: #ECE8E4;
-  --color-accent: #3C151A;
+  /* ── New warm-minimal design system ── */
+  --color-bg: #F7F4EF;
+  --color-bg-card: #FFFFFF;
+  --color-bg-warm: #F2EEE9;
+  --color-bg-soft: #F2EEE9;
+  --color-bg-secondary: #F2EEE9;
+  --color-fg: #1C1B1F;
+  --color-fg-secondary: #6F6B73;
+  --color-fg-disabled: #BDB7C3;
+  --color-border: #E6E0D8;
+  --color-accent: #4A1F23;
   --color-accent-light: #9A4D5A;
+  --color-accent-selection: rgba(74, 31, 35, 0.06);
   --color-success: #5FB07A;
   --color-danger: #D9534F;
   --color-whatsapp: #25D366;
-  --color-cta: #3C151A;
+  --color-cta: #4A1F23;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-serif: 'DM Serif Display', 'Georgia', serif;
 }
 
 body {
   margin: 0;
-  background: #FFFFFF;
-  color: #111111;
+  background: #F7F4EF;
+  color: #1C1B1F;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle grain overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.022;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
 }
 
 ::-webkit-scrollbar { display: none; }
@@ -40,18 +54,18 @@ input, textarea, select, button { font-family: inherit; }
 
 /* Premium card */
 .card {
-  background: #F6F6F6;
-  border-radius: 18px;
-  border: 1px solid #ECE8E4;
-  box-shadow: 0 6px 18px rgba(25, 18, 18, 0.03);
+  background: #FFFFFF;
+  border-radius: 16px;
+  border: 1px solid #E6E0D8;
+  box-shadow: none;
 }
 
 /* Image card with overlay */
 .img-card {
-  border-radius: 18px;
+  border-radius: 16px;
   overflow: hidden;
   position: relative;
-  background: #F6F6F6;
+  background: #F2EEE9;
 }
 
 .img-card img {
@@ -68,7 +82,7 @@ input, textarea, select, button { font-family: inherit; }
   left: 0;
   right: 0;
   padding: 20px;
-  background: linear-gradient(transparent, rgba(31,30,46,0.75));
+  background: linear-gradient(transparent, rgba(28, 27, 31, 0.7));
   color: #fff;
 }
 
@@ -81,13 +95,13 @@ input, textarea, select, button { font-family: inherit; }
   border-radius: 100px;
   font-size: 11px;
   font-weight: 500;
-  background: #F1F2F4;
-  color: #3C151A;
-  border: 1px solid #ECE8E4;
+  background: #F2EEE9;
+  color: #4A1F23;
+  border: 1px solid #E6E0D8;
 }
 
 .chip-accent {
-  background: #3C151A;
+  background: #4A1F23;
   color: #FFFFFF;
 }
 
@@ -99,29 +113,49 @@ input, textarea, select, button { font-family: inherit; }
   right: 0;
   z-index: 60;
   padding: 12px 20px calc(env(safe-area-inset-bottom, 8px) + 12px);
-  background: rgba(255,255,255,0.96);
+  background: rgba(247, 244, 239, 0.97);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border-top: 1px solid #D9D9D9;
+  border-top: 1px solid #E6E0D8;
 }
 
 /* Section label */
 .section-label {
   font-size: 11px;
   font-weight: 600;
-  color: #8A8A8A;
+  color: #6F6B73;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
 
 /* Smooth transitions */
 .transition-smooth {
-  transition: all 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: all 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* No-tap highlight */
 button, a { -webkit-tap-highlight-color: transparent; }
 
+/* Primary CTA */
+.btn-primary {
+  height: 46px;
+  border-radius: 18px;
+  background: #4A1F23;
+  color: #FFFFFF;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: opacity 0.2s;
+}
+.btn-primary:active { opacity: 0.88; }
+.btn-primary:disabled { background: #E6E0D8; color: #BDB7C3; cursor: not-allowed; }
+
+/* Dark mode */
 .dark-mode {
   background: #121212 !important;
 }
@@ -150,7 +184,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   to { transform: translateY(0); }
 }
 .animate-slide-up {
-  animation: slide-up 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: slide-up 0.36s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 /* Line clamp utility */

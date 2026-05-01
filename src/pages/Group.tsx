@@ -1,0 +1,360 @@
+import { useState } from 'react'
+import { Crown, Plus, UserPlus, BookOpen, ChevronRight, X, Users } from 'lucide-react'
+import { useStore } from '../store/useStore'
+import BottomNav from '../components/BottomNav'
+import InviteSheet from '../components/InviteSheet'
+import { useNavigate } from 'react-router-dom'
+
+const serifFont = "'DM Serif Display', Georgia, serif"
+
+export default function Group() {
+  const navigate = useNavigate()
+  const { preferences, groups, groupMembers, sharedRecipes, createGroup, setActiveGroup } = useStore()
+  const [showInvite, setShowInvite] = useState(false)
+  const [detailGroupId, setDetailGroupId] = useState<string | null>(null)
+
+  /* ── Data ── */
+  const visibleGroups = groups.length > 0
+    ? groups
+    : [{
+        id: preferences.groupId || 'preview-group',
+        name: preferences.groupName || 'Flat 503 Kitchen',
+        inviteCode: preferences.groupInviteCode || 'SMRUTI-HOME',
+        role: 'owner' as const,
+      }]
+
+  const activeGroup = visibleGroups.find((g) => g.id === preferences.groupId) || visibleGroups[0]
+
+  const getMembersForGroup = (groupId: string) => {
+    const members = groupMembers.filter((m) => m.groupId === groupId)
+    return members.length > 0
+      ? members
+      : [{ id: preferences.userId, groupId, name: preferences.name || 'You', role: 'owner' as const }]
+  }
+
+  const getRecipesForGroup = (groupId: string) =>
+    sharedRecipes.filter((r) => r.groupId === groupId || (!r.groupId && preferences.groupEnabled))
+
+  const detailGroup = detailGroupId
+    ? (visibleGroups.find((g) => g.id === detailGroupId) || null)
+    : null
+
+  /* ── Colors ── */
+  const C = preferences.darkMode
+    ? {
+        page: '#121212', card: '#1B1B1B', border: '#2E2E2E',
+        text: '#FEFEFE', sub: '#A9A0A3', accent: '#9A4D5A',
+        soft: 'rgba(154,77,90,0.18)', selBorder: 'rgba(154,77,90,0.4)',
+        elevated: '#252525', sheetBg: '#181818',
+      }
+    : {
+        page: '#F7F4EF', card: '#FFFFFF', border: '#E6E0D8',
+        text: '#1C1B1F', sub: '#6F6B73', accent: '#4A1F23',
+        soft: 'rgba(74,31,35,0.06)', selBorder: 'rgba(74,31,35,0.22)',
+        elevated: '#F2EEE9', sheetBg: '#F7F4EF',
+      }
+
+  const ensureAndInvite = () => {
+    if (!preferences.groupEnabled) createGroup(activeGroup.name)
+    setDetailGroupId(null)
+    setShowInvite(true)
+  }
+
+  return (
+    <div className="min-h-screen pb-24" style={{ background: C.page }}>
+      <div className="px-5 pt-14 pb-6">
+
+        {/* ── Header — same layout as Recipes ── */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <p style={{
+              fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em',
+              textTransform: 'uppercase', color: C.sub, margin: '0 0 4px 0',
+            }}>
+              Group
+            </p>
+            <h1 style={{ fontFamily: serifFont, fontSize: '32px', fontWeight: 400, color: C.text, margin: 0, lineHeight: 1.1 }}>
+              {preferences.groupEnabled ? activeGroup.name : 'Your groups'}
+            </h1>
+          </div>
+
+          {/* ── Exact same CTA as Recipes ── */}
+          <button
+            onClick={ensureAndInvite}
+            className="w-10 h-10 rounded-full flex items-center justify-center border-none cursor-pointer"
+            style={{ background: C.accent, color: '#FFF' }}
+            aria-label="Invite member"
+          >
+            <Plus size={18} />
+          </button>
+        </div>
+
+        {/* ── Group cards ── */}
+        <p style={{
+          fontSize: '11px', fontWeight: 600, color: C.sub,
+          textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px 0',
+        }}>
+          Your groups
+        </p>
+
+        <div className="space-y-2.5">
+          {visibleGroups.map((group) => {
+            const members = getMembersForGroup(group.id)
+            const recipes = getRecipesForGroup(group.id)
+            const isActive = group.id === activeGroup.id
+            return (
+              <button
+                key={group.id}
+                onClick={() => { setActiveGroup(group.id); setDetailGroupId(group.id) }}
+                className="w-full flex items-center gap-4 text-left border-none cursor-pointer transition-smooth"
+                style={{
+                  background: C.card,
+                  border: `1px solid ${isActive ? C.selBorder : C.border}`,
+                  borderRadius: 16,
+                  padding: '14px 16px',
+                }}
+              >
+                {/* Group icon */}
+                <div style={{
+                  width: 44, height: 44, borderRadius: 14,
+                  background: C.soft, color: C.accent, flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Users size={20} />
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <p style={{ fontSize: '15px', fontWeight: 700, color: C.text, margin: '0 0 3px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {group.name}
+                  </p>
+                  <p style={{ fontSize: '12px', color: C.sub, margin: 0 }}>
+                    {members.length} member{members.length === 1 ? '' : 's'}
+                    {recipes.length > 0 ? ` · ${recipes.length} shared recipe${recipes.length === 1 ? '' : 's'}` : ''}
+                  </p>
+                </div>
+
+                {/* Stacked avatars */}
+                <div className="flex items-center" style={{ gap: 0, flexShrink: 0 }}>
+                  {members.slice(0, 3).map((m, i) => (
+                    <div key={m.id} style={{
+                      width: 26, height: 26, borderRadius: 13,
+                      marginLeft: i === 0 ? 0 : -7,
+                      background: C.soft,
+                      border: `2px solid ${C.card}`,
+                      color: C.accent,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 10, fontWeight: 700,
+                    }}>
+                      {m.name.charAt(0).toUpperCase()}
+                    </div>
+                  ))}
+                </div>
+
+                <ChevronRight size={16} style={{ color: C.sub, flexShrink: 0 }} />
+              </button>
+            )
+          })}
+        </div>
+
+      </div>
+
+      {/* ══════════════════════════════════════════
+          Group Detail Bottom Sheet
+      ══════════════════════════════════════════ */}
+      {detailGroup && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center"
+          style={{ background: 'rgba(28,27,31,0.4)' }}
+          onClick={() => setDetailGroupId(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md animate-slide-up"
+            style={{
+              background: C.sheetBg,
+              borderRadius: '24px 24px 0 0',
+              maxHeight: '88vh',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              boxShadow: '0 -4px 24px rgba(28,27,31,0.1)',
+            }}
+          >
+            {/* Drag handle */}
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '10px auto 0' }} />
+
+            {/* Sheet header */}
+            <div className="flex items-center justify-between px-5 pt-4 pb-3" style={{ flexShrink: 0 }}>
+              <div>
+                <h2 style={{ fontFamily: serifFont, fontSize: '22px', fontWeight: 400, color: C.text, margin: 0, lineHeight: 1.2 }}>
+                  {detailGroup.name}
+                </h2>
+                <p style={{ fontSize: '12px', color: C.sub, margin: '3px 0 0 0' }}>
+                  {getMembersForGroup(detailGroup.id).length} member{getMembersForGroup(detailGroup.id).length === 1 ? '' : 's'} · {detailGroup.role}
+                </p>
+              </div>
+              <button
+                onClick={() => setDetailGroupId(null)}
+                className="flex items-center justify-center border-none cursor-pointer transition-smooth"
+                style={{
+                  width: 32, height: 32, borderRadius: '50%',
+                  background: C.card, color: C.sub,
+                  border: `1px solid ${C.border}`,
+                }}
+              >
+                <X size={15} />
+              </button>
+            </div>
+
+            {/* Scrollable body */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '4px 20px 32px' }}>
+
+              {/* ── Members section ── */}
+              <p style={{
+                fontSize: '11px', fontWeight: 600, color: C.sub,
+                textTransform: 'uppercase', letterSpacing: '0.1em', margin: '12px 0 10px 0',
+              }}>
+                Members
+              </p>
+
+              <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, overflow: 'hidden', marginBottom: 4 }}>
+                {getMembersForGroup(detailGroup.id).map((member, i, arr) => (
+                  <div
+                    key={member.id}
+                    className="flex items-center gap-3 px-4 py-3"
+                    style={{ borderBottom: i < arr.length - 1 ? `1px solid ${C.border}` : 'none' }}
+                  >
+                    {/* Avatar */}
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 18,
+                      background: C.soft, color: C.accent,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 13, fontWeight: 700, flexShrink: 0,
+                    }}>
+                      {member.name.charAt(0).toUpperCase()}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p style={{ fontSize: '14px', fontWeight: 600, color: C.text, margin: 0, lineHeight: 1.2 }}>
+                        {member.name}
+                      </p>
+                      <p style={{ fontSize: '11.5px', color: C.sub, margin: '2px 0 0 0' }}>
+                        {member.role === 'owner' ? 'Can manage invites & settings' : 'Can view and share recipes'}
+                      </p>
+                    </div>
+
+                    <span style={{
+                      display: 'flex', alignItems: 'center', gap: 4,
+                      padding: '3px 8px', borderRadius: 999,
+                      background: C.soft, color: C.accent,
+                      fontSize: 11, fontWeight: 600, flexShrink: 0,
+                    }}>
+                      {member.role === 'owner' && <Crown size={11} />}
+                      {member.role}
+                    </span>
+                  </div>
+                ))}
+
+                {/* Tertiary invite action — inside the card */}
+                <div style={{ borderTop: `1px solid ${C.border}`, padding: '10px 16px' }}>
+                  <button
+                    onClick={ensureAndInvite}
+                    className="flex items-center gap-2 bg-transparent border-none cursor-pointer transition-smooth"
+                    style={{ color: C.accent, fontSize: '13px', fontWeight: 600, padding: 0 }}
+                  >
+                    <UserPlus size={14} />
+                    Invite someone
+                  </button>
+                </div>
+              </div>
+
+              {/* ── Shared Recipes section ── */}
+              <div className="flex items-center justify-between" style={{ margin: '20px 0 10px 0' }}>
+                <p style={{
+                  fontSize: '11px', fontWeight: 600, color: C.sub,
+                  textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0,
+                }}>
+                  Shared recipes
+                </p>
+                {getRecipesForGroup(detailGroup.id).length > 0 && (
+                  <button
+                    onClick={() => { setDetailGroupId(null); navigate('/recipes', { state: { tab: 'shared' } }) }}
+                    className="flex items-center gap-1 bg-transparent border-none cursor-pointer"
+                    style={{ fontSize: '12px', fontWeight: 600, color: C.accent, padding: 0 }}
+                  >
+                    See all <ChevronRight size={13} />
+                  </button>
+                )}
+              </div>
+
+              {getRecipesForGroup(detailGroup.id).length === 0 ? (
+                <div style={{
+                  background: C.card, border: `1px solid ${C.border}`,
+                  borderRadius: 14, padding: '20px 18px', textAlign: 'center',
+                }}>
+                  <div style={{ fontSize: '28px', marginBottom: 8 }}>🍽️</div>
+                  <p style={{ fontSize: '14px', fontWeight: 600, color: C.text, margin: '0 0 4px 0' }}>
+                    No shared recipes yet
+                  </p>
+                  <p style={{ fontSize: '12px', color: C.sub, margin: '0 0 14px 0', lineHeight: 1.45 }}>
+                    Be the first to share a recipe with this group.
+                  </p>
+                  <button
+                    onClick={() => { setDetailGroupId(null); navigate('/recipes', { state: { openTypePicker: true } }) }}
+                    className="flex items-center gap-2 border-none cursor-pointer mx-auto transition-smooth"
+                    style={{
+                      background: C.soft, color: C.accent,
+                      padding: '8px 16px', borderRadius: 999,
+                      fontSize: '13px', fontWeight: 600,
+                      border: `1px solid ${C.selBorder}`,
+                    }}
+                  >
+                    <BookOpen size={14} />
+                    Share a recipe
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {getRecipesForGroup(detailGroup.id).slice(0, 5).map((recipe) => (
+                    <button
+                      key={recipe.id}
+                      onClick={() => { setDetailGroupId(null); navigate(`/recipe/${recipe.id}`, { state: { recipe: { ...recipe, source: 'shared' } } }) }}
+                      className="w-full flex items-center gap-3 text-left border-none cursor-pointer transition-smooth"
+                      style={{
+                        background: C.card, border: `1px solid ${C.border}`,
+                        borderRadius: 13, padding: '11px 14px',
+                      }}
+                    >
+                      <div style={{
+                        width: 34, height: 34, borderRadius: 10,
+                        background: C.soft, color: C.accent,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 12, fontWeight: 700, flexShrink: 0,
+                      }}>
+                        {recipe.sharedBy?.charAt(0)?.toUpperCase() || '?'}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p style={{ fontSize: '14px', fontWeight: 600, color: C.text, margin: '0 0 2px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {recipe.name}
+                        </p>
+                        <p style={{ fontSize: '11.5px', color: C.sub, margin: 0 }}>
+                          by {recipe.sharedBy}{recipe.mealType ? ` · ${recipe.mealType}` : ''}
+                        </p>
+                      </div>
+                      <ChevronRight size={14} style={{ color: C.sub, flexShrink: 0 }} />
+                    </button>
+                  ))}
+                </div>
+              )}
+
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showInvite && <InviteSheet onClose={() => setShowInvite(false)} />}
+      <BottomNav />
+    </div>
+  )
+}

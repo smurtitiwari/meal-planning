@@ -5,19 +5,20 @@ import type { Meal } from '../store/useStore'
 import BottomNav from '../components/BottomNav'
 import CookMessage from '../components/CookMessage'
 import MealPreviewSheet from '../components/MealPreviewSheet'
-import { ChefHat, Sparkles, X, User } from 'lucide-react'
+import InviteSheet from '../components/InviteSheet'
+import { ChefHat, Sparkles, X, User, Users } from 'lucide-react'
 
 const mealLabel: Record<string, string> = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' }
 const allMealTypes: ('breakfast' | 'lunch' | 'dinner')[] = ['breakfast', 'lunch', 'dinner']
 const serifFont = "'DM Serif Display', Georgia, serif"
 
 const lightColors = {
-  textPrimary: '#111111', textSecondary: '#7A746D', textTertiary: '#7A746D', textMuted: '#7A746D',
-  accentPurple: '#3C151A', accentPurpleLight: '#9A4D5A', accentText: '#3C151A',
-  surface: '#FFFFFF', pageSurface: '#FFFFFF', card: '#F6F6F6',
-  border: '#F4F4F4', borderActive: '#F4F4F4', warmSurface: '#F4F5F7', iconSurface: '#F1F2F4', tertiaryAction: '#3C151A',
-  chipBg: '#F8F6F3', chipBorder: 'rgba(60, 21, 26, 0.18)', chipText: '#3C151A',
-  softShadow: '0 6px 18px rgba(27,18,18,0.04)',
+  textPrimary: '#1C1B1F', textSecondary: '#6F6B73', textTertiary: '#6F6B73', textMuted: '#6F6B73',
+  accentPurple: '#4A1F23', accentPurpleLight: '#9A4D5A', accentText: '#4A1F23',
+  surface: '#F7F4EF', pageSurface: '#F7F4EF', card: '#FFFFFF',
+  border: '#E6E0D8', borderActive: '#E6E0D8', warmSurface: '#F2EEE9', iconSurface: '#F2EEE9', tertiaryAction: '#4A1F23',
+  chipBg: 'rgba(74, 31, 35, 0.06)', chipBorder: 'rgba(74, 31, 35, 0.15)', chipText: '#4A1F23',
+  softShadow: 'none',
 }
 const darkColors = {
   textPrimary: '#FEFEFE', textSecondary: '#B8B0B2', textTertiary: '#A9A0A3', textMuted: '#B9B1B4',
@@ -27,14 +28,14 @@ const darkColors = {
   chipBg: 'rgba(255,255,255,0.08)', chipBorder: 'rgba(255,255,255,0.14)', chipText: '#F0C7CF',
   softShadow: 'none',
 }
-
 export default function Home() {
   const navigate = useNavigate()
-  const { preferences, weeklyPlan, initWeeklyPlan } = useStore()
+  const { preferences, weeklyPlan, groupMembers, initWeeklyPlan } = useStore()
   const colors = preferences.darkMode ? darkColors : lightColors
   const today = new Date().toISOString().split('T')[0]
   const currentType = getCurrentMealType()
   const [showCookMessage, setShowCookMessage] = useState(false)
+  const [showInvite, setShowInvite] = useState(false)
   const [previewMeal, setPreviewMeal] = useState<Meal | null>(null)
 
   useEffect(() => { initWeeklyPlan() }, [initWeeklyPlan])
@@ -56,7 +57,6 @@ export default function Home() {
               width: 40, height: 40, borderRadius: 14,
               background: colors.accentPurple,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 8px 20px rgba(60,21,26,0.25)',
             }}
           >
             <ChefHat size={22} color="#FFF" />
@@ -131,6 +131,33 @@ export default function Home() {
         )}
       </div>
 
+      {preferences.groupEnabled && groupMembers.length <= 1 && (
+        <div className="px-5 mt-4">
+          <button
+            onClick={() => setShowInvite(true)}
+            className="w-full flex items-center gap-3 text-left border-none cursor-pointer"
+            style={{
+              background: colors.card,
+              border: `1px solid ${colors.border}`,
+              borderRadius: 16,
+              padding: '12px 14px',
+            }}
+          >
+            <div style={{ width: 34, height: 34, borderRadius: 12, background: colors.chipBg, color: colors.accentPurple, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <Users size={17} />
+            </div>
+            <div className="flex-1">
+              <p style={{ fontSize: '13px', fontWeight: 800, color: colors.textPrimary, margin: 0 }}>
+                Invite your flatmates to start sharing meals
+              </p>
+              <p style={{ fontSize: '11px', color: colors.textSecondary, margin: '2px 0 0 0' }}>
+                Share one recipe pool for {preferences.groupName || 'your group'}
+              </p>
+            </div>
+          </button>
+        </div>
+      )}
+
       {/* ── AI Cook Message Bottom Modal ── */}
       {showCookMessage && preferences.hasCook && (
         <div
@@ -143,12 +170,12 @@ export default function Home() {
             className="w-full max-w-md animate-slide-up"
             style={{
               background: colors.pageSurface,
-              borderRadius: '28px 28px 0 0',
+              borderRadius: '24px 24px 0 0',
               height: '80vh',
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
-              boxShadow: '0 -12px 40px rgba(0,0,0,0.18)',
+              boxShadow: '0 -4px 24px rgba(28,27,31,0.1)',
             }}
           >
             <div
@@ -212,6 +239,7 @@ export default function Home() {
         cookPhone={preferences.cookPhone}
       />
 
+      {showInvite && <InviteSheet onClose={() => setShowInvite(false)} />}
       <BottomNav />
     </div>
   )
@@ -239,7 +267,6 @@ function QuickAction({
         padding: '12px 14px',
         gap: 10,
         minHeight: 60,
-        boxShadow: colors.softShadow,
       }}
     >
       <div
@@ -282,13 +309,12 @@ function MealCard({
       <div
         style={{
           background: colors.card,
-          borderRadius: 20,
-          border: `1px solid ${darkMode ? colors.border : '#F4F4F4'}`,
+          borderRadius: 16,
+          border: `1px solid ${colors.border}`,
           display: 'flex',
           alignItems: 'stretch',
           padding: 12,
           gap: 14,
-          boxShadow: colors.softShadow,
           position: 'relative',
         }}
       >

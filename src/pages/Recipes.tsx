@@ -1,37 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useStore, generateId, guessIngredients, detectSourceType } from '../store/useStore'
-import type { Recipe, SharedRecipe } from '../store/useStore'
+import type { Recipe } from '../store/useStore'
 import BottomNav from '../components/BottomNav'
 import SegmentedControl from '../components/SegmentedControl'
 import { Plus, X, Link2, Sparkles, Trash2, UtensilsCrossed, Check, BookOpen, Users } from 'lucide-react'
 
 const MEAL_TYPE_FILTERS = ['All', 'Breakfast', 'Lunch', 'Dinner', 'Snacks']
-
-// Sample shared recipes for empty state
-const SAMPLE_SHARED: SharedRecipe[] = [
-  {
-    id: 'sr1', name: 'Butter Chicken', sharedBy: 'Rahul', sourceType: 'youtube',
-    link: 'https://youtube.com/watch?v=example', ingredients: ['Chicken', 'Butter', 'Cream', 'Tomato puree', 'Garam masala'],
-    tags: ['Dinner', 'Cook Approved'], note: 'Cook makes this perfectly!', timestamp: Date.now() - 86400000,
-    cookApproved: true, mealType: 'dinner',
-    image: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=400&q=80',
-  },
-  {
-    id: 'sr2', name: 'Egg Bhurji', sharedBy: 'Priya', sourceType: 'manual',
-    ingredients: ['Eggs', 'Onion', 'Tomato', 'Green chili', 'Butter'],
-    tags: ['Breakfast', 'Quick'], note: 'Best with hot parathas', timestamp: Date.now() - 172800000,
-    mealType: 'breakfast',
-    image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&q=80',
-  },
-  {
-    id: 'sr3', name: 'Pesto Pasta', sharedBy: 'Ayush', sourceType: 'instagram',
-    link: 'https://instagram.com/reel/example', ingredients: ['Pasta', 'Basil pesto', 'Olive oil', 'Garlic', 'Parmesan'],
-    tags: ['Dinner', 'Easy for Cook'], timestamp: Date.now() - 259200000,
-    mealType: 'dinner',
-    image: 'https://images.unsplash.com/photo-1473093295043-cdd812d0e601?w=400&q=80',
-  },
-]
+const serifFont = "'DM Serif Display', Georgia, serif"
 
 export default function Recipes() {
   const navigate = useNavigate()
@@ -57,20 +33,20 @@ export default function Recipes() {
   const userName = preferences.name || 'You'
 
   const lightColors = {
-    accent: '#3C151A',
-    accentPurple: '#3C151A',
-    accentLight: '#F2F3F5',
-    accentBorder: '#ECE8E4',
-    accentText: '#3C151A',
-    surface: '#FFFFFF',
-    pageSurface: '#FFFFFF',
-    card: '#F6F6F6',
-    border: '#ECE8E4',
-    elevated: '#F4F5F7',
-    textPrimary: '#111111',
-    textSecondary: '#7A746D',
-    textTertiary: '#7A746D',
-    warmSurface: '#F4F5F7'
+    accent: '#4A1F23',
+    accentPurple: '#4A1F23',
+    accentLight: 'rgba(74, 31, 35, 0.06)',
+    accentBorder: 'rgba(74, 31, 35, 0.22)',
+    accentText: '#4A1F23',
+    surface: '#F7F4EF',
+    pageSurface: '#F7F4EF',
+    card: '#FFFFFF',
+    border: '#E6E0D8',
+    elevated: '#F2EEE9',
+    textPrimary: '#1C1B1F',
+    textSecondary: '#6F6B73',
+    textTertiary: '#6F6B73',
+    warmSurface: '#F2EEE9'
   }
   const darkColors = {
     accent: '#9A4D5A',
@@ -129,7 +105,7 @@ export default function Recipes() {
     const ings = ingredients.length > 0 ? ingredients : guessIngredients(name)
     if (activeTab === 'shared') {
       addSharedRecipe({
-        id: generateId(), name: name.trim(), sharedBy: userName,
+        id: generateId(), groupId: preferences.groupId || undefined, name: name.trim(), sharedBy: userName,
         link: link || undefined, sourceType: detectSourceType(link), ingredients: ings,
         tags: [], note: note || undefined, timestamp: Date.now(), mealType,
       })
@@ -167,7 +143,10 @@ export default function Recipes() {
   }
 
   const filteredRecipes = filterByMealTypeAndSearch(recipes)
-  const allShared = sharedRecipes.length > 0 ? sharedRecipes : SAMPLE_SHARED
+  const groupSharedRecipes = preferences.groupId
+    ? sharedRecipes.filter((recipe) => recipe.groupId === preferences.groupId)
+    : []
+  const allShared = groupSharedRecipes
   const filteredShared = filterByMealTypeAndSearch(allShared)
 
   const recipeImage = (r: { image?: string; name: string }) => {
@@ -184,7 +163,7 @@ export default function Recipes() {
     <div className="min-h-screen pb-24" style={{ background: colors.pageSurface }}>
       <div className="px-5 pt-14 pb-1">
         <div className="flex items-center justify-between">
-          <h1 style={{ fontSize: '28px', fontWeight: 800, color: colors.textPrimary, margin: 0, letterSpacing: '-0.03em' }}>
+          <h1 style={{ fontFamily: serifFont, fontSize: '32px', fontWeight: 400, color: colors.textPrimary, margin: 0, lineHeight: 1.1 }}>
             Recipes
           </h1>
           <button onClick={openTypePicker}
@@ -203,12 +182,12 @@ export default function Recipes() {
           ]}
           value={activeTab}
           onChange={(tab) => { setActiveTab(tab); setMealFilter('All') }}
-          railBackground={preferences.darkMode ? '#1B1B1B' : '#F2F3F5'}
-          activeBackground={preferences.darkMode ? '#2E2E2E' : colors.surface}
-          activeText={preferences.darkMode ? '#FEFEFE' : '#111111'}
-          inactiveText={preferences.darkMode ? '#A9A0A3' : '#7A746D'}
-          activeBorder={preferences.darkMode ? '#3A3A3A' : '#DDD8D3'}
-          inactiveBorder={preferences.darkMode ? 'rgba(255,255,255,0.08)' : '#E0DCD8'}
+          railBackground={preferences.darkMode ? '#1B1B1B' : '#F2EEE9'}
+          activeBackground={preferences.darkMode ? '#2E2E2E' : '#FFFFFF'}
+          activeText={preferences.darkMode ? '#FEFEFE' : '#1C1B1F'}
+          inactiveText={preferences.darkMode ? '#A9A0A3' : '#6F6B73'}
+          activeBorder={preferences.darkMode ? '#3A3A3A' : '#E6E0D8'}
+          inactiveBorder={preferences.darkMode ? 'rgba(255,255,255,0.08)' : '#E6E0D8'}
         />
       </div>
 
@@ -218,7 +197,7 @@ export default function Recipes() {
           placeholder="Search recipes or ingredients..." 
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          style={{ width: '100%', padding: '10px 16px', borderRadius: 14, border: `1.5px solid ${preferences.darkMode ? colors.border : '#F4F4F4'}`, background: preferences.darkMode ? 'transparent' : '#F6F6F6', outline: 'none', color: colors.textPrimary, fontSize: '14px' }}
+          style={{ width: '100%', padding: '10px 16px', borderRadius: 14, border: `1px solid ${colors.border}`, background: preferences.darkMode ? 'transparent' : '#FFFFFF', outline: 'none', color: colors.textPrimary, fontSize: '14px' }}
         />
       </div>
 
@@ -232,14 +211,14 @@ export default function Recipes() {
                 className="px-3.5 py-1.5 rounded-full cursor-pointer transition-smooth whitespace-nowrap outline-none"
                 style={{
                   background: isSel
-                    ? (preferences.darkMode ? 'rgba(154, 77, 90, 0.18)' : '#F8F6F3')
-                    : (preferences.darkMode ? '#1B1B1B' : '#F6F6F6'),
+                    ? (preferences.darkMode ? 'rgba(154, 77, 90, 0.18)' : 'rgba(74, 31, 35, 0.06)')
+                    : (preferences.darkMode ? '#1B1B1B' : '#FFFFFF'),
                   color: isSel
-                    ? (preferences.darkMode ? '#F0C7CF' : '#3C151A')
-                    : (preferences.darkMode ? '#FEFEFE' : '#111111'),
+                    ? (preferences.darkMode ? '#F0C7CF' : '#4A1F23')
+                    : colors.textPrimary,
                   border: isSel
-                    ? `1.5px solid ${preferences.darkMode ? 'rgba(240, 199, 207, 0.5)' : 'rgba(60, 21, 26, 0.5)'}`
-                    : `1px solid ${preferences.darkMode ? 'rgba(255,255,255,0.08)' : '#F4F4F4'}`,
+                    ? `1.5px solid ${preferences.darkMode ? 'rgba(240, 199, 207, 0.4)' : 'rgba(74, 31, 35, 0.22)'}`
+                    : `1px solid ${colors.border}`,
                   fontSize: '12px',
                   fontWeight: isSel ? 700 : 600,
                 }}>
@@ -268,9 +247,8 @@ export default function Recipes() {
               <div className="space-y-4">
                 {filteredRecipes.map((recipe) => (
                   <div key={recipe.id} style={{
-                    background: colors.card, border: `1px solid ${preferences.darkMode ? colors.border : '#F4F4F4'}`,
-                    borderRadius: 18, display: 'flex', alignItems: 'stretch', padding: '12px', gap: '12px', position: 'relative',
-                    boxShadow: preferences.darkMode ? 'none' : '0 8px 22px rgba(27,18,18,0.05)',
+                    background: colors.card, border: `1px solid ${colors.border}`,
+                    borderRadius: 16, display: 'flex', alignItems: 'stretch', padding: '12px', gap: '12px', position: 'relative',
                   }}>
                     <button onClick={() => navigate(`/recipe/${recipe.id}`)} className="absolute inset-0 w-full h-full border-none bg-transparent cursor-pointer z-0 outline-none" aria-label={`View ${recipe.name}`}></button>
                     <div style={{ width: 80, height: 80, flexShrink: 0, borderRadius: 14, overflow: 'hidden', background: colors.surface, zIndex: 1, pointerEvents: 'none' }}>
@@ -314,7 +292,7 @@ export default function Recipes() {
               </div>
             ) : (
               filteredShared.map((recipe) => (
-                <div key={recipe.id} style={{ background: colors.card, border: `1px solid ${preferences.darkMode ? colors.border : '#F4F4F4'}`, borderRadius: 18, boxShadow: preferences.darkMode ? 'none' : '0 8px 22px rgba(27,18,18,0.05)', overflow: 'hidden' }}>
+                <div key={recipe.id} style={{ background: colors.card, border: `1px solid ${colors.border}`, borderRadius: 16, overflow: 'hidden' }}>
                   <div style={{ display: 'flex', alignItems: 'center', padding: '12px', gap: '12px', position: 'relative' }}>
                     <button onClick={() => navigate(`/recipe/${recipe.id}`, { state: { recipe: { ...recipe, source: 'shared' } } })} className="absolute inset-0 w-full h-full border-none bg-transparent cursor-pointer z-0 outline-none" aria-label={`View ${recipe.name}`}></button>
                     <div style={{ width: 80, height: 80, flexShrink: 0, borderRadius: 14, overflow: 'hidden', background: colors.surface, zIndex: 1, pointerEvents: 'none' }}>
@@ -373,13 +351,13 @@ export default function Recipes() {
             className="w-full max-w-md animate-slide-up"
             style={{
               background: colors.pageSurface,
-              borderRadius: '28px 28px 0 0',
+              borderRadius: '24px 24px 0 0',
               padding: '22px 22px 28px',
               boxShadow: '0 -12px 40px rgba(0,0,0,0.18)',
             }}
           >
             <div style={{ width: 40, height: 4, borderRadius: 2, background: preferences.darkMode ? '#2E2E2E' : '#F4F4F4', margin: '0 auto 18px' }} />
-            <h3 style={{ fontSize: '19px', fontWeight: 800, color: colors.textPrimary, margin: '0 0 4px 0', letterSpacing: '-0.01em' }}>
+            <h3 style={{ fontFamily: serifFont, fontSize: '22px', fontWeight: 400, color: colors.textPrimary, margin: '0 0 4px 0', lineHeight: 1.15 }}>
               New recipe
             </h3>
             <p style={{ fontSize: '13px', color: colors.textSecondary, margin: '0 0 18px 0' }}>
@@ -391,24 +369,24 @@ export default function Recipes() {
                 onClick={() => pickType('mine')}
                 className="w-full flex items-center cursor-pointer border-none outline-none text-left"
                 style={{
-                  background: preferences.darkMode ? '#1B1B1B' : '#F6F6F6',
-                  border: `1px solid ${preferences.darkMode ? 'rgba(255,255,255,0.08)' : '#F4F4F4'}`,
-                  borderRadius: 18,
+                  background: preferences.darkMode ? '#1B1B1B' : '#FFFFFF',
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: 16,
                   padding: '16px 16px',
                   gap: 14,
                   minHeight: 64,
                 }}
               >
                 <div style={{
-                  width: 42, height: 42, borderRadius: 12,
-                  background: preferences.darkMode ? 'rgba(154, 77, 90, 0.18)' : '#F8F6F3',
+                  width: 40, height: 40, borderRadius: 12,
+                  background: 'rgba(74, 31, 35, 0.06)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: colors.accentPurple, flexShrink: 0,
                 }}>
                   <BookOpen size={18} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: '14px', fontWeight: 700, color: colors.textPrimary, margin: 0, lineHeight: 1.2 }}>
+                  <p style={{ fontSize: '14px', fontWeight: 600, color: colors.textPrimary, margin: 0, lineHeight: 1.2 }}>
                     My recipe
                   </p>
                   <p style={{ fontSize: '12px', color: colors.textSecondary, margin: '3px 0 0 0', lineHeight: 1.3 }}>
@@ -421,17 +399,17 @@ export default function Recipes() {
                 onClick={() => pickType('shared')}
                 className="w-full flex items-center cursor-pointer border-none outline-none text-left"
                 style={{
-                  background: preferences.darkMode ? '#1B1B1B' : '#F6F6F6',
-                  border: `1px solid ${preferences.darkMode ? 'rgba(255,255,255,0.08)' : '#F4F4F4'}`,
-                  borderRadius: 18,
+                  background: preferences.darkMode ? '#1B1B1B' : '#FFFFFF',
+                  border: `1px solid ${colors.border}`,
+                  borderRadius: 16,
                   padding: '16px 16px',
                   gap: 14,
                   minHeight: 64,
                 }}
               >
                 <div style={{
-                  width: 42, height: 42, borderRadius: 12,
-                  background: preferences.darkMode ? 'rgba(154, 77, 90, 0.18)' : '#F8F6F3',
+                  width: 40, height: 40, borderRadius: 12,
+                  background: 'rgba(74, 31, 35, 0.06)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: colors.accentPurple, flexShrink: 0,
                 }}>
@@ -463,7 +441,7 @@ export default function Recipes() {
             className="w-full max-w-md animate-slide-up"
             style={{
               background: colors.pageSurface,
-              borderRadius: '28px 28px 0 0',
+              borderRadius: '24px 24px 0 0',
               height: '80vh',
               display: 'flex',
               flexDirection: 'column',
@@ -486,7 +464,7 @@ export default function Recipes() {
                 <p style={{ fontSize: '10px', fontWeight: 800, color: colors.textSecondary, margin: 0, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
                   {editId ? 'Edit' : activeTab === 'shared' ? 'Shared' : 'Mine'}
                 </p>
-                <h3 style={{ fontSize: '18px', fontWeight: 800, margin: '2px 0 0 0', color: colors.textPrimary, letterSpacing: '-0.01em' }}>
+                <h3 style={{ fontFamily: serifFont, fontSize: '22px', fontWeight: 400, margin: '2px 0 0 0', color: colors.textPrimary, lineHeight: 1.15 }}>
                   {editId ? 'Edit recipe' : activeTab === 'shared' ? 'Share a recipe' : 'New recipe'}
                 </h3>
               </div>
@@ -547,14 +525,14 @@ export default function Recipes() {
                           className="px-3.5 py-2 rounded-full cursor-pointer transition-smooth outline-none"
                           style={{
                             background: sel
-                              ? (preferences.darkMode ? 'rgba(154, 77, 90, 0.18)' : '#F8F6F3')
-                              : (preferences.darkMode ? '#1B1B1B' : '#F6F6F6'),
+                              ? (preferences.darkMode ? 'rgba(154, 77, 90, 0.18)' : 'rgba(74, 31, 35, 0.06)')
+                              : (preferences.darkMode ? '#1B1B1B' : '#FFFFFF'),
                             border: sel
-                              ? `1.5px solid ${preferences.darkMode ? 'rgba(240, 199, 207, 0.5)' : 'rgba(60, 21, 26, 0.5)'}`
-                              : `1px solid ${preferences.darkMode ? 'rgba(255,255,255,0.08)' : '#F4F4F4'}`,
+                              ? `1.5px solid ${preferences.darkMode ? 'rgba(240, 199, 207, 0.4)' : 'rgba(74, 31, 35, 0.22)'}`
+                              : `1px solid ${colors.border}`,
                             color: sel
-                              ? (preferences.darkMode ? '#F0C7CF' : '#3C151A')
-                              : (preferences.darkMode ? '#FEFEFE' : '#111111'),
+                              ? (preferences.darkMode ? '#F0C7CF' : '#4A1F23')
+                              : colors.textPrimary,
                             fontSize: '12px',
                             fontWeight: sel ? 700 : 600,
                           }}>
@@ -637,15 +615,15 @@ export default function Recipes() {
                 <button
                   onClick={handleSave}
                   disabled={!name.trim()}
-                  className="w-full flex items-center justify-center gap-2 rounded-2xl border-none cursor-pointer outline-none"
+                  className="w-full flex items-center justify-center gap-2 border-none cursor-pointer outline-none"
                   style={{
                     background: colors.accentPurple,
-                    color: preferences.darkMode ? '#111111' : '#FFFFFF',
-                    height: 54,
+                    color: '#FFFFFF',
+                    height: 46,
+                    borderRadius: 18,
                     fontSize: '15px',
-                    fontWeight: 700,
+                    fontWeight: 600,
                     opacity: name.trim() ? 1 : 0.45,
-                    boxShadow: preferences.darkMode ? 'none' : '0 12px 28px rgba(60,21,26,0.22)',
                   }}
                 >
                   {editId ? <Check size={16} /> : <Plus size={16} />}
