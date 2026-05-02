@@ -173,7 +173,7 @@ export default function Planner() {
         </h1>
       </div>
 
-      <div className="px-5 mt-4 mb-3">
+      <div className="px-5 mt-4 mb-0">
         <SegmentedControl
           options={[ { value: 'meals', label: 'Meals' }, { value: 'grocery', label: `Grocery (${unchecked.length})` } ]}
           value={activeTab}

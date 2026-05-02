@@ -193,7 +193,7 @@ export default function Recipes() {
       </div>
 
 
-      <div className="px-5 mt-4 mb-3">
+      <div className="px-5 mt-4 mb-0">
         <SegmentedControl
           options={[
             { value: 'mine', label: `Mine (${recipes.length})` },
