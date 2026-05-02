@@ -39,15 +39,15 @@ const serifStyle = { fontFamily: "'DM Serif Display', Georgia, serif" }
 
 /* Design tokens */
 const T = {
-  bg: '#F7F4EF',
-  card: '#FFFFFF',
-  secondary: '#F2EEE9',
-  border: '#E6E0D8',
+  bg: '#F5F3F1',
+  card: '#FBFAF8',
+  secondary: '#EDE9E4',
+  border: 'rgba(0,0,0,0.07)',
   accent: '#4A1F23',
   selBg: 'rgba(74, 31, 35, 0.06)',
   selBorder: 'rgba(74, 31, 35, 0.22)',
-  textPrimary: '#1C1B1F',
-  textSecondary: '#6F6B73',
+  textPrimary: '#1C1C1C',
+  textSecondary: '#6F6B66',
   disabled: '#BDB7C3',
 }
 

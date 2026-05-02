@@ -7,7 +7,7 @@ import CookMessage from '../components/CookMessage'
 const light = {
   page: '#FBFAF8',
   card: '#F5F3F1',
-  border: '#E7E3DF',
+  border: 'rgba(0,0,0,0.07)',
   text: '#1C1C1C',
   muted: '#6F6B66',
   accent: '#4A1F23',

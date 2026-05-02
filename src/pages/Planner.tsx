@@ -15,7 +15,7 @@ const lightColors = {
   textPrimary: '#1C1C1C', textSecondary: '#6F6B66', textTertiary: '#6F6B66', textMuted: '#6F6B66',
   accentPurple: '#4A1F23', accentPurpleLight: '#9A4D5A', accentText: '#4A1F23',
   surface: '#F5F3F1', pageSurface: '#F5F3F1', card: '#FBFAF8',
-  border: '#E7E3DF', borderActive: 'rgba(74, 31, 35, 0.22)',
+  border: 'rgba(0,0,0,0.07)', borderActive: 'rgba(74, 31, 35, 0.22)',
   secondarySurface: '#EDE9E4', elevatedSurface: '#EDE9E4',
   accentSoft: 'rgba(74, 31, 35, 0.06)', tertiaryAction: '#4A1F23', warmSurface: '#EDE9E4', iconSurface: '#EDE9E4'
 }

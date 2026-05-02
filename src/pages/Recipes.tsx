@@ -45,7 +45,7 @@ export default function Recipes() {
     surface: '#F5F3F1',
     pageSurface: '#F5F3F1',
     card: '#FBFAF8',
-    border: '#E7E3DF',
+    border: 'rgba(0,0,0,0.07)',
     elevated: '#EDE9E4',
     textPrimary: '#1C1C1C',
     textSecondary: '#6F6B66',

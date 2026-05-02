@@ -41,7 +41,7 @@ export default function AskChef() {
     textPrimary: '#1C1C1C',
     textSecondary: '#6F6B66',
     textTertiary: '#6F6B66',
-    border: '#E7E3DF',
+    border: 'rgba(0,0,0,0.07)',
     card: '#F5F3F1',
     accentText: '#4A1F23',
     accentPurple: '#4A1F23',
@@ -311,7 +311,7 @@ function ChatRecipeCard({
       style={{
         background: colors.card,
         borderRadius: 20,
-        border: `1px solid ${colors.pageSurface === '#121212' ? colors.border : '#F4F4F4'}`,
+        border: `1px solid ${colors.border}`,
         overflow: 'hidden',
         boxShadow: colors.pageSurface === '#121212' ? 'none' : '0 6px 16px rgba(27,18,18,0.05)',
       }}
@@ -376,7 +376,7 @@ function ChatRecipeCard({
                   padding: '3px 8px',
                   borderRadius: 999,
                   background: colors.chipBg,
-                  border: `1px solid ${colors.pageSurface === '#121212' ? 'rgba(255,255,255,0.2)' : '#ECE8E4'}`,
+                  border: `1px solid ${colors.border}`,
                   color: colors.chipText,
                 }}
               >

@@ -194,7 +194,7 @@ export default function MealDetail() {
 
           <button onClick={() => window.open(getGroceryUrl(), '_blank')}
             className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl cursor-pointer mb-6"
-            style={{ background: '#F6F6F6', color: colors.text, border: '1px solid #ECE8E4', fontSize: '14px', fontWeight: 600 }}>
+            style={{ background: colors.card, color: colors.text, border: `1px solid ${colors.border}`, fontSize: '14px', fontWeight: 600 }}>
             <ShoppingCart size={15} style={{ color: colors.textSecondary }} />
             Order on {preferences.preferredGroceryApp
               ? preferences.preferredGroceryApp.charAt(0).toUpperCase() + preferences.preferredGroceryApp.slice(1)

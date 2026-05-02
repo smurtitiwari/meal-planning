@@ -16,8 +16,23 @@ export default function SegmentedControl<T extends string>({
   onChange,
   darkMode = false,
 }: SegmentedControlProps<T>) {
+  const rail         = darkMode ? '#1B1B1B' : '#EDE9E4'
+  const active       = darkMode ? '#2A2A2A' : '#F5F3F1'
+  const activeShadow = darkMode ? '0 1px 4px rgba(0,0,0,0.4)' : '0 1px 4px rgba(28,27,31,0.07)'
+  const activeText   = darkMode ? '#FEFEFE' : '#1C1C1C'
+  const inactiveText = darkMode ? '#6B6370' : '#6F6B66'
+
   return (
-    <div style={{ display: 'flex', gap: 3 }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${options.length}, 1fr)`,
+        background: rail,
+        borderRadius: 12,
+        padding: 3,
+        gap: 2,
+      }}
+    >
       {options.map((option) => {
         const selected = option.value === value
         return (
@@ -25,24 +40,17 @@ export default function SegmentedControl<T extends string>({
             key={option.value}
             onClick={() => onChange(option.value)}
             style={{
-              flex: 1,
-              background: selected
-                ? (darkMode ? '#121212' : '#F5F3F1')
-                : (darkMode ? '#0D0D0D' : '#E4DFD9'),
-              color: selected
-                ? (darkMode ? '#FEFEFE' : '#1C1B1F')
-                : (darkMode ? '#5A5460' : '#7A746D'),
+              background: selected ? active : 'transparent',
+              color: selected ? activeText : inactiveText,
               fontSize: '14px',
               fontWeight: selected ? 700 : 500,
-              padding: '10px 0',
-              borderRadius: '10px 10px 0 0',
-              border: selected
-                ? `1px solid ${darkMode ? '#2E2E2E' : '#E7E3DF'}`
-                : '1px solid transparent',
-              borderBottom: 'none',
+              padding: '9px 0',
+              borderRadius: 10,
+              border: 'none',
               outline: 'none',
               cursor: 'pointer',
               transition: 'all 0.18s ease',
+              boxShadow: selected ? activeShadow : 'none',
               whiteSpace: 'nowrap',
             }}
           >

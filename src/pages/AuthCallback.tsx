@@ -73,8 +73,8 @@ export default function AuthCallback() {
   }, [navigate])
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#F7F4EF' }}>
-      <div style={{ textAlign: 'center', color: '#6F6B73', fontSize: 14 }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#F5F3F1' }}>
+      <div style={{ textAlign: 'center', color: '#6F6B66', fontSize: 14 }}>
         Signing you in…
       </div>
     </div>

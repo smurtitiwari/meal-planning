@@ -52,7 +52,7 @@ export default function Group() {
         elevated: '#252525', sheetBg: '#181818',
       }
     : {
-        page: '#F5F3F1', card: '#FBFAF8', border: '#E7E3DF',
+        page: '#F5F3F1', card: '#FBFAF8', border: 'rgba(0,0,0,0.07)',
         text: '#1C1C1C', sub: '#6F6B66', accent: '#4A1F23',
         soft: 'rgba(74,31,35,0.06)', selBorder: 'rgba(74,31,35,0.22)',
         elevated: '#EDE9E4', sheetBg: '#F5F3F1',

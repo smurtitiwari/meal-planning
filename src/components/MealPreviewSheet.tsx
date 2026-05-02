@@ -8,11 +8,11 @@ import { ArrowLeft, Clock, User, Globe, Square, CheckSquare2, ShoppingCart, Spar
 const serifFont = "'DM Serif Display', Georgia, serif"
 
 const lightColors = {
-  textPrimary: '#111111', textSecondary: '#7A746D', textMuted: '#7A746D',
-  accent: '#3C151A', accentLight: 'rgba(60, 21, 26, 0.08)',
-  surface: '#FFFFFF', card: '#F6F6F6',
-  border: '#ECE8E4',
-  chipBg: '#F8F6F3', chipBorder: 'rgba(60, 21, 26, 0.14)', chipText: '#3C151A',
+  textPrimary: '#1C1C1C', textSecondary: '#6F6B66', textMuted: '#6F6B66',
+  accent: '#4A1F23', accentLight: 'rgba(74, 31, 35, 0.07)',
+  surface: '#FBFAF8', card: '#F5F3F1',
+  border: 'rgba(0,0,0,0.07)',
+  chipBg: '#EDE9E4', chipBorder: 'rgba(74, 31, 35, 0.12)', chipText: '#4A1F23',
 }
 const darkColors = {
   textPrimary: '#FEFEFE', textSecondary: '#B8B0B2', textMuted: '#A9A0A3',

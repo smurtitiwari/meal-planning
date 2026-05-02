@@ -26,7 +26,7 @@ export default function InviteSheet({ onClose }: InviteSheetProps) {
   const dark = preferences.darkMode
   const C = dark
     ? { bg: '#1A1A1A', card: '#252525', border: '#333', text: '#FEFEFE', sub: '#A9A0A3', accent: '#9A4D5A', code: '#F0C7CF', codeBg: 'rgba(154,77,90,0.15)' }
-    : { bg: '#F7F4EF', card: '#FFFFFF', border: '#E6E0D8', text: '#1C1B1F', sub: '#6F6B73', accent: '#4A1F23', code: '#4A1F23', codeBg: 'rgba(74,31,35,0.06)' }
+    : { bg: '#F5F3F1', card: '#FBFAF8', border: 'rgba(0,0,0,0.07)', text: '#1C1C1C', sub: '#6F6B66', accent: '#4A1F23', code: '#4A1F23', codeBg: 'rgba(74,31,35,0.06)' }
 
   return (
     <div
