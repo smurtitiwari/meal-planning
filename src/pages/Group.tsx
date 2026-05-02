@@ -52,10 +52,10 @@ export default function Group() {
         elevated: '#252525', sheetBg: '#181818',
       }
     : {
-        page: '#F7F4EF', card: '#FFFFFF', border: '#E6E0D8',
-        text: '#1C1B1F', sub: '#6F6B73', accent: '#4A1F23',
+        page: '#F5F3F1', card: '#FBFAF8', border: '#E7E3DF',
+        text: '#1C1C1C', sub: '#6F6B66', accent: '#4A1F23',
         soft: 'rgba(74,31,35,0.06)', selBorder: 'rgba(74,31,35,0.22)',
-        elevated: '#F2EEE9', sheetBg: '#F7F4EF',
+        elevated: '#EDE9E4', sheetBg: '#F5F3F1',
       }
 
   const ensureAndInvite = () => {

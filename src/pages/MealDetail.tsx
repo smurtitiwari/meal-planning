@@ -61,16 +61,16 @@ export default function MealDetail() {
   const mealLabel: Record<string, string> = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' }
   const dm = preferences.darkMode
   const colors = {
-    page:          dm ? '#121212' : '#FFFFFF',
-    card:          dm ? '#1B1B1B' : '#F6F6F6',
-    border:        dm ? '#2E2E2E' : '#ECE8E4',
-    text:          dm ? '#FEFEFE' : '#111111',
-    textSecondary: dm ? '#A9A0A3' : '#7A746D',
-    textTertiary:  dm ? '#A9A0A3' : '#7A746D',
+    page:          dm ? '#121212' : '#FBFAF8',
+    card:          dm ? '#1B1B1B' : '#F5F3F1',
+    border:        dm ? '#2E2E2E' : '#E7E3DF',
+    text:          dm ? '#FEFEFE' : '#1C1C1C',
+    textSecondary: dm ? '#A9A0A3' : '#6F6B66',
+    textTertiary:  dm ? '#A9A0A3' : '#6F6B66',
     accent:        dm ? '#9A4D5A' : '#4A1F23',
-    accentLight:   dm ? 'rgba(154,77,90,0.18)' : '#F2EEE9',
-    sheetBg:       dm ? '#181818' : '#FFFFFF',
-    sheetHeader:   dm ? '#1B1B1B' : '#FFFFFF',
+    accentLight:   dm ? 'rgba(154,77,90,0.18)' : '#EDE9E4',
+    sheetBg:       dm ? '#181818' : '#FBFAF8',
+    sheetHeader:   dm ? '#1B1B1B' : '#FBFAF8',
     closeBtn:      dm ? '#252525' : '#F1F2F4',
   }
 

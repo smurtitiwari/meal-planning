@@ -37,12 +37,12 @@ export default function AskChef() {
   const userName = preferences.name || 'there'
 
   const lightColors = {
-    pageSurface: '#FFFFFF',
-    textPrimary: '#111111',
-    textSecondary: '#7A746D',
-    textTertiary: '#7A746D',
-    border: '#ECE8E4',
-    card: '#F6F6F6',
+    pageSurface: '#FBFAF8',
+    textPrimary: '#1C1C1C',
+    textSecondary: '#6F6B66',
+    textTertiary: '#6F6B66',
+    border: '#E7E3DF',
+    card: '#F5F3F1',
     accentText: '#4A1F23',
     accentPurple: '#4A1F23',
     accentBackground: '#F2F3F5',

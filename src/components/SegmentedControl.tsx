@@ -27,7 +27,7 @@ export default function SegmentedControl<T extends string>({
             style={{
               flex: 1,
               background: selected
-                ? (darkMode ? '#121212' : '#F7F4EF')
+                ? (darkMode ? '#121212' : '#F5F3F1')
                 : (darkMode ? '#0D0D0D' : '#E4DFD9'),
               color: selected
                 ? (darkMode ? '#FEFEFE' : '#1C1B1F')
@@ -37,7 +37,7 @@ export default function SegmentedControl<T extends string>({
               padding: '10px 0',
               borderRadius: '10px 10px 0 0',
               border: selected
-                ? `1px solid ${darkMode ? '#2E2E2E' : '#E6E0D8'}`
+                ? `1px solid ${darkMode ? '#2E2E2E' : '#E7E3DF'}`
                 : '1px solid transparent',
               borderBottom: 'none',
               outline: 'none',

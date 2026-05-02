@@ -13,10 +13,10 @@ const allMealTypes: ('breakfast' | 'lunch' | 'dinner')[] = ['breakfast', 'lunch'
 const serifFont = "'DM Serif Display', Georgia, serif"
 
 const lightColors = {
-  textPrimary: '#1C1B1F', textSecondary: '#6F6B73', textTertiary: '#6F6B73', textMuted: '#6F6B73',
+  textPrimary: '#1C1C1C', textSecondary: '#6F6B66', textTertiary: '#6F6B66', textMuted: '#6F6B66',
   accentPurple: '#4A1F23', accentPurpleLight: '#9A4D5A', accentText: '#4A1F23',
-  surface: '#F7F4EF', pageSurface: '#F7F4EF', card: '#FFFFFF',
-  border: '#E6E0D8', borderActive: '#E6E0D8', warmSurface: '#F2EEE9', iconSurface: '#F2EEE9', tertiaryAction: '#4A1F23',
+  surface: '#F5F3F1', pageSurface: '#F5F3F1', card: '#FBFAF8',
+  border: '#E7E3DF', borderActive: '#E7E3DF', warmSurface: '#EDE9E4', iconSurface: '#EDE9E4', tertiaryAction: '#4A1F23',
   chipBg: 'rgba(74, 31, 35, 0.06)', chipBorder: 'rgba(74, 31, 35, 0.15)', chipText: '#4A1F23',
   softShadow: 'none',
 }
@@ -68,9 +68,9 @@ export default function Home() {
             aria-label="Profile"
           >
             {preferences.profileImage ? (
-              <img src={preferences.profileImage} alt="Profile" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${preferences.darkMode ? '#2E2E2E' : '#ECE8E4'}` }} />
+              <img src={preferences.profileImage} alt="Profile" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${preferences.darkMode ? '#2E2E2E' : '#E7E3DF'}` }} />
             ) : (
-              <div style={{ width: 40, height: 40, borderRadius: '50%', background: preferences.darkMode ? '#1B1B1B' : '#F6F6F6', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${preferences.darkMode ? '#2E2E2E' : '#ECE8E4'}` }}>
+              <div style={{ width: 40, height: 40, borderRadius: '50%', background: preferences.darkMode ? '#1B1B1B' : '#FBFAF8', display: 'flex', alignItems: 'center', justifyContent: 'center', border: `1px solid ${preferences.darkMode ? '#2E2E2E' : '#E7E3DF'}` }}>
                 <User size={20} color={colors.textSecondary} />
               </div>
             )}

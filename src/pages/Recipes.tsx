@@ -42,15 +42,15 @@ export default function Recipes() {
     accentLight: 'rgba(74, 31, 35, 0.06)',
     accentBorder: 'rgba(74, 31, 35, 0.22)',
     accentText: '#4A1F23',
-    surface: '#F7F4EF',
-    pageSurface: '#F7F4EF',
-    card: '#FFFFFF',
-    border: '#E6E0D8',
-    elevated: '#F2EEE9',
-    textPrimary: '#1C1B1F',
-    textSecondary: '#6F6B73',
-    textTertiary: '#6F6B73',
-    warmSurface: '#F2EEE9'
+    surface: '#F5F3F1',
+    pageSurface: '#F5F3F1',
+    card: '#FBFAF8',
+    border: '#E7E3DF',
+    elevated: '#EDE9E4',
+    textPrimary: '#1C1C1C',
+    textSecondary: '#6F6B66',
+    textTertiary: '#6F6B66',
+    warmSurface: '#EDE9E4'
   }
   const darkColors = {
     accent: '#9A4D5A',

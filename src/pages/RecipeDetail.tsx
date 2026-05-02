@@ -5,13 +5,13 @@ import { useStore, DEFAULT_MEALS, generateId } from '../store/useStore'
 import CookMessage from '../components/CookMessage'
 
 const light = {
-  page: '#FFFFFF',
-  card: '#F6F6F6',
-  border: '#E6E0D8',
-  text: '#111111',
-  muted: '#7A746D',
+  page: '#FBFAF8',
+  card: '#F5F3F1',
+  border: '#E7E3DF',
+  text: '#1C1C1C',
+  muted: '#6F6B66',
   accent: '#4A1F23',
-  kcalBg: '#F8F6F3',
+  kcalBg: '#EDE9E4',
 }
 const dark = {
   page: '#121212',
