@@ -192,7 +192,7 @@ export default function Group() {
                 </button>
 
                 {/* Tertiary CTAs at bottom of card */}
-                <div style={{ borderTop: `1px solid ${C.border}`, padding: '8px 16px', display: 'flex', gap: 16 }}>
+                <div style={{ padding: '4px 16px 10px', display: 'flex', gap: 16 }}>
                   <button
                     onClick={() => { setActiveGroup(group.id); ensureAndInvite() }}
                     className="flex items-center gap-1.5 bg-transparent border-none cursor-pointer p-0"
@@ -290,12 +290,11 @@ export default function Group() {
                 Members ({getMembersForGroup(detailGroup!.id).length})
               </p>
 
-              <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, overflow: 'hidden', marginBottom: 4 }}>
-                {getMembersForGroup(detailGroup.id).map((member, i, arr) => (
+              <div style={{ background: C.card, borderRadius: 16, overflow: 'hidden', marginBottom: 4 }}>
+                {getMembersForGroup(detailGroup.id).map((member) => (
                   <div
                     key={member.id}
                     className="flex items-center gap-3 px-4 py-3"
-                    style={{ borderBottom: `1px solid ${C.border}` }}
                   >
                     {/* Avatar */}
                     <div style={{
