@@ -5,6 +5,8 @@ import BottomNav from '../components/BottomNav'
 import InviteSheet from '../components/InviteSheet'
 import { useNavigate } from 'react-router-dom'
 
+const serifFont2 = "'DM Serif Display', Georgia, serif"
+
 const serifFont = "'DM Serif Display', Georgia, serif"
 
 export default function Group() {
@@ -12,6 +14,8 @@ export default function Group() {
   const { preferences, groups, groupMembers, sharedRecipes, createGroup, setActiveGroup } = useStore()
   const [showInvite, setShowInvite] = useState(false)
   const [detailGroupId, setDetailGroupId] = useState<string | null>(null)
+  const [showCreateGroup, setShowCreateGroup] = useState(false)
+  const [newGroupName, setNewGroupName] = useState('')
 
   /* ── Data ── */
   const visibleGroups = groups.length > 0
@@ -60,6 +64,13 @@ export default function Group() {
     setShowInvite(true)
   }
 
+  const handleCreateGroup = () => {
+    if (!newGroupName.trim()) return
+    createGroup(newGroupName.trim())
+    setNewGroupName('')
+    setShowCreateGroup(false)
+  }
+
   return (
     <div className="min-h-screen pb-24" style={{ background: C.page }}>
       <div className="px-5 pt-14 pb-6">
@@ -78,12 +89,12 @@ export default function Group() {
             </h1>
           </div>
 
-          {/* ── Exact same CTA as Recipes ── */}
+          {/* ── Create new group ── */}
           <button
-            onClick={ensureAndInvite}
+            onClick={() => setShowCreateGroup(true)}
             className="w-10 h-10 rounded-full flex items-center justify-center border-none cursor-pointer"
             style={{ background: C.accent, color: '#FFF' }}
-            aria-label="Invite member"
+            aria-label="Create new group"
           >
             <Plus size={18} />
           </button>
@@ -247,12 +258,45 @@ export default function Group() {
             {/* Scrollable body */}
             <div style={{ flex: 1, overflowY: 'auto', padding: '4px 20px 32px' }}>
 
+              {/* ── Quick CTAs ── */}
+              <div style={{ display: 'flex', gap: 10, margin: '12px 0 16px 0' }}>
+                <button
+                  onClick={ensureAndInvite}
+                  className="flex-1 flex items-center justify-center gap-2 border-none cursor-pointer"
+                  style={{
+                    background: C.soft, color: C.accent,
+                    borderRadius: 14, padding: '11px 14px',
+                    fontSize: '13px', fontWeight: 700,
+                    border: `1px solid ${C.selBorder}`,
+                  }}
+                >
+                  <UserPlus size={15} />
+                  Invite flatmate
+                </button>
+                <button
+                  onClick={() => {
+                    setDetailGroupId(null)
+                    navigate('/recipes', { state: { openTypePicker: true, groupId: detailGroup?.id } })
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 border-none cursor-pointer"
+                  style={{
+                    background: C.soft, color: C.accent,
+                    borderRadius: 14, padding: '11px 14px',
+                    fontSize: '13px', fontWeight: 700,
+                    border: `1px solid ${C.selBorder}`,
+                  }}
+                >
+                  <BookOpen size={15} />
+                  Add recipe
+                </button>
+              </div>
+
               {/* ── Members section ── */}
               <p style={{
                 fontSize: '11px', fontWeight: 600, color: C.sub,
-                textTransform: 'uppercase', letterSpacing: '0.1em', margin: '12px 0 10px 0',
+                textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px 0',
               }}>
-                Members
+                Members ({getMembersForGroup(detailGroup!.id).length})
               </p>
 
               <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, overflow: 'hidden', marginBottom: 4 }}>
@@ -386,6 +430,68 @@ export default function Group() {
               )}
 
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Create Group Sheet ── */}
+      {showCreateGroup && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center"
+          style={{ background: 'rgba(28,27,31,0.4)' }}
+          onClick={() => setShowCreateGroup(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md animate-slide-up"
+            style={{
+              background: C.sheetBg, borderRadius: '24px 24px 0 0',
+              padding: '22px 22px 36px',
+              boxShadow: '0 -4px 24px rgba(28,27,31,0.1)',
+            }}
+          >
+            <div style={{ width: 36, height: 4, borderRadius: 2, background: C.border, margin: '0 auto 18px' }} />
+            <div className="flex items-center justify-between mb-4">
+              <h2 style={{ fontFamily: serifFont2, fontSize: '22px', fontWeight: 400, color: C.text, margin: 0 }}>
+                New group
+              </h2>
+              <button
+                onClick={() => setShowCreateGroup(false)}
+                className="flex items-center justify-center border-none cursor-pointer"
+                style={{ width: 32, height: 32, borderRadius: '50%', background: C.card, color: C.sub, border: `1px solid ${C.border}` }}
+              >
+                <X size={15} />
+              </button>
+            </div>
+            <p style={{ fontSize: '13px', color: C.sub, margin: '0 0 16px 0' }}>
+              Create a new group to share recipes and meal plans.
+            </p>
+            <input
+              type="text"
+              placeholder="e.g. Flat 503 Kitchen"
+              value={newGroupName}
+              onChange={(e) => setNewGroupName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleCreateGroup()}
+              autoFocus
+              style={{
+                width: '100%', height: 46, padding: '0 14px',
+                border: `1px solid ${C.border}`, borderRadius: 14,
+                background: C.card, fontSize: '15px', color: C.text,
+                outline: 'none', marginBottom: 12, boxSizing: 'border-box',
+              }}
+            />
+            <button
+              onClick={handleCreateGroup}
+              disabled={!newGroupName.trim()}
+              style={{
+                width: '100%', height: 46, background: C.accent, border: 'none',
+                borderRadius: 14, color: '#FFF', fontSize: '15px', fontWeight: 600,
+                cursor: newGroupName.trim() ? 'pointer' : 'not-allowed',
+                opacity: newGroupName.trim() ? 1 : 0.5,
+              }}
+            >
+              Create group
+            </button>
           </div>
         </div>
       )}
