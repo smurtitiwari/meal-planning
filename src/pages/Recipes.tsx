@@ -77,28 +77,24 @@ export default function Recipes() {
     setSelectedGroupId(preferences.groupId || ''); setFromGroup(false)
   }
 
-  // Handle edit requests coming from RecipeDetail
+  // Handle navigation state — redirect legacy bottom-sheet states to new routes
   useEffect(() => {
     if ((location.state as any)?.editRecipe) {
       const r = (location.state as any).editRecipe
-      handleEdit(r)
       window.history.replaceState({}, document.title)
+      navigate('/recipes/new', { state: { editRecipe: r } })
     }
-    if ((location.state as any)?.openNewRecipe) {
-      const type = (location.state as any).openNewRecipe
-      pickType(type)
+    if ((location.state as any)?.openNewRecipe || (location.state as any)?.openTypePicker) {
       window.history.replaceState({}, document.title)
-    }
-    if ((location.state as any)?.openTypePicker) {
-      openTypePicker()
-      window.history.replaceState({}, document.title)
+      navigate('/recipes/new')
     }
     if ((location.state as any)?.openSharedRecipe) {
       const gid = (location.state as any).groupId
-      if (gid) { setSelectedGroupId(gid); setFromGroup(true) }
+      window.history.replaceState({}, document.title)
+      navigate('/recipes/new', { state: { lockedGroupId: gid || null } })
+    }
+    if ((location.state as any)?.tab === 'shared') {
       setActiveTab('shared')
-      setShowTypePicker(false)
-      setShowAdd(true)
       window.history.replaceState({}, document.title)
     }
   }, [location.state])
@@ -186,7 +182,7 @@ export default function Recipes() {
               Your collection
             </h1>
           </div>
-          <button onClick={openTypePicker}
+          <button onClick={() => navigate('/recipes/new')}
             className="w-10 h-10 rounded-full flex items-center justify-center border-none cursor-pointer"
             style={{ background: colors.accentPurple, color: '#FFF' }}>
             <Plus size={18} />

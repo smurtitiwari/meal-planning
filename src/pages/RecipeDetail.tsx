@@ -243,7 +243,7 @@ export default function RecipeDetail() {
           )}
           {recipe.source === 'mine' && (
             <button
-              onClick={() => navigate('/recipes', { state: { editRecipe: recipe } })}
+              onClick={() => navigate('/recipes/new', { state: { editRecipe: recipe } })}
               className="flex items-center gap-1.5 cursor-pointer bg-transparent outline-none"
               style={{
                 padding: '5px 11px',

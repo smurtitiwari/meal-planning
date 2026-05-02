@@ -12,6 +12,8 @@ import AskChef from './pages/AskChef'
 import RecipeDetail from './pages/RecipeDetail'
 import Group from './pages/Group'
 import AuthCallback from './pages/AuthCallback'
+import AddRecipe from './pages/AddRecipe'
+import SelectGroup from './pages/SelectGroup'
 
 export default function App() {
   const onboardingComplete = useStore((s) => s.preferences.onboardingComplete)
@@ -95,6 +97,8 @@ export default function App() {
         <Route path="/recipe/:id" element={<RecipeDetail />} />
         <Route path="/planner" element={<Planner />} />
         <Route path="/recipes" element={<Recipes />} />
+        <Route path="/recipes/new" element={<AddRecipe />} />
+        <Route path="/recipes/new/group" element={<SelectGroup />} />
         <Route path="/group" element={<Group />} />
         <Route path="/ask" element={<AskChef />} />
         <Route path="/profile" element={<Profile />} />

@@ -204,7 +204,7 @@ export default function Group() {
                   <button
                     onClick={() => {
                       setActiveGroup(group.id)
-                      navigate('/recipes', { state: { openSharedRecipe: true, groupId: group.id } })
+                      navigate('/recipes/new', { state: { lockedGroupId: group.id } })
                     }}
                     className="flex items-center gap-1.5 bg-transparent border-none cursor-pointer p-0"
                     style={{ color: C.accent, fontSize: '13px', fontWeight: 600 }}
@@ -372,7 +372,7 @@ export default function Group() {
                     Be the first to share a recipe with this group.
                   </p>
                   <button
-                    onClick={() => { setDetailGroupId(null); navigate('/recipes', { state: { openSharedRecipe: true, groupId: detailGroup?.id } }) }}
+                    onClick={() => { setDetailGroupId(null); navigate('/recipes/new', { state: { lockedGroupId: detailGroup?.id } }) }}
                     className="flex items-center gap-2 border-none cursor-pointer mx-auto transition-smooth"
                     style={{
                       background: C.soft, color: C.accent,
