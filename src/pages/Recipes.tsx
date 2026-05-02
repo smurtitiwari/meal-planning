@@ -515,66 +515,99 @@ export default function Recipes() {
             <div style={{ flex: 1, overflowY: 'auto', padding: '18px 22px 32px' }}>
               <div className="space-y-4">
 
-                {/* ── Group selection — FIRST decision for shared recipes ── */}
-                {activeTab === 'shared' && !fromGroup && groups.length > 0 && (
+                {/* ── Group selection — first decision, compact + scrollable for any count ── */}
+                {activeTab === 'shared' && (
                   <div>
-                    <label className="section-label" style={{ display: 'block', marginBottom: 8, color: colors.textSecondary }}>Share to group</label>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                      {groups.map((g) => {
-                        const sel = selectedGroupId === g.id
-                        return (
-                          <button
-                            key={g.id}
-                            onClick={() => setSelectedGroupId(g.id)}
-                            className="w-full flex items-center gap-3 cursor-pointer border-none outline-none text-left"
-                            style={{
-                              background: sel ? colors.accentLight : (preferences.darkMode ? '#1B1B1B' : colors.card),
-                              border: sel
-                                ? `1.5px solid ${preferences.darkMode ? 'rgba(240,199,207,0.4)' : 'rgba(74,31,35,0.22)'}`
-                                : `1px solid ${colors.border}`,
-                              borderRadius: 12, padding: '12px 14px',
-                            }}
-                          >
-                            <div style={{
-                              width: 32, height: 32, borderRadius: 10,
-                              background: sel ? (preferences.darkMode ? 'rgba(154,77,90,0.3)' : 'rgba(74,31,35,0.1)') : colors.elevated,
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              color: colors.accentPurple, flexShrink: 0,
-                            }}>
-                              <Users size={15} />
-                            </div>
-                            <span style={{ fontSize: '14px', fontWeight: sel ? 700 : 500, color: sel ? colors.accentPurple : colors.textPrimary, flex: 1 }}>
-                              {g.name}
-                            </span>
-                            {sel && <Check size={15} color={colors.accentPurple} />}
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
+                    <label className="section-label" style={{ display: 'block', marginBottom: 8, color: colors.textSecondary }}>
+                      Share to group
+                    </label>
 
-                {/* ── Locked group indicator when coming from a group card ── */}
-                {activeTab === 'shared' && fromGroup && selectedGroupId && (
-                  <div style={{
-                    display: 'flex', alignItems: 'center', gap: 10,
-                    background: colors.accentLight,
-                    border: `1px solid ${preferences.darkMode ? 'rgba(240,199,207,0.25)' : 'rgba(74,31,35,0.15)'}`,
-                    borderRadius: 12, padding: '10px 14px',
-                  }}>
-                    <div style={{
-                      width: 32, height: 32, borderRadius: 10,
-                      background: preferences.darkMode ? 'rgba(154,77,90,0.3)' : 'rgba(74,31,35,0.1)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      color: colors.accentPurple, flexShrink: 0,
-                    }}>
-                      <Users size={15} />
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: '11px', fontWeight: 600, color: colors.accentPurple, margin: '0 0 1px 0', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Sharing to</p>
-                      <p style={{ fontSize: '14px', fontWeight: 700, color: colors.accentPurple, margin: 0 }}>{groupName(selectedGroupId)}</p>
-                    </div>
-                    <Check size={16} color={colors.accentPurple} />
+                    {fromGroup && selectedGroupId ? (
+                      /* Locked: came from a specific group card — no picker */
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: 10,
+                        background: colors.accentLight,
+                        border: `1px solid ${preferences.darkMode ? 'rgba(240,199,207,0.25)' : 'rgba(74,31,35,0.15)'}`,
+                        borderRadius: 12, padding: '11px 14px',
+                      }}>
+                        <div style={{
+                          width: 30, height: 30, borderRadius: 9,
+                          background: preferences.darkMode ? 'rgba(154,77,90,0.3)' : 'rgba(74,31,35,0.1)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          color: colors.accentPurple, flexShrink: 0,
+                        }}>
+                          <Users size={14} />
+                        </div>
+                        <span style={{ fontSize: '14px', fontWeight: 700, color: colors.accentPurple, flex: 1 }}>
+                          {groupName(selectedGroupId)}
+                        </span>
+                        <Check size={15} color={colors.accentPurple} />
+                      </div>
+                    ) : groups.length === 0 ? (
+                      /* No groups yet */
+                      <p style={{ fontSize: '13px', color: colors.textSecondary, margin: 0 }}>
+                        No groups yet. Create one from the Groups tab.
+                      </p>
+                    ) : (
+                      /* Selectable list — capped height so form fields stay visible for 4+ groups */
+                      <div style={{
+                        border: `1px solid ${colors.border}`,
+                        borderRadius: 14,
+                        overflow: 'hidden',
+                        maxHeight: groups.length > 3 ? 192 : 'none',
+                        overflowY: groups.length > 3 ? 'auto' : 'visible',
+                      }}>
+                        {groups.map((g, i) => {
+                          const sel = selectedGroupId === g.id
+                          const isLast = i === groups.length - 1
+                          return (
+                            <button
+                              key={g.id}
+                              onClick={() => setSelectedGroupId(g.id)}
+                              className="w-full flex items-center gap-3 cursor-pointer border-none outline-none text-left"
+                              style={{
+                                background: sel
+                                  ? colors.accentLight
+                                  : (preferences.darkMode ? '#1B1B1B' : colors.card),
+                                padding: '11px 14px',
+                                borderBottom: isLast ? 'none' : `1px solid ${colors.border}`,
+                              }}
+                            >
+                              {/* Group initial avatar */}
+                              <div style={{
+                                width: 30, height: 30, borderRadius: 9, flexShrink: 0,
+                                background: sel
+                                  ? (preferences.darkMode ? 'rgba(154,77,90,0.3)' : 'rgba(74,31,35,0.1)')
+                                  : colors.elevated,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontSize: '12px', fontWeight: 700,
+                                color: sel ? colors.accentPurple : colors.textSecondary,
+                              }}>
+                                {g.name.charAt(0).toUpperCase()}
+                              </div>
+                              <span style={{
+                                fontSize: '14px', fontWeight: sel ? 700 : 500,
+                                color: sel ? colors.accentPurple : colors.textPrimary,
+                                flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                              }}>
+                                {g.name}
+                              </span>
+                              {/* Radio dot */}
+                              <div style={{
+                                width: 18, height: 18, borderRadius: 9, flexShrink: 0,
+                                border: sel
+                                  ? 'none'
+                                  : `2px solid ${preferences.darkMode ? '#444' : '#D0CBC6'}`,
+                                background: sel ? colors.accentPurple : 'transparent',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              }}>
+                                {sel && <div style={{ width: 7, height: 7, borderRadius: 4, background: '#fff' }} />}
+                              </div>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    )}
                   </div>
                 )}
 
