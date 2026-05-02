@@ -7,54 +7,53 @@ type SegmentedControlProps<T extends string> = {
   options: SegmentedOption<T>[]
   value: T
   onChange: (value: T) => void
-  railBackground: string
-  activeBackground: string
-  activeText: string
-  inactiveText: string
-  activeBorder?: string
-  inactiveBorder?: string
+  darkMode?: boolean
 }
 
 export default function SegmentedControl<T extends string>({
   options,
   value,
   onChange,
-  railBackground,
-  activeBackground,
-  activeText,
-  inactiveText,
-  activeBorder,
-  inactiveBorder,
+  darkMode = false,
 }: SegmentedControlProps<T>) {
-  const count = Math.max(options.length, 1)
+  const rail   = darkMode ? '#1B1B1B' : '#F2EEE9'
+  const active = darkMode ? '#2A2A2A' : '#FFFFFF'
+  const activeShadow = darkMode
+    ? '0 1px 4px rgba(0,0,0,0.4)'
+    : '0 1px 4px rgba(28,27,31,0.08)'
+  const activeText   = darkMode ? '#FEFEFE' : '#1C1B1F'
+  const inactiveText = darkMode ? '#6B6370' : '#6F6B73'
 
   return (
-    <div className="relative w-full" style={{ display: 'grid', gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))` }}>
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${options.length}, 1fr)`,
+        background: rail,
+        borderRadius: 12,
+        padding: 3,
+        gap: 2,
+      }}
+    >
       {options.map((option) => {
         const selected = option.value === value
         return (
           <button
             key={option.value}
             onClick={() => onChange(option.value)}
-            className="cursor-pointer transition-smooth whitespace-nowrap"
             style={{
-              background: selected ? activeBackground : railBackground,
+              background: selected ? active : 'transparent',
               color: selected ? activeText : inactiveText,
-              fontSize: '15px',
-              fontWeight: selected ? 700 : 600,
-              padding: '14px 0',
-              borderTopLeftRadius: 14,
-              borderTopRightRadius: 14,
-              borderBottomLeftRadius: 0,
-              borderBottomRightRadius: 0,
-              border: selected
-                ? (activeBorder ? `1px solid ${activeBorder}` : '1px solid transparent')
-                : '1px solid transparent',
-              borderBottom: selected
-                ? '2px solid transparent'
-                : (inactiveBorder ? `2px solid ${inactiveBorder}` : '2px solid transparent'),
+              fontSize: '14px',
+              fontWeight: selected ? 700 : 500,
+              padding: '9px 0',
+              borderRadius: 10,
+              border: 'none',
               outline: 'none',
-              boxShadow: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.18s ease',
+              boxShadow: selected ? activeShadow : 'none',
+              whiteSpace: 'nowrap',
             }}
           >
             {option.label}

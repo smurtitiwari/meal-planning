@@ -201,12 +201,7 @@ export default function Recipes() {
           ]}
           value={activeTab}
           onChange={(tab) => { setActiveTab(tab); setMealFilter('All') }}
-          railBackground={preferences.darkMode ? '#1B1B1B' : '#F2EEE9'}
-          activeBackground={preferences.darkMode ? '#2E2E2E' : '#FFFFFF'}
-          activeText={preferences.darkMode ? '#FEFEFE' : '#1C1B1F'}
-          inactiveText={preferences.darkMode ? '#A9A0A3' : '#6F6B73'}
-          activeBorder={preferences.darkMode ? '#3A3A3A' : '#E6E0D8'}
-          inactiveBorder={preferences.darkMode ? 'rgba(255,255,255,0.08)' : '#E6E0D8'}
+          darkMode={preferences.darkMode}
         />
       </div>
 

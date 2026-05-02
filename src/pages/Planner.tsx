@@ -176,12 +176,9 @@ export default function Planner() {
       <div className="px-5 mt-4 mb-3">
         <SegmentedControl
           options={[ { value: 'meals', label: 'Meals' }, { value: 'grocery', label: `Grocery (${unchecked.length})` } ]}
-          value={activeTab} onChange={setActiveTab}
-          railBackground={preferences.darkMode ? '#1B1B1B' : '#F2EEE9'}
-          activeBackground={preferences.darkMode ? '#2E2E2E' : '#FFFFFF'}
-          activeText={colors.textPrimary} inactiveText={colors.textSecondary}
-          activeBorder={preferences.darkMode ? '#3A3A3A' : '#E6E0D8'}
-          inactiveBorder={preferences.darkMode ? 'rgba(255,255,255,0.08)' : '#E6E0D8'}
+          value={activeTab}
+          onChange={setActiveTab}
+          darkMode={preferences.darkMode}
         />
       </div>
 
