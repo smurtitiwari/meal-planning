@@ -118,7 +118,7 @@ export default function Group() {
                 key={group.id}
                 style={{
                   background: C.card,
-                  border: `1px solid ${isActive ? C.selBorder : C.border}`,
+                  border: `1px solid ${C.border}`,
                   borderRadius: 16,
                   overflow: 'hidden',
                 }}
@@ -290,7 +290,7 @@ export default function Group() {
                 Members ({getMembersForGroup(detailGroup!.id).length})
               </p>
 
-              <div style={{ background: C.card, borderRadius: 16, overflow: 'hidden', marginBottom: 4 }}>
+              <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 16, overflow: 'hidden', marginBottom: 4 }}>
                 {getMembersForGroup(detailGroup.id).map((member) => (
                   <div
                     key={member.id}
