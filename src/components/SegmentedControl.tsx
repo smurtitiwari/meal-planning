@@ -16,18 +16,23 @@ export default function SegmentedControl<T extends string>({
   onChange,
   darkMode = false,
 }: SegmentedControlProps<T>) {
-  // Selected tab = main page background; inactive = slightly darker muted tone
-  const activeTab    = darkMode ? '#121212' : '#F7F4EF'
-  const inactiveTab  = darkMode ? '#0D0D0D' : '#E4DFD9'
+  const rail   = darkMode ? '#1B1B1B' : '#E8E3DD'
+  const active = darkMode ? '#2A2A2A' : '#F7F4EF'
+  const activeShadow = darkMode
+    ? '0 1px 4px rgba(0,0,0,0.4)'
+    : '0 1px 4px rgba(28,27,31,0.08)'
   const activeText   = darkMode ? '#FEFEFE' : '#1C1B1F'
-  const inactiveText = darkMode ? '#5A5460' : '#7A746D'
+  const inactiveText = darkMode ? '#6B6370' : '#6F6B73'
 
   return (
     <div
       style={{
-        display: 'flex',
-        alignItems: 'flex-end',
-        gap: 3,
+        display: 'grid',
+        gridTemplateColumns: `repeat(${options.length}, 1fr)`,
+        background: rail,
+        borderRadius: 12,
+        padding: 3,
+        gap: 2,
       }}
     >
       {options.map((option) => {
@@ -37,20 +42,17 @@ export default function SegmentedControl<T extends string>({
             key={option.value}
             onClick={() => onChange(option.value)}
             style={{
-              flex: 1,
-              background: selected ? activeTab : inactiveTab,
+              background: selected ? active : 'transparent',
               color: selected ? activeText : inactiveText,
               fontSize: '14px',
               fontWeight: selected ? 700 : 500,
-              paddingTop: selected ? 10 : 8,
-              paddingBottom: selected ? 10 : 8,
-              paddingLeft: 0,
-              paddingRight: 0,
-              borderRadius: '10px 10px 0 0',
+              padding: '9px 0',
+              borderRadius: 10,
               border: 'none',
               outline: 'none',
               cursor: 'pointer',
               transition: 'all 0.18s ease',
+              boxShadow: selected ? activeShadow : 'none',
               whiteSpace: 'nowrap',
             }}
           >
