@@ -16,8 +16,8 @@ export default function SegmentedControl<T extends string>({
   onChange,
   darkMode = false,
 }: SegmentedControlProps<T>) {
-  // Selected tab matches the card background — creates the "connected to content" effect
-  const activeTab    = darkMode ? '#1B1B1B' : '#FFFFFF'
+  // Selected tab = main page background; inactive = slightly darker muted tone
+  const activeTab    = darkMode ? '#121212' : '#F7F4EF'
   const inactiveTab  = darkMode ? '#0D0D0D' : '#E4DFD9'
   const activeText   = darkMode ? '#FEFEFE' : '#1C1B1F'
   const inactiveText = darkMode ? '#5A5460' : '#7A746D'
