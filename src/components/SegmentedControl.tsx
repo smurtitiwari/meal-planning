@@ -16,25 +16,8 @@ export default function SegmentedControl<T extends string>({
   onChange,
   darkMode = false,
 }: SegmentedControlProps<T>) {
-  const rail   = darkMode ? '#1B1B1B' : '#E8E3DD'
-  const active = darkMode ? '#2A2A2A' : '#F7F4EF'
-  const activeShadow = darkMode
-    ? '0 1px 4px rgba(0,0,0,0.4)'
-    : '0 1px 4px rgba(28,27,31,0.08)'
-  const activeText   = darkMode ? '#FEFEFE' : '#1C1B1F'
-  const inactiveText = darkMode ? '#6B6370' : '#6F6B73'
-
   return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: `repeat(${options.length}, 1fr)`,
-        background: rail,
-        borderRadius: 12,
-        padding: 3,
-        gap: 2,
-      }}
-    >
+    <div style={{ display: 'flex', gap: 3 }}>
       {options.map((option) => {
         const selected = option.value === value
         return (
@@ -42,17 +25,24 @@ export default function SegmentedControl<T extends string>({
             key={option.value}
             onClick={() => onChange(option.value)}
             style={{
-              background: selected ? active : 'transparent',
-              color: selected ? activeText : inactiveText,
+              flex: 1,
+              background: selected
+                ? (darkMode ? '#121212' : '#F7F4EF')
+                : (darkMode ? '#0D0D0D' : '#E4DFD9'),
+              color: selected
+                ? (darkMode ? '#FEFEFE' : '#1C1B1F')
+                : (darkMode ? '#5A5460' : '#7A746D'),
               fontSize: '14px',
               fontWeight: selected ? 700 : 500,
-              padding: '9px 0',
-              borderRadius: 10,
-              border: 'none',
+              padding: '10px 0',
+              borderRadius: '10px 10px 0 0',
+              border: selected
+                ? `1px solid ${darkMode ? '#2E2E2E' : '#E6E0D8'}`
+                : '1px solid transparent',
+              borderBottom: 'none',
               outline: 'none',
               cursor: 'pointer',
               transition: 'all 0.18s ease',
-              boxShadow: selected ? activeShadow : 'none',
               whiteSpace: 'nowrap',
             }}
           >
