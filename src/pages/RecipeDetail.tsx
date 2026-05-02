@@ -7,10 +7,10 @@ import CookMessage from '../components/CookMessage'
 const light = {
   page: '#FFFFFF',
   card: '#F6F6F6',
-  border: '#F4F4F4',
+  border: '#E6E0D8',
   text: '#111111',
   muted: '#7A746D',
-  accent: '#3C151A',
+  accent: '#4A1F23',
   kcalBg: '#F8F6F3',
 }
 const dark = {
@@ -19,7 +19,7 @@ const dark = {
   border: '#2E2E2E',
   text: '#FEFEFE',
   muted: '#A9A0A3',
-  accent: '#F0C7CF',
+  accent: '#9A4D5A',
   kcalBg: 'rgba(154, 77, 90, 0.18)',
 }
 

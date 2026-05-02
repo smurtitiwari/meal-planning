@@ -43,8 +43,8 @@ export default function AskChef() {
     textTertiary: '#7A746D',
     border: '#ECE8E4',
     card: '#F6F6F6',
-    accentText: '#3C151A',
-    accentPurple: '#3C151A',
+    accentText: '#4A1F23',
+    accentPurple: '#4A1F23',
     accentBackground: '#F2F3F5',
     userBubble: '#F2F3F5',
     chipBg: '#F1F2F4',
@@ -142,7 +142,7 @@ export default function AskChef() {
     <div className="min-h-screen flex flex-col" style={{ background: colors.pageSurface }}>
       <div className="px-5 pt-14 pb-4 sticky top-0 z-10" style={{ background: colors.pageSurface }}>
         <div className="flex items-center justify-between">
-          <h1 style={{ fontFamily: serifFont, fontSize: '28px', fontWeight: 400, color: colors.textPrimary, margin: 0 }}>
+          <h1 style={{ fontFamily: serifFont, fontSize: '32px', fontWeight: 400, color: colors.textPrimary, margin: 0 }}>
             Ask Chef
           </h1>
           <button
@@ -344,7 +344,7 @@ function ChatRecipeCard({
                 backdropFilter: 'blur(4px)',
               }}
             >
-              <Play size={14} style={{ color: '#3C151A', marginLeft: 1 }} fill="#3C151A" />
+              <Play size={14} style={{ color: '#4A1F23', marginLeft: 1 }} fill="#4A1F23" />
             </div>
           </div>
         </div>

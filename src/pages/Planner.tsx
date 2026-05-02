@@ -165,10 +165,12 @@ export default function Planner() {
   return (
     <div className="min-h-screen pb-24" style={{ background: colors.pageSurface }}>
       <div className="px-5 pt-14 pb-2">
-        <h1 style={{ fontFamily: serifFont, fontSize: '26px', fontWeight: 400, color: colors.textPrimary, margin: 0 }}>
+        <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: colors.textSecondary, margin: '0 0 4px 0' }}>
+          Planner
+        </p>
+        <h1 style={{ fontFamily: serifFont, fontSize: '32px', fontWeight: 400, color: colors.textPrimary, margin: 0, lineHeight: 1.1 }}>
           Meal Plan
         </h1>
-        <p style={{ fontSize: '13px', color: colors.textSecondary, margin: '4px 0 0 0' }}>Plan your week, eat better</p>
       </div>
 
       <div className="px-5 mt-4 mb-3">

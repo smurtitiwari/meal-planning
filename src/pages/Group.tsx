@@ -364,7 +364,7 @@ export default function Group() {
                   background: C.card, border: `1px solid ${C.border}`,
                   borderRadius: 14, padding: '20px 18px', textAlign: 'center',
                 }}>
-                  <div style={{ fontSize: '28px', marginBottom: 8 }}>🍽️</div>
+                  <div style={{ fontSize: '48px', marginBottom: 12 }}>🍽️</div>
                   <p style={{ fontSize: '14px', fontWeight: 600, color: C.text, margin: '0 0 4px 0' }}>
                     No shared recipes yet
                   </p>

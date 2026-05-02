@@ -170,9 +170,14 @@ export default function Recipes() {
     <div className="min-h-screen pb-24" style={{ background: colors.pageSurface }}>
       <div className="px-5 pt-14 pb-1">
         <div className="flex items-center justify-between">
-          <h1 style={{ fontFamily: serifFont, fontSize: '32px', fontWeight: 400, color: colors.textPrimary, margin: 0, lineHeight: 1.1 }}>
-            Recipes
-          </h1>
+          <div>
+            <p style={{ fontSize: '11px', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: colors.textSecondary, margin: '0 0 4px 0' }}>
+              Recipes
+            </p>
+            <h1 style={{ fontFamily: serifFont, fontSize: '32px', fontWeight: 400, color: colors.textPrimary, margin: 0, lineHeight: 1.1 }}>
+              Your collection
+            </h1>
+          </div>
           <button onClick={openTypePicker}
             className="w-10 h-10 rounded-full flex items-center justify-center border-none cursor-pointer"
             style={{ background: colors.accentPurple, color: '#FFF' }}>
@@ -180,6 +185,7 @@ export default function Recipes() {
           </button>
         </div>
       </div>
+
 
       <div className="px-5 mt-4 mb-3">
         <SegmentedControl
@@ -370,8 +376,8 @@ export default function Recipes() {
             style={{
               background: colors.pageSurface,
               borderRadius: '24px 24px 0 0',
-              padding: '22px 22px 28px',
-              boxShadow: '0 -12px 40px rgba(0,0,0,0.18)',
+              padding: '22px 20px 32px',
+              boxShadow: '0 -4px 24px rgba(28,27,31,0.1)',
             }}
           >
             <div style={{ width: 40, height: 4, borderRadius: 2, background: preferences.darkMode ? '#2E2E2E' : '#F4F4F4', margin: '0 auto 18px' }} />
@@ -505,7 +511,7 @@ export default function Recipes() {
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
-              boxShadow: '0 -12px 40px rgba(0,0,0,0.18)',
+              boxShadow: '0 -4px 24px rgba(28,27,31,0.1)',
             }}
           >
             {/* Header */}

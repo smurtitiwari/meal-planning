@@ -182,7 +182,7 @@ export default function MealPreviewSheet({ meal, onClose, userName, darkMode, pr
         {/* Content area */}
         <div style={{
           background: colors.surface,
-          borderRadius: '28px 28px 0 0',
+          borderRadius: '24px 24px 0 0',
           marginTop: -28,
           position: 'relative',
           zIndex: 2,
@@ -416,12 +416,12 @@ export default function MealPreviewSheet({ meal, onClose, userName, darkMode, pr
             className="w-full max-w-md animate-slide-up"
             style={{
               background: colors.surface,
-              borderRadius: '28px 28px 0 0',
+              borderRadius: '24px 24px 0 0',
               height: '80vh',
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
-              boxShadow: '0 -12px 40px rgba(0,0,0,0.18)',
+              boxShadow: '0 -4px 24px rgba(28,27,31,0.1)',
             }}
           >
             <div
