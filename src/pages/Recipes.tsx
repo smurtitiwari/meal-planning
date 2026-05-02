@@ -30,6 +30,7 @@ export default function Recipes() {
   const [note, setNote] = useState('')
   const [toast, setToast] = useState<string | null>(null)
   const [selectedGroupId, setSelectedGroupId] = useState<string>(preferences.groupId || '')
+  const [fromGroup, setFromGroup] = useState(false)
 
   const userName = preferences.name || 'You'
 
@@ -73,7 +74,7 @@ export default function Recipes() {
   const resetForm = () => {
     setName(''); setLink(''); setCategory('main'); setMealType('lunch');
     setIngredients([]); setNewIngredient(''); setNote(''); setEditId(null); setShowAdd(false)
-    setSelectedGroupId(preferences.groupId || '')
+    setSelectedGroupId(preferences.groupId || ''); setFromGroup(false)
   }
 
   // Handle edit requests coming from RecipeDetail
@@ -94,7 +95,7 @@ export default function Recipes() {
     }
     if ((location.state as any)?.openSharedRecipe) {
       const gid = (location.state as any).groupId
-      if (gid) setSelectedGroupId(gid)
+      if (gid) { setSelectedGroupId(gid); setFromGroup(true) }
       setActiveTab('shared')
       setShowTypePicker(false)
       setShowAdd(true)
@@ -109,6 +110,7 @@ export default function Recipes() {
 
   const pickType = (type: 'mine' | 'shared') => {
     setActiveTab(type)
+    setFromGroup(false)
     setShowTypePicker(false)
     setShowAdd(true)
   }
@@ -450,46 +452,6 @@ export default function Recipes() {
                 </div>
               </button>
 
-              {/* Group picker — shown only when user has groups */}
-              {groups.length > 0 && (
-                <div style={{ marginTop: 4 }}>
-                  <p style={{ fontSize: '11px', fontWeight: 600, color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.08em', margin: '4px 0 8px 2px' }}>
-                    Share to group
-                  </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    {groups.map((g) => {
-                      const sel = selectedGroupId === g.id
-                      return (
-                        <button
-                          key={g.id}
-                          onClick={() => setSelectedGroupId(g.id)}
-                          className="w-full flex items-center gap-3 cursor-pointer border-none outline-none text-left"
-                          style={{
-                            background: sel ? colors.accentLight : (preferences.darkMode ? '#1B1B1B' : '#FFFFFF'),
-                            border: sel
-                              ? `1.5px solid ${preferences.darkMode ? 'rgba(240,199,207,0.4)' : 'rgba(74,31,35,0.22)'}`
-                              : `1px solid ${colors.border}`,
-                            borderRadius: 12, padding: '10px 14px',
-                          }}
-                        >
-                          <div style={{
-                            width: 28, height: 28, borderRadius: 9,
-                            background: sel ? (preferences.darkMode ? 'rgba(154,77,90,0.3)' : 'rgba(74,31,35,0.1)') : colors.elevated,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            color: colors.accentPurple, flexShrink: 0,
-                          }}>
-                            <Users size={13} />
-                          </div>
-                          <span style={{ fontSize: '13px', fontWeight: sel ? 700 : 600, color: sel ? colors.accentPurple : colors.textPrimary, flex: 1 }}>
-                            {g.name}
-                          </span>
-                          {sel && <Check size={14} color={colors.accentPurple} />}
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -528,10 +490,10 @@ export default function Recipes() {
             >
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontSize: '10px', fontWeight: 800, color: colors.textSecondary, margin: 0, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                  {editId ? 'Edit' : activeTab === 'shared' && selectedGroupId && groupName(selectedGroupId) ? 'Sharing to' : activeTab === 'shared' ? 'Shared' : 'Mine'}
+                  {editId ? 'Edit' : fromGroup && selectedGroupId ? 'Sharing to' : activeTab === 'shared' ? 'Shared recipe' : 'Mine'}
                 </p>
                 <h3 style={{ fontFamily: serifFont, fontSize: '22px', fontWeight: 400, margin: '2px 0 0 0', color: colors.textPrimary, lineHeight: 1.15 }}>
-                  {editId ? 'Edit recipe' : activeTab === 'shared' && selectedGroupId && groupName(selectedGroupId) ? groupName(selectedGroupId) : activeTab === 'shared' ? 'Share a recipe' : 'New recipe'}
+                  {editId ? 'Edit recipe' : fromGroup && selectedGroupId ? groupName(selectedGroupId) : activeTab === 'shared' ? 'Share a recipe' : 'New recipe'}
                 </h3>
               </div>
               <button onClick={resetForm}
@@ -608,6 +570,45 @@ export default function Recipes() {
                     })}
                   </div>
                 </div>
+
+                {/* Group picker — only shown when user chose "Shared recipe" manually (not from a group card) */}
+                {activeTab === 'shared' && !fromGroup && groups.length > 0 && (
+                  <div>
+                    <label className="section-label" style={{ display: 'block', marginBottom: 8, color: colors.textSecondary }}>Share to group</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      {groups.map((g) => {
+                        const sel = selectedGroupId === g.id
+                        return (
+                          <button
+                            key={g.id}
+                            onClick={() => setSelectedGroupId(g.id)}
+                            className="w-full flex items-center gap-3 cursor-pointer border-none outline-none text-left"
+                            style={{
+                              background: sel ? colors.accentLight : (preferences.darkMode ? '#1B1B1B' : colors.card),
+                              border: sel
+                                ? `1.5px solid ${preferences.darkMode ? 'rgba(240,199,207,0.4)' : 'rgba(74,31,35,0.22)'}`
+                                : `1px solid ${colors.border}`,
+                              borderRadius: 12, padding: '10px 14px',
+                            }}
+                          >
+                            <div style={{
+                              width: 30, height: 30, borderRadius: 9,
+                              background: sel ? (preferences.darkMode ? 'rgba(154,77,90,0.3)' : 'rgba(74,31,35,0.1)') : colors.elevated,
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              color: colors.accentPurple, flexShrink: 0,
+                            }}>
+                              <Users size={14} />
+                            </div>
+                            <span style={{ fontSize: '14px', fontWeight: sel ? 700 : 500, color: sel ? colors.accentPurple : colors.textPrimary, flex: 1 }}>
+                              {g.name}
+                            </span>
+                            {sel && <Check size={15} color={colors.accentPurple} />}
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 <div>
                   <label className="section-label" style={{ display: 'block', marginBottom: 6, color: colors.textSecondary }}>Note (optional)</label>
