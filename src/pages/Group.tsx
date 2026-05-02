@@ -114,82 +114,113 @@ export default function Group() {
             const recipes = getRecipesForGroup(group.id)
             const isActive = group.id === activeGroup.id
             return (
-              <button
+              <div
                 key={group.id}
-                onClick={() => { setActiveGroup(group.id); setDetailGroupId(group.id) }}
-                className="w-full flex items-center gap-4 text-left border-none cursor-pointer transition-smooth"
                 style={{
                   background: C.card,
                   border: `1px solid ${isActive ? C.selBorder : C.border}`,
                   borderRadius: 16,
-                  padding: '14px 16px',
+                  overflow: 'hidden',
                 }}
               >
-                {/* Group icon */}
-                <div style={{
-                  width: 44, height: 44, borderRadius: 14,
-                  background: C.soft, color: C.accent, flexShrink: 0,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  <Users size={20} />
-                </div>
+                {/* Clickable top row → opens detail sheet */}
+                <button
+                  onClick={() => { setActiveGroup(group.id); setDetailGroupId(group.id) }}
+                  className="w-full flex items-center gap-4 text-left border-none cursor-pointer transition-smooth"
+                  style={{ background: 'transparent', padding: '14px 16px' }}
+                >
+                  {/* Group icon */}
+                  <div style={{
+                    width: 44, height: 44, borderRadius: 14,
+                    background: C.soft, color: C.accent, flexShrink: 0,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <Users size={20} />
+                  </div>
 
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <p style={{ fontSize: '15px', fontWeight: 700, color: C.text, margin: '0 0 5px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {group.name}
-                  </p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                    {/* Member count badge */}
-                    <span style={{
-                      display: 'inline-flex', alignItems: 'center', gap: 4,
-                      background: C.soft, color: C.accent,
-                      fontSize: '11px', fontWeight: 700,
-                      padding: '2px 8px', borderRadius: 999,
-                    }}>
-                      <Users size={10} />
-                      {members.length} member{members.length === 1 ? '' : 's'}
-                    </span>
-                    {recipes.length > 0 && (
-                      <span style={{ fontSize: '11px', color: C.sub }}>
-                        · {recipes.length} recipe{recipes.length === 1 ? '' : 's'}
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <p style={{ fontSize: '15px', fontWeight: 700, color: C.text, margin: '0 0 5px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {group.name}
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                      <span style={{
+                        display: 'inline-flex', alignItems: 'center', gap: 4,
+                        background: C.soft, color: C.accent,
+                        fontSize: '11px', fontWeight: 700,
+                        padding: '2px 8px', borderRadius: 999,
+                      }}>
+                        <Users size={10} />
+                        {members.length} member{members.length === 1 ? '' : 's'}
                       </span>
+                      {recipes.length > 0 && (
+                        <span style={{ fontSize: '11px', color: C.sub }}>
+                          · {recipes.length} recipe{recipes.length === 1 ? '' : 's'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Stacked avatars */}
+                  <div className="flex items-center" style={{ gap: 0, flexShrink: 0 }}>
+                    {members.slice(0, 3).map((m, i) => (
+                      <div key={m.id} style={{
+                        width: 28, height: 28, borderRadius: 14,
+                        marginLeft: i === 0 ? 0 : -8,
+                        background: C.soft, border: `2px solid ${C.card}`,
+                        color: C.accent,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 11, fontWeight: 700,
+                      }}>
+                        {m.name.charAt(0).toUpperCase()}
+                      </div>
+                    ))}
+                    {members.length > 3 && (
+                      <div style={{
+                        width: 28, height: 28, borderRadius: 14, marginLeft: -8,
+                        background: C.elevated, border: `2px solid ${C.card}`,
+                        color: C.sub,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 10, fontWeight: 700,
+                      }}>
+                        +{members.length - 3}
+                      </div>
                     )}
                   </div>
-                </div>
 
-                {/* Stacked avatars */}
-                <div className="flex items-center" style={{ gap: 0, flexShrink: 0 }}>
-                  {members.slice(0, 3).map((m, i) => (
-                    <div key={m.id} style={{
-                      width: 28, height: 28, borderRadius: 14,
-                      marginLeft: i === 0 ? 0 : -8,
-                      background: C.soft,
-                      border: `2px solid ${C.card}`,
-                      color: C.accent,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 11, fontWeight: 700,
-                    }}>
-                      {m.name.charAt(0).toUpperCase()}
-                    </div>
-                  ))}
-                  {members.length > 3 && (
-                    <div style={{
-                      width: 28, height: 28, borderRadius: 14,
-                      marginLeft: -8,
-                      background: C.elevated,
-                      border: `2px solid ${C.card}`,
-                      color: C.sub,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 10, fontWeight: 700,
-                    }}>
-                      +{members.length - 3}
-                    </div>
-                  )}
-                </div>
+                  <ChevronRight size={16} style={{ color: C.sub, flexShrink: 0 }} />
+                </button>
 
-                <ChevronRight size={16} style={{ color: C.sub, flexShrink: 0 }} />
-              </button>
+                {/* Tertiary CTAs at bottom of card */}
+                <div style={{ borderTop: `1px solid ${C.border}`, display: 'flex' }}>
+                  <button
+                    onClick={() => { setActiveGroup(group.id); ensureAndInvite() }}
+                    className="flex-1 flex items-center justify-center gap-2 border-none cursor-pointer"
+                    style={{
+                      background: 'transparent', color: C.accent,
+                      padding: '10px 12px', fontSize: '12px', fontWeight: 700,
+                      borderRight: `1px solid ${C.border}`,
+                    }}
+                  >
+                    <UserPlus size={13} />
+                    Invite flatmate
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveGroup(group.id)
+                      navigate('/recipes', { state: { openTypePicker: true, groupId: group.id } })
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 border-none cursor-pointer"
+                    style={{
+                      background: 'transparent', color: C.accent,
+                      padding: '10px 12px', fontSize: '12px', fontWeight: 700,
+                    }}
+                  >
+                    <BookOpen size={13} />
+                    Add recipe
+                  </button>
+                </div>
+              </div>
             )
           })}
         </div>
@@ -258,43 +289,10 @@ export default function Group() {
             {/* Scrollable body */}
             <div style={{ flex: 1, overflowY: 'auto', padding: '4px 20px 32px' }}>
 
-              {/* ── Quick CTAs ── */}
-              <div style={{ display: 'flex', gap: 10, margin: '12px 0 16px 0' }}>
-                <button
-                  onClick={ensureAndInvite}
-                  className="flex-1 flex items-center justify-center gap-2 border-none cursor-pointer"
-                  style={{
-                    background: C.soft, color: C.accent,
-                    borderRadius: 14, padding: '11px 14px',
-                    fontSize: '13px', fontWeight: 700,
-                    border: `1px solid ${C.selBorder}`,
-                  }}
-                >
-                  <UserPlus size={15} />
-                  Invite flatmate
-                </button>
-                <button
-                  onClick={() => {
-                    setDetailGroupId(null)
-                    navigate('/recipes', { state: { openTypePicker: true, groupId: detailGroup?.id } })
-                  }}
-                  className="flex-1 flex items-center justify-center gap-2 border-none cursor-pointer"
-                  style={{
-                    background: C.soft, color: C.accent,
-                    borderRadius: 14, padding: '11px 14px',
-                    fontSize: '13px', fontWeight: 700,
-                    border: `1px solid ${C.selBorder}`,
-                  }}
-                >
-                  <BookOpen size={15} />
-                  Add recipe
-                </button>
-              </div>
-
               {/* ── Members section ── */}
               <p style={{
                 fontSize: '11px', fontWeight: 600, color: C.sub,
-                textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px 0',
+                textTransform: 'uppercase', letterSpacing: '0.1em', margin: '12px 0 10px 0',
               }}>
                 Members ({getMembersForGroup(detailGroup!.id).length})
               </p>
@@ -337,17 +335,6 @@ export default function Group() {
                   </div>
                 ))}
 
-                {/* Tertiary invite action — inside the card */}
-                <div style={{ borderTop: `1px solid ${C.border}`, padding: '10px 16px' }}>
-                  <button
-                    onClick={ensureAndInvite}
-                    className="flex items-center gap-2 bg-transparent border-none cursor-pointer transition-smooth"
-                    style={{ color: C.accent, fontSize: '13px', fontWeight: 600, padding: 0 }}
-                  >
-                    <UserPlus size={14} />
-                    Invite someone
-                  </button>
-                </div>
               </div>
 
               {/* ── Shared Recipes section ── */}
