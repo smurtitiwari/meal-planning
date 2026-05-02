@@ -192,17 +192,13 @@ export default function Group() {
                 </button>
 
                 {/* Tertiary CTAs at bottom of card */}
-                <div style={{ borderTop: `1px solid ${C.border}`, display: 'flex' }}>
+                <div style={{ borderTop: `1px solid ${C.border}`, padding: '8px 16px', display: 'flex', gap: 16 }}>
                   <button
                     onClick={() => { setActiveGroup(group.id); ensureAndInvite() }}
-                    className="flex-1 flex items-center justify-center gap-2 border-none cursor-pointer"
-                    style={{
-                      background: 'transparent', color: C.accent,
-                      padding: '10px 12px', fontSize: '12px', fontWeight: 700,
-                      borderRight: `1px solid ${C.border}`,
-                    }}
+                    className="flex items-center gap-1.5 bg-transparent border-none cursor-pointer p-0"
+                    style={{ color: C.accent, fontSize: '13px', fontWeight: 600 }}
                   >
-                    <UserPlus size={13} />
+                    <UserPlus size={14} />
                     Invite flatmate
                   </button>
                   <button
@@ -210,13 +206,10 @@ export default function Group() {
                       setActiveGroup(group.id)
                       navigate('/recipes', { state: { openTypePicker: true, groupId: group.id } })
                     }}
-                    className="flex-1 flex items-center justify-center gap-2 border-none cursor-pointer"
-                    style={{
-                      background: 'transparent', color: C.accent,
-                      padding: '10px 12px', fontSize: '12px', fontWeight: 700,
-                    }}
+                    className="flex items-center gap-1.5 bg-transparent border-none cursor-pointer p-0"
+                    style={{ color: C.accent, fontSize: '13px', fontWeight: 600 }}
                   >
-                    <BookOpen size={13} />
+                    <BookOpen size={14} />
                     Add recipe
                   </button>
                 </div>
@@ -302,7 +295,7 @@ export default function Group() {
                   <div
                     key={member.id}
                     className="flex items-center gap-3 px-4 py-3"
-                    style={{ borderBottom: i < arr.length - 1 ? `1px solid ${C.border}` : 'none' }}
+                    style={{ borderBottom: `1px solid ${C.border}` }}
                   >
                     {/* Avatar */}
                     <div style={{
@@ -335,6 +328,17 @@ export default function Group() {
                   </div>
                 ))}
 
+                {/* Invite flatmate — tertiary link at bottom of members card */}
+                <div style={{ padding: '10px 16px' }}>
+                  <button
+                    onClick={ensureAndInvite}
+                    className="flex items-center gap-1.5 bg-transparent border-none cursor-pointer p-0"
+                    style={{ color: C.accent, fontSize: '13px', fontWeight: 600 }}
+                  >
+                    <UserPlus size={14} />
+                    Invite flatmate
+                  </button>
+                </div>
               </div>
 
               {/* ── Shared Recipes section ── */}
