@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useStore, generateId } from '../store/useStore'
+import { useStore } from '../store/useStore'
 import { ArrowLeft, Search, Plus, Check } from 'lucide-react'
 
 const serifFont = "'DM Serif Display', Georgia, serif"
@@ -8,10 +8,9 @@ const serifFont = "'DM Serif Display', Georgia, serif"
 export default function SelectGroup() {
   const navigate   = useNavigate()
   const location   = useLocation()
-  const { groups, addRecipe, addSharedRecipe, createGroup, preferences } = useStore()
+  const { groups, createGroup, preferences } = useStore()
 
-  const state       = (location.state as any) || {}
-  const recipeData  = state.recipe
+  const state = (location.state as any) || {}
   const lockedGroupId: string | null = state.lockedGroupId || null
 
   // If a group is locked, pre-select it; otherwise default to first group
@@ -41,19 +40,12 @@ export default function SelectGroup() {
     g.name.toLowerCase().includes(search.toLowerCase())
   )
 
-  const handleShare = () => {
-    if (!selectedGroupId || !recipeData) return
-    const { name, link, mealType, note, ingredients } = recipeData
-    addSharedRecipe({
-      id: generateId(),
-      groupId: selectedGroupId,
-      name, link, ingredients,
-      sharedBy: preferences.name || 'You',
-      tags: [], note, timestamp: Date.now(), mealType,
-      sourceType: link ? 'manual' : undefined,
+  const handleContinue = () => {
+    if (!selectedGroupId) return
+    // Hand off to AddRecipe with the selected group locked in
+    navigate('/recipes/new', {
+      state: { lockedGroupId: selectedGroupId, mode: 'share' },
     })
-    addRecipe({ id: generateId(), category: 'main', name, link, ingredients, note, mealType })
-    navigate('/recipes', { state: { tab: 'shared' }, replace: true })
   }
 
   const handleCreateGroup = () => {
@@ -93,11 +85,9 @@ export default function SelectGroup() {
           <h1 style={{ fontFamily: serifFont, fontSize: '24px', fontWeight: 400, color: C.text, margin: 0, lineHeight: 1.1 }}>
             Select group
           </h1>
-          {recipeData?.name && (
-            <p style={{ fontSize: '12px', color: C.sub, margin: '3px 0 0 0' }}>
-              Sharing "{recipeData.name}"
-            </p>
-          )}
+          <p style={{ fontSize: '13px', color: C.sub, margin: '3px 0 0 0' }}>
+            Choose a group to share your recipe with.
+          </p>
         </div>
       </div>
 
@@ -261,7 +251,7 @@ export default function SelectGroup() {
         background: `linear-gradient(to top, ${C.page} 70%, transparent)`,
       }}>
         <button
-          onClick={handleShare}
+          onClick={handleContinue}
           disabled={!selectedGroupId}
           style={{
             width: '100%', height: 50, borderRadius: 16, border: 'none',
@@ -271,7 +261,7 @@ export default function SelectGroup() {
             opacity: selectedGroupId ? 1 : 0.4,
           }}
         >
-          Share recipe
+          Continue
         </button>
       </div>
 
