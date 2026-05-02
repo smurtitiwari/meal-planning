@@ -73,6 +73,7 @@ export default function Recipes() {
   const resetForm = () => {
     setName(''); setLink(''); setCategory('main'); setMealType('lunch');
     setIngredients([]); setNewIngredient(''); setNote(''); setEditId(null); setShowAdd(false)
+    setSelectedGroupId(preferences.groupId || '')
   }
 
   // Handle edit requests coming from RecipeDetail
@@ -88,10 +89,15 @@ export default function Recipes() {
       window.history.replaceState({}, document.title)
     }
     if ((location.state as any)?.openTypePicker) {
-      if ((location.state as any)?.groupId) {
-        setSelectedGroupId((location.state as any).groupId)
-      }
       openTypePicker()
+      window.history.replaceState({}, document.title)
+    }
+    if ((location.state as any)?.openSharedRecipe) {
+      const gid = (location.state as any).groupId
+      if (gid) setSelectedGroupId(gid)
+      setActiveTab('shared')
+      setShowTypePicker(false)
+      setShowAdd(true)
       window.history.replaceState({}, document.title)
     }
   }, [location.state])
@@ -527,10 +533,10 @@ export default function Recipes() {
             >
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p style={{ fontSize: '10px', fontWeight: 800, color: colors.textSecondary, margin: 0, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                  {editId ? 'Edit' : activeTab === 'shared' ? 'Shared' : 'Mine'}
+                  {editId ? 'Edit' : activeTab === 'shared' && selectedGroupId && groupName(selectedGroupId) ? 'Sharing to' : activeTab === 'shared' ? 'Shared' : 'Mine'}
                 </p>
                 <h3 style={{ fontFamily: serifFont, fontSize: '22px', fontWeight: 400, margin: '2px 0 0 0', color: colors.textPrimary, lineHeight: 1.15 }}>
-                  {editId ? 'Edit recipe' : activeTab === 'shared' ? 'Share a recipe' : 'New recipe'}
+                  {editId ? 'Edit recipe' : activeTab === 'shared' && selectedGroupId && groupName(selectedGroupId) ? groupName(selectedGroupId) : activeTab === 'shared' ? 'Share a recipe' : 'New recipe'}
                 </h3>
               </div>
               <button onClick={resetForm}
