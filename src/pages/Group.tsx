@@ -125,30 +125,56 @@ export default function Group() {
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <p style={{ fontSize: '15px', fontWeight: 700, color: C.text, margin: '0 0 3px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <p style={{ fontSize: '15px', fontWeight: 700, color: C.text, margin: '0 0 5px 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {group.name}
                   </p>
-                  <p style={{ fontSize: '12px', color: C.sub, margin: 0 }}>
-                    {members.length} member{members.length === 1 ? '' : 's'}
-                    {recipes.length > 0 ? ` · ${recipes.length} shared recipe${recipes.length === 1 ? '' : 's'}` : ''}
-                  </p>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                    {/* Member count badge */}
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 4,
+                      background: C.soft, color: C.accent,
+                      fontSize: '11px', fontWeight: 700,
+                      padding: '2px 8px', borderRadius: 999,
+                    }}>
+                      <Users size={10} />
+                      {members.length} member{members.length === 1 ? '' : 's'}
+                    </span>
+                    {recipes.length > 0 && (
+                      <span style={{ fontSize: '11px', color: C.sub }}>
+                        · {recipes.length} recipe{recipes.length === 1 ? '' : 's'}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Stacked avatars */}
                 <div className="flex items-center" style={{ gap: 0, flexShrink: 0 }}>
                   {members.slice(0, 3).map((m, i) => (
                     <div key={m.id} style={{
-                      width: 26, height: 26, borderRadius: 13,
-                      marginLeft: i === 0 ? 0 : -7,
+                      width: 28, height: 28, borderRadius: 14,
+                      marginLeft: i === 0 ? 0 : -8,
                       background: C.soft,
                       border: `2px solid ${C.card}`,
                       color: C.accent,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 10, fontWeight: 700,
+                      fontSize: 11, fontWeight: 700,
                     }}>
                       {m.name.charAt(0).toUpperCase()}
                     </div>
                   ))}
+                  {members.length > 3 && (
+                    <div style={{
+                      width: 28, height: 28, borderRadius: 14,
+                      marginLeft: -8,
+                      background: C.elevated,
+                      border: `2px solid ${C.card}`,
+                      color: C.sub,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 10, fontWeight: 700,
+                    }}>
+                      +{members.length - 3}
+                    </div>
+                  )}
                 </div>
 
                 <ChevronRight size={16} style={{ color: C.sub, flexShrink: 0 }} />
@@ -190,9 +216,20 @@ export default function Group() {
                 <h2 style={{ fontFamily: serifFont, fontSize: '22px', fontWeight: 400, color: C.text, margin: 0, lineHeight: 1.2 }}>
                   {detailGroup.name}
                 </h2>
-                <p style={{ fontSize: '12px', color: C.sub, margin: '3px 0 0 0' }}>
-                  {getMembersForGroup(detailGroup.id).length} member{getMembersForGroup(detailGroup.id).length === 1 ? '' : 's'} · {detailGroup.role}
-                </p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 5 }}>
+                  <span style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 4,
+                    background: C.soft, color: C.accent,
+                    fontSize: '11px', fontWeight: 700,
+                    padding: '2px 8px', borderRadius: 999,
+                  }}>
+                    <Users size={10} />
+                    {getMembersForGroup(detailGroup.id).length} member{getMembersForGroup(detailGroup.id).length === 1 ? '' : 's'}
+                  </span>
+                  <span style={{ fontSize: '11px', color: C.sub, textTransform: 'capitalize' }}>
+                    · {detailGroup.role}
+                  </span>
+                </div>
               </div>
               <button
                 onClick={() => setDetailGroupId(null)}
