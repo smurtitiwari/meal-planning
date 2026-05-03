@@ -1,4 +1,9 @@
 import { useState, useEffect } from 'react'
+import blinkitLogo from '../assets/blinkit.png'
+import zeptoLogo from '../assets/zepto.png'
+import instamartLogo from '../assets/instamart.png'
+import bigbasketLogo from '../assets/bigbasket.png'
+import dunzoLogo from '../assets/dunzo.png'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 import { supabase, signInWithGoogle } from '../lib/supabase'
@@ -27,11 +32,11 @@ const MEAL_OPTIONS = [
 ]
 
 const GROCERY_APPS = [
-  { id: 'blinkit', name: 'Blinkit', emoji: '⚡', color: '#F8CE46' },
-  { id: 'zepto', name: 'Zepto', emoji: '🟣', color: '#7B2D8E' },
-  { id: 'swiggy', name: 'Swiggy Instamart', emoji: '🧡', color: '#FC8019' },
-  { id: 'bigbasket', name: 'BigBasket', emoji: '🟢', color: '#84C225' },
-  { id: 'dunzo', name: 'Dunzo Daily', emoji: '📦', color: '#00D290' },
+  { id: 'blinkit',   name: 'Blinkit',         logo: blinkitLogo },
+  { id: 'zepto',     name: 'Zepto',            logo: zeptoLogo },
+  { id: 'swiggy',    name: 'Swiggy Instamart', logo: instamartLogo },
+  { id: 'bigbasket', name: 'BigBasket',        logo: bigbasketLogo },
+  { id: 'dunzo',     name: 'Dunzo Daily',      logo: dunzoLogo },
 ]
 
 const TOTAL_STEPS = 7
@@ -600,7 +605,7 @@ export default function Onboarding() {
                           background: sel ? T.selBg : T.card,
                           border: sel ? `1.5px solid ${T.selBorder}` : `1px solid ${T.border}`,
                         }}>
-                        <span style={{ fontSize: '26px', lineHeight: 1, flexShrink: 0 }}>{app.emoji}</span>
+                        <img src={app.logo} alt={app.name} style={{ width: 28, height: 28, borderRadius: 8, objectFit: 'contain', flexShrink: 0 }} />
                         <span className="flex-1 text-left" style={{ fontSize: '15px', fontWeight: 600, color: sel ? T.accent : T.textPrimary }}>
                           {app.name}
                         </span>
