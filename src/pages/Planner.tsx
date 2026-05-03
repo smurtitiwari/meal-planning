@@ -351,10 +351,10 @@ export default function Planner() {
           )}
 
           {filteredGrocery.length === 0 && (
-            <div className="text-center py-16">
-              <div style={{ fontSize: '48px', marginBottom: 12 }}>🛒</div>
-              <p style={{ fontSize: '15px', fontWeight: 600, color: colors.textPrimary, margin: '0 0 4px 0' }}>No items yet</p>
-              <p style={{ fontSize: '13px', color: colors.textSecondary }}>
+            <div style={{ textAlign: 'center', padding: '40px 24px', background: colors.card, border: `1px solid ${colors.border}`, borderRadius: 20, marginTop: 4 }}>
+              <div style={{ fontSize: '40px', marginBottom: 12 }}>🛒</div>
+              <p style={{ fontSize: '15px', fontWeight: 600, color: colors.textPrimary, margin: '0 0 6px 0' }}>No items yet</p>
+              <p style={{ fontSize: '13px', color: colors.textSecondary, margin: 0, lineHeight: 1.5 }}>
                 {groceryScope === 'today' ? "Your today's plan doesn't need anything extra yet." : 'Your weekly plan does not need any extra items yet.'}
               </p>
             </div>

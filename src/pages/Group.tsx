@@ -377,23 +377,22 @@ export default function Group() {
               {getRecipesForGroup(detailGroup.id).length === 0 ? (
                 <div style={{
                   background: C.card, border: `1px solid ${C.border}`,
-                  borderRadius: 14, padding: '20px 18px', textAlign: 'center',
+                  borderRadius: 20, padding: '40px 24px', textAlign: 'center',
                 }}>
-                  <div style={{ fontSize: '48px', marginBottom: 12 }}>🍽️</div>
-                  <p style={{ fontSize: '14px', fontWeight: 600, color: C.text, margin: '0 0 4px 0' }}>
+                  <div style={{ fontSize: '40px', marginBottom: 12 }}>🍽️</div>
+                  <p style={{ fontSize: '15px', fontWeight: 600, color: C.text, margin: '0 0 6px 0' }}>
                     No shared recipes yet
                   </p>
-                  <p style={{ fontSize: '12px', color: C.sub, margin: '0 0 14px 0', lineHeight: 1.45 }}>
+                  <p style={{ fontSize: '13px', color: C.sub, margin: '0 0 20px 0', lineHeight: 1.5 }}>
                     Be the first to share a recipe with this group.
                   </p>
                   <button
                     onClick={() => { setDetailGroupId(null); navigate('/recipes/new', { state: { mode: 'share', lockedGroupId: detailGroup?.id } }) }}
                     className="flex items-center gap-2 border-none cursor-pointer mx-auto transition-smooth"
                     style={{
-                      background: C.elevated, color: C.sub,
-                      padding: '8px 16px', borderRadius: 999,
-                      fontSize: '13px', fontWeight: 600,
-                      border: `1px solid ${C.border}`,
+                      background: C.accent, color: '#FFF',
+                      padding: '10px 20px', borderRadius: 14,
+                      fontSize: '14px', fontWeight: 600,
                     }}
                   >
                     <BookOpen size={14} />

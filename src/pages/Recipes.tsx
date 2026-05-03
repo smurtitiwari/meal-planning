@@ -264,14 +264,19 @@ export default function Recipes() {
         {activeTab === 'mine' && (
           <>
             {filteredRecipes.length === 0 ? (
-              <div className="text-center py-16">
-                <div style={{ fontSize: '48px', marginBottom: 12 }}>📖</div>
-                <p style={{ fontSize: '15px', fontWeight: 600, color: colors.textPrimary, margin: '0 0 4px 0' }}>
+              <div style={{ textAlign: 'center', padding: '40px 24px', background: colors.card, border: `1px solid ${colors.border}`, borderRadius: 20, marginTop: 4 }}>
+                <div style={{ fontSize: '40px', marginBottom: 12 }}>📖</div>
+                <p style={{ fontSize: '15px', fontWeight: 600, color: colors.textPrimary, margin: '0 0 6px 0' }}>
                   {recipes.length === 0 ? 'No recipes yet' : 'No matches'}
                 </p>
-                <p style={{ fontSize: '13px', color: colors.textSecondary }}>
-                  {recipes.length === 0 ? 'Save your first recipe to get started' : 'Try a different filter'}
+                <p style={{ fontSize: '13px', color: colors.textSecondary, margin: '0 0 20px 0', lineHeight: 1.5 }}>
+                  {recipes.length === 0 ? 'Save your first recipe to get started.' : 'Try a different filter.'}
                 </p>
+                {recipes.length === 0 && (
+                  <button onClick={() => setShowTypePicker(true)} style={{ background: colors.accentPurple, color: '#FFF', border: 'none', borderRadius: 14, padding: '10px 20px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
+                    Add a recipe
+                  </button>
+                )}
               </div>
             ) : (
               <div className="space-y-4">
@@ -315,10 +320,13 @@ export default function Recipes() {
         {activeTab === 'shared' && (
           <div className="space-y-4">
             {filteredShared.length === 0 ? (
-              <div className="text-center py-16">
-                <div style={{ fontSize: '48px', marginBottom: 12 }}>👥</div>
-                <p style={{ fontSize: '15px', fontWeight: 600, color: colors.textPrimary, margin: '0 0 4px 0' }}>No shared recipes</p>
-                <p style={{ fontSize: '13px', color: colors.textSecondary }}>Share your first recipe with friends</p>
+              <div style={{ textAlign: 'center', padding: '40px 24px', background: colors.card, border: `1px solid ${colors.border}`, borderRadius: 20, marginTop: 4 }}>
+                <div style={{ fontSize: '40px', marginBottom: 12 }}>👥</div>
+                <p style={{ fontSize: '15px', fontWeight: 600, color: colors.textPrimary, margin: '0 0 6px 0' }}>No shared recipes</p>
+                <p style={{ fontSize: '13px', color: colors.textSecondary, margin: '0 0 20px 0', lineHeight: 1.5 }}>Share your first recipe with your group.</p>
+                <button onClick={() => pickType('shared')} style={{ background: colors.accentPurple, color: '#FFF', border: 'none', borderRadius: 14, padding: '10px 20px', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
+                  Share a recipe
+                </button>
               </div>
             ) : (
               filteredShared.map((recipe) => (
