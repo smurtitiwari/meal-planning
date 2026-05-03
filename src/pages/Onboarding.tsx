@@ -627,45 +627,53 @@ export default function Onboarding() {
           </div>
 
           {/* Bottom CTA bar */}
-          <div className="fixed bottom-0 left-0 right-0 px-5 py-4" style={{
+          <div className="fixed bottom-0 left-0 right-0 px-5" style={{
+            paddingTop: 12, paddingBottom: 28,
             background: 'rgba(247,244,239,0.97)',
             backdropFilter: 'blur(16px)',
             borderTop: `1px solid ${T.border}`,
           }}>
-            <div className="max-w-md mx-auto flex gap-3">
-              <button onClick={() => setStep(step - 1)}
-                className="flex items-center justify-center cursor-pointer transition-smooth"
-                style={{
-                  width: 46, height: 46, borderRadius: 16, flexShrink: 0,
-                  background: T.card, border: `1px solid ${T.border}`,
-                }}>
-                <ArrowLeft size={17} color={T.textPrimary} />
-              </button>
-              <button onClick={() => {
-                if (step === 2 && avoidances.length === 0) {
-                  setStep(step + 1)
-                } else if (step < TOTAL_STEPS - 1) {
-                  setStep(step + 1)
-                } else {
-                  handleFinish()
-                }
-              }}
-                disabled={!canProceed() && !(step === 2) && !(step === 6)}
-                className="flex-1 font-semibold flex items-center justify-center border-none cursor-pointer transition-smooth"
-                style={{
-                  height: 46, borderRadius: 18,
-                  background: (canProceed() || step === 2 || step === 6) ? T.accent : T.border,
-                  color: (canProceed() || step === 2 || step === 6) ? '#FFFFFF' : T.disabled,
-                  fontSize: '15px',
-                }}>
-                {step === 2 && avoidances.length === 0
-                  ? 'None'
-                  : step === 5 && groupEnabled
-                    ? 'Create & continue'
-                  : step < TOTAL_STEPS - 1
-                    ? 'Continue'
-                    : "Let's eat"}
-              </button>
+            <div className="max-w-md mx-auto">
+              <div className="flex gap-3">
+                <button onClick={() => setStep(step - 1)}
+                  className="flex items-center justify-center cursor-pointer transition-smooth"
+                  style={{
+                    width: 46, height: 46, borderRadius: 16, flexShrink: 0,
+                    background: T.card, border: `1px solid ${T.border}`,
+                  }}>
+                  <ArrowLeft size={17} color={T.textPrimary} />
+                </button>
+                <button onClick={() => {
+                  if (step < TOTAL_STEPS - 1) {
+                    setStep(step + 1)
+                  } else {
+                    handleFinish()
+                  }
+                }}
+                  disabled={!canProceed() && !(step === 2) && !(step === 6)}
+                  className="flex-1 font-semibold flex items-center justify-center border-none cursor-pointer transition-smooth"
+                  style={{
+                    height: 46, borderRadius: 18,
+                    background: (canProceed() || step === 2 || step === 6) ? T.accent : T.border,
+                    color: (canProceed() || step === 2 || step === 6) ? '#FFFFFF' : T.disabled,
+                    fontSize: '15px',
+                  }}>
+                  {step === 5 && groupEnabled ? 'Create & continue' : step < TOTAL_STEPS - 1 ? 'Continue' : "Let's eat"}
+                </button>
+              </div>
+              {/* Skip — shown on non-required steps */}
+              {[2, 3, 4, 5, 6].includes(step) && (
+                <button
+                  onClick={() => step < TOTAL_STEPS - 1 ? setStep(step + 1) : handleFinish()}
+                  style={{
+                    width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+                    fontSize: '13px', fontWeight: 500, color: T.textSecondary,
+                    paddingTop: 12, textAlign: 'center',
+                  }}
+                >
+                  Skip for now
+                </button>
+              )}
             </div>
           </div>
         </>
