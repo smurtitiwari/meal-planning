@@ -320,25 +320,12 @@ export default function Onboarding() {
         <>
           {/* Progress bar */}
           <div className="px-6 pt-14 pb-2">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="flex gap-1.5 flex-1">
-                {Array.from({ length: TOTAL_STEPS - 1 }).map((_, i) => (
-                  <div key={i} className="h-1 flex-1 rounded-full transition-all" style={{
-                    background: i < step ? T.accent : T.border,
-                  }} />
-                ))}
-              </div>
-              {[2, 3, 4, 5, 6].includes(step) && (
-                <button
-                  onClick={() => step < TOTAL_STEPS - 1 ? setStep(nextStep(step)) : handleFinish()}
-                  style={{
-                    background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-                    fontSize: '13px', fontWeight: 500, color: T.textSecondary, whiteSpace: 'nowrap',
-                  }}
-                >
-                  Skip
-                </button>
-              )}
+            <div className="flex gap-1.5 mb-6">
+              {Array.from({ length: TOTAL_STEPS - 1 }).map((_, i) => (
+                <div key={i} className="h-1 flex-1 rounded-full transition-all" style={{
+                  background: i < step ? T.accent : T.border,
+                }} />
+              ))}
             </div>
           </div>
 
@@ -684,6 +671,19 @@ export default function Onboarding() {
                   {step === 5 && groupEnabled ? 'Create & continue' : step < TOTAL_STEPS - 1 ? 'Continue' : "Let's eat"}
                 </button>
               </div>
+              {/* Skip — shown on non-required steps */}
+              {[2, 3, 4, 5, 6].includes(step) && (
+                <button
+                  onClick={() => step < TOTAL_STEPS - 1 ? setStep(nextStep(step)) : handleFinish()}
+                  style={{
+                    width: '100%', background: 'none', border: 'none', cursor: 'pointer',
+                    fontSize: '13px', fontWeight: 500, color: T.textSecondary,
+                    paddingTop: 12, textAlign: 'center',
+                  }}
+                >
+                  Skip for now
+                </button>
+              )}
             </div>
           </div>
         </>
