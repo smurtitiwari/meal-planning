@@ -145,6 +145,16 @@ export default function Onboarding() {
     return true
   }
 
+  // Steps to show — skip step 5 (group) if user chose "use alone"
+  const nextStep = (current: number) => {
+    if (current === 4 && !groupEnabled) return 6 // skip group step
+    return current + 1
+  }
+  const prevStep = (current: number) => {
+    if (current === 6 && !groupEnabled) return 4 // skip back over group step
+    return current - 1
+  }
+
   /* ─── Reusable list card ─── */
   const ListCard = ({
     emoji, label, desc, selected, onClick, trailing,
@@ -635,7 +645,7 @@ export default function Onboarding() {
           }}>
             <div className="max-w-md mx-auto">
               <div className="flex gap-3">
-                <button onClick={() => setStep(step - 1)}
+                <button onClick={() => setStep(prevStep(step))}
                   className="flex items-center justify-center cursor-pointer transition-smooth"
                   style={{
                     width: 46, height: 46, borderRadius: 16, flexShrink: 0,
@@ -645,7 +655,7 @@ export default function Onboarding() {
                 </button>
                 <button onClick={() => {
                   if (step < TOTAL_STEPS - 1) {
-                    setStep(step + 1)
+                    setStep(nextStep(step))
                   } else {
                     handleFinish()
                   }
@@ -664,7 +674,7 @@ export default function Onboarding() {
               {/* Skip — shown on non-required steps */}
               {[2, 3, 4, 5, 6].includes(step) && (
                 <button
-                  onClick={() => step < TOTAL_STEPS - 1 ? setStep(step + 1) : handleFinish()}
+                  onClick={() => step < TOTAL_STEPS - 1 ? setStep(nextStep(step)) : handleFinish()}
                   style={{
                     width: '100%', background: 'none', border: 'none', cursor: 'pointer',
                     fontSize: '13px', fontWeight: 500, color: T.textSecondary,
