@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useStore, generateId, guessIngredients } from '../store/useStore'
 import type { Recipe } from '../store/useStore'
-import { ArrowLeft, Link2, Sparkles, X, BookOpen, Users } from 'lucide-react'
+import { ArrowLeft, Link2, Sparkles, X, ChevronRight } from 'lucide-react'
 
 const serifFont = "'DM Serif Display', Georgia, serif"
 
@@ -11,16 +11,15 @@ export default function AddRecipe() {
   const location = useLocation()
   const { addRecipe, updateRecipe, addSharedRecipe, preferences, groups } = useStore()
 
-  const state        = (location.state as any) || {}
-  const lockedGroupId: string | null = state.lockedGroupId || null
-  const editRecipe: Recipe | null    = state.editRecipe    || null
-  const initialMode: 'mine' | 'share' = state.mode || (lockedGroupId ? 'share' : 'mine')
+  const state          = (location.state as any) || {}
+  const lockedGroupId: string | null  = state.lockedGroupId  || null
+  const defaultGroupId: string | null = state.defaultGroupId || null
+  const editRecipe: Recipe | null     = state.editRecipe     || null
+  const mode: 'mine' | 'share' = state.mode || (lockedGroupId ? 'share' : 'mine')
 
-  // If locked to a group or editing → go straight to form; otherwise show type selection first
-  const [view, setView] = useState<'type-select' | 'form'>(
-    lockedGroupId || editRecipe ? 'form' : 'type-select'
+  const [selectedGroupId, setSelectedGroupId] = useState<string>(
+    lockedGroupId || defaultGroupId || groups[0]?.id || ''
   )
-  const [mode, setMode] = useState<'mine' | 'share'>(initialMode)
 
   // Form state
   const [name,          setName]          = useState(editRecipe?.name          || '')
@@ -45,9 +44,7 @@ export default function AddRecipe() {
     elevated:    dm ? '#252525'                   : '#EDE9E4',
   }
 
-  const lockedGroupName = lockedGroupId
-    ? (groups.find(g => g.id === lockedGroupId)?.name || preferences.groupName || '')
-    : ''
+  const selectedGroupName = groups.find(g => g.id === selectedGroupId)?.name || ''
 
   const addIng = () => {
     const v = newIngredient.trim()
@@ -68,9 +65,9 @@ export default function AddRecipe() {
       return
     }
 
-    if (mode === 'share' && lockedGroupId) {
+    if (mode === 'share' && selectedGroupId) {
       addSharedRecipe({
-        id: generateId(), groupId: lockedGroupId, sharedBy: preferences.name || 'You',
+        id: generateId(), groupId: selectedGroupId, sharedBy: preferences.name || 'You',
         tags: [], timestamp: Date.now(), sourceType: link ? 'manual' : undefined, ...data,
       })
       addRecipe({ id: generateId(), category: 'main', ...data })
@@ -82,116 +79,11 @@ export default function AddRecipe() {
   }
 
   // ─────────────────────────────────────────────────────────────────
-  // VIEW 1 — Type selection
-  // ─────────────────────────────────────────────────────────────────
-  if (view === 'type-select') {
-    return (
-      <div className="min-h-screen animate-slide-right" style={{ background: C.page }}>
-        <div style={{ padding: '56px 20px 24px' }}>
-          <button
-            onClick={() => navigate(-1)}
-            style={{
-              width: 36, height: 36, borderRadius: 12, marginBottom: 28,
-              background: C.card, border: `1px solid ${C.border}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', color: C.text,
-            }}
-          >
-            <ArrowLeft size={18} />
-          </button>
-
-          <h1 style={{ fontFamily: serifFont, fontSize: '28px', fontWeight: 400, color: C.text, margin: '0 0 6px 0' }}>
-            Add recipe
-          </h1>
-          <p style={{ fontSize: '14px', color: C.sub, margin: '0 0 32px 0' }}>
-            Where would you like to save it?
-          </p>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {/* My recipe */}
-            <button
-              onClick={() => { setMode('mine'); setView('form') }}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 16,
-                background: C.card, border: `1px solid ${C.border}`,
-                borderRadius: 18, padding: '20px 18px',
-                cursor: 'pointer', textAlign: 'left', width: '100%',
-              }}
-            >
-              <div style={{
-                width: 48, height: 48, borderRadius: 14, flexShrink: 0,
-                background: C.elevated,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: C.accent,
-              }}>
-                <BookOpen size={22} />
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: '16px', fontWeight: 700, color: C.text, margin: '0 0 3px 0' }}>
-                  My recipe
-                </p>
-                <p style={{ fontSize: '13px', color: C.sub, margin: 0, lineHeight: 1.4 }}>
-                  Save to your personal collection.
-                </p>
-              </div>
-              <ArrowRight color={C.sub} />
-            </button>
-
-            {/* Share recipe */}
-            <button
-              onClick={() => {
-                setMode('share')
-                if (groups.length === 0) {
-                  // No groups — go to form, will save as mine
-                  setView('form')
-                } else if (groups.length === 1) {
-                  // Single group — skip group selection
-                  navigate('/recipes/new', {
-                    replace: true,
-                    state: { lockedGroupId: groups[0].id, mode: 'share' },
-                  })
-                } else {
-                  // Multiple groups — pick group first
-                  navigate('/recipes/new/group')
-                }
-              }}
-              style={{
-                display: 'flex', alignItems: 'center', gap: 16,
-                background: C.card, border: `1px solid ${C.border}`,
-                borderRadius: 18, padding: '20px 18px',
-                cursor: 'pointer', textAlign: 'left', width: '100%',
-              }}
-            >
-              <div style={{
-                width: 48, height: 48, borderRadius: 14, flexShrink: 0,
-                background: C.accentLight,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: C.accent,
-              }}>
-                <Users size={22} />
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: '16px', fontWeight: 700, color: C.text, margin: '0 0 3px 0' }}>
-                  Share recipe
-                </p>
-                <p style={{ fontSize: '13px', color: C.sub, margin: 0, lineHeight: 1.4 }}>
-                  Share with your group & save to yours.
-                </p>
-              </div>
-              <ArrowRight color={C.sub} />
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // ─────────────────────────────────────────────────────────────────
-  // VIEW 2 — Recipe form
+  // Recipe form
   // ─────────────────────────────────────────────────────────────────
   const ctaLabel = editRecipe
     ? 'Update recipe'
-    : mode === 'share' && lockedGroupId
+    : mode === 'share'
     ? 'Share recipe'
     : 'Save recipe'
 
@@ -205,7 +97,7 @@ export default function AddRecipe() {
         position: 'sticky', top: 0, zIndex: 10, background: C.page,
       }}>
         <button
-          onClick={() => (lockedGroupId ? navigate(-1) : setView('type-select'))}
+          onClick={() => navigate(-1)}
           style={{
             width: 36, height: 36, borderRadius: 12,
             background: C.card, border: `1px solid ${C.border}`,
@@ -218,7 +110,7 @@ export default function AddRecipe() {
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontSize: '11px', fontWeight: 700, color: C.sub, margin: '0 0 1px 0', textTransform: 'uppercase', letterSpacing: '0.07em' }}>
-            {mode === 'share' && lockedGroupName ? `Sharing to ${lockedGroupName}` : mode === 'share' ? 'Share recipe' : 'My recipe'}
+            {mode === 'share' && selectedGroupName ? `Sharing to ${selectedGroupName}` : mode === 'share' ? 'Share recipe' : 'My recipe'}
           </p>
           <h1 style={{ fontFamily: serifFont, fontSize: '22px', fontWeight: 400, color: C.text, margin: 0 }}>
             {editRecipe ? 'Edit recipe' : 'Add recipe'}
@@ -228,6 +120,38 @@ export default function AddRecipe() {
 
       {/* Form */}
       <div style={{ padding: '4px 20px 120px', display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+        {/* Group row — share mode only */}
+        {mode === 'share' && (
+          <div>
+            <label style={labelStyle(C)}>Share to group</label>
+            <button
+              onClick={() => navigate('/recipes/new/group', {
+                state: { currentGroupId: selectedGroupId, mode: 'share' }
+              })}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+                background: C.accentLight,
+                border: `1.5px solid ${C.accentBorder}`,
+                borderRadius: 14, padding: '13px 16px',
+                cursor: 'pointer', textAlign: 'left',
+              }}
+            >
+              <div style={{
+                width: 36, height: 36, borderRadius: 10, flexShrink: 0,
+                background: dm ? 'rgba(154,77,90,0.3)' : 'rgba(74,31,35,0.1)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '14px', fontWeight: 700, color: C.accent,
+              }}>
+                {selectedGroupName.charAt(0).toUpperCase() || '?'}
+              </div>
+              <span style={{ flex: 1, fontSize: '15px', fontWeight: 700, color: C.accent }}>
+                {selectedGroupName || 'Select group'}
+              </span>
+              <ChevronRight size={16} color={C.accent} />
+            </button>
+          </div>
+        )}
 
         {/* Recipe name */}
         <div>
@@ -360,10 +284,3 @@ const inputStyle = (C: { inputBg: string; inputBorder: string; text: string }) =
   boxSizing: 'border-box' as const,
 })
 
-function ArrowRight({ color }: { color: string }) {
-  return (
-    <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-      <polyline points="9 18 15 12 9 6" />
-    </svg>
-  )
-}

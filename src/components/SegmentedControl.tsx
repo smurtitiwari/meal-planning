@@ -17,7 +17,7 @@ export default function SegmentedControl<T extends string>({
   darkMode = false,
 }: SegmentedControlProps<T>) {
   const rail         = darkMode ? '#1B1B1B' : '#EDE9E4'
-  const active       = darkMode ? '#2A2A2A' : '#F5F3F1'
+  const active       = darkMode ? '#2A2A2A' : '#FFFFFF'
   const activeShadow = darkMode ? '0 1px 4px rgba(0,0,0,0.4)' : '0 1px 4px rgba(28,27,31,0.07)'
   const activeText   = darkMode ? '#FEFEFE' : '#1C1C1C'
   const inactiveText = darkMode ? '#6B6370' : '#6F6B66'
@@ -29,8 +29,9 @@ export default function SegmentedControl<T extends string>({
         gridTemplateColumns: `repeat(${options.length}, 1fr)`,
         background: rail,
         borderRadius: 12,
-        padding: 3,
+        padding: 2,
         gap: 2,
+        height: 40,
       }}
     >
       {options.map((option) => {
@@ -44,12 +45,13 @@ export default function SegmentedControl<T extends string>({
               color: selected ? activeText : inactiveText,
               fontSize: '14px',
               fontWeight: selected ? 700 : 500,
-              padding: '9px 0',
+              height: 36,
+              padding: '0',
               borderRadius: 10,
               border: 'none',
               outline: 'none',
               cursor: 'pointer',
-              transition: 'all 0.18s ease',
+              transition: 'background 0.22s ease, color 0.22s ease, box-shadow 0.22s ease, font-weight 0.1s ease',
               boxShadow: selected ? activeShadow : 'none',
               whiteSpace: 'nowrap',
             }}

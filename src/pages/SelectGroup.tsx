@@ -11,10 +11,9 @@ export default function SelectGroup() {
   const { groups, createGroup, preferences } = useStore()
 
   const state = (location.state as any) || {}
-  const lockedGroupId: string | null = state.lockedGroupId || null
+  const currentGroupId: string | null = state.currentGroupId || state.lockedGroupId || null
 
-  // If a group is locked, pre-select it; otherwise default to first group
-  const defaultId = lockedGroupId || preferences.groupId || groups[0]?.id || ''
+  const defaultId = currentGroupId || preferences.groupId || groups[0]?.id || ''
   const [selectedGroupId, setSelectedGroupId] = useState(defaultId)
   const [search, setSearch]   = useState('')
   const [showCreate, setShowCreate] = useState(false)
@@ -42,10 +41,7 @@ export default function SelectGroup() {
 
   const handleContinue = () => {
     if (!selectedGroupId) return
-    // Hand off to AddRecipe with the selected group locked in
-    navigate('/recipes/new', {
-      state: { lockedGroupId: selectedGroupId, mode: 'share' },
-    })
+    navigate('/recipes/new', { replace: true, state: { mode: 'share', lockedGroupId: selectedGroupId, defaultGroupId: selectedGroupId } })
   }
 
   const handleCreateGroup = () => {
@@ -126,26 +122,21 @@ export default function SelectGroup() {
         )}
 
         {filteredGroups.length > 0 && (
-          <div style={{
-            background: C.card, border: `1px solid ${C.border}`,
-            borderRadius: 16, overflow: 'hidden',
-          }}>
-            {filteredGroups.map((g, i) => {
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {filteredGroups.map((g) => {
               const sel = selectedGroupId === g.id
-              const isLast = i === filteredGroups.length - 1
               return (
                 <button
                   key={g.id}
                   onClick={() => setSelectedGroupId(g.id)}
                   style={{
                     width: '100%', display: 'flex', alignItems: 'center', gap: 12,
-                    padding: '14px 16px', border: 'none', cursor: 'pointer', textAlign: 'left',
-                    background: sel ? C.accentLight : 'transparent',
-                    borderBottom: isLast ? 'none' : `1px solid ${C.divider}`,
+                    padding: '14px 16px', borderRadius: 14, border: 'none', cursor: 'pointer', textAlign: 'left',
+                    background: sel ? C.accentLight : C.card,
+                    outline: sel ? `1.5px solid ${C.accentBorder}` : `1px solid ${C.border}`,
                     transition: 'background 0.15s ease',
                   }}
                 >
-                  {/* Group avatar */}
                   <div style={{
                     width: 40, height: 40, borderRadius: 12, flexShrink: 0,
                     background: sel
@@ -157,7 +148,6 @@ export default function SelectGroup() {
                   }}>
                     {g.name.charAt(0).toUpperCase()}
                   </div>
-
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{
                       fontSize: '15px', fontWeight: sel ? 700 : 500,
@@ -166,20 +156,16 @@ export default function SelectGroup() {
                     }}>
                       {g.name}
                     </p>
-                    <p style={{ fontSize: '12px', color: C.sub, margin: '2px 0 0 0' }}>
-                      {g.role === 'owner' ? 'Owner' : 'Member'}
-                    </p>
                   </div>
-
-                  {/* Radio */}
-                  <div style={{
-                    width: 22, height: 22, borderRadius: 11, flexShrink: 0,
-                    border: sel ? 'none' : `2px solid ${dm ? '#444' : '#CCC'}`,
-                    background: sel ? C.accent : 'transparent',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {sel && <div style={{ width: 8, height: 8, borderRadius: 4, background: '#FFF' }} />}
-                  </div>
+                  {sel && (
+                    <div style={{
+                      width: 22, height: 22, borderRadius: 11, flexShrink: 0,
+                      background: C.accent,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <div style={{ width: 8, height: 8, borderRadius: 4, background: '#FFF' }} />
+                    </div>
+                  )}
                 </button>
               )
             })}

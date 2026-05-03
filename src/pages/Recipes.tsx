@@ -31,6 +31,7 @@ export default function Recipes() {
   const [toast, setToast] = useState<string | null>(null)
   const [selectedGroupId, setSelectedGroupId] = useState<string>(preferences.groupId || '')
   const [fromGroup, setFromGroup] = useState(false)
+  const [showGroupPicker, setShowGroupPicker] = useState(false)
 
   const userName = preferences.name || 'You'
 
@@ -74,24 +75,37 @@ export default function Recipes() {
   const resetForm = () => {
     setName(''); setLink(''); setCategory('main'); setMealType('lunch');
     setIngredients([]); setNewIngredient(''); setNote(''); setEditId(null); setShowAdd(false)
-    setSelectedGroupId(preferences.groupId || ''); setFromGroup(false)
+    setSelectedGroupId(preferences.groupId || ''); setFromGroup(false); setShowGroupPicker(false)
   }
 
   // Handle navigation state — redirect legacy bottom-sheet states to new routes
   useEffect(() => {
     if ((location.state as any)?.editRecipe) {
-      const r = (location.state as any).editRecipe
+      const r = (location.state as any).editRecipe as Recipe
       window.history.replaceState({}, document.title)
-      navigate('/recipes/new', { state: { editRecipe: r } })
+      setEditId(r.id)
+      setName(r.name)
+      setLink(r.link || '')
+      setCategory(r.category)
+      setMealType(r.mealType || 'lunch')
+      setIngredients(r.ingredients)
+      setNote(r.note || '')
+      setActiveTab('mine')
+      setShowAdd(true)
     }
     if ((location.state as any)?.openNewRecipe || (location.state as any)?.openTypePicker) {
       window.history.replaceState({}, document.title)
-      navigate('/recipes/new')
+      setShowTypePicker(true)
     }
     if ((location.state as any)?.openSharedRecipe) {
       const gid = (location.state as any).groupId
       window.history.replaceState({}, document.title)
-      navigate('/recipes/new', { state: { lockedGroupId: gid || null } })
+      navigate('/recipes/new', { state: { mode: 'share', lockedGroupId: gid || null } })
+    }
+    if ((location.state as any)?.openFormSheet) {
+      const gid = (location.state as any).lockedGroupId
+      window.history.replaceState({}, document.title)
+      navigate('/recipes/new', { state: { mode: 'share', lockedGroupId: gid || null } })
     }
     if ((location.state as any)?.tab === 'shared') {
       setActiveTab('shared')
@@ -105,10 +119,14 @@ export default function Recipes() {
   }
 
   const pickType = (type: 'mine' | 'shared') => {
-    setActiveTab(type)
-    setFromGroup(false)
     setShowTypePicker(false)
-    setShowAdd(true)
+    if (type === 'mine') {
+      navigate('/recipes/new', { state: { mode: 'mine' } })
+    } else {
+      navigate('/recipes/new', {
+        state: { mode: 'share', defaultGroupId: groups[0]?.id || null },
+      })
+    }
   }
 
   const handleSave = () => {
@@ -182,7 +200,7 @@ export default function Recipes() {
               Your collection
             </h1>
           </div>
-          <button onClick={() => navigate('/recipes/new')}
+          <button onClick={() => setShowTypePicker(true)}
             className="w-10 h-10 rounded-full flex items-center justify-center border-none cursor-pointer"
             style={{ background: colors.accentPurple, color: '#FFF' }}>
             <Plus size={18} />
@@ -511,98 +529,42 @@ export default function Recipes() {
             <div style={{ flex: 1, overflowY: 'auto', padding: '18px 22px 32px' }}>
               <div className="space-y-4">
 
-                {/* ── Group selection — first decision, compact + scrollable for any count ── */}
+                {/* ── Group selection — tappable row, opens picker sheet ── */}
                 {activeTab === 'shared' && (
                   <div>
                     <label className="section-label" style={{ display: 'block', marginBottom: 8, color: colors.textSecondary }}>
                       Share to group
                     </label>
-
-                    {fromGroup && selectedGroupId ? (
-                      /* Locked: came from a specific group card — no picker */
-                      <div style={{
-                        display: 'flex', alignItems: 'center', gap: 10,
-                        background: colors.accentLight,
-                        border: `1px solid ${preferences.darkMode ? 'rgba(240,199,207,0.25)' : 'rgba(74,31,35,0.15)'}`,
-                        borderRadius: 12, padding: '11px 14px',
-                      }}>
-                        <div style={{
-                          width: 30, height: 30, borderRadius: 9,
-                          background: preferences.darkMode ? 'rgba(154,77,90,0.3)' : 'rgba(74,31,35,0.1)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          color: colors.accentPurple, flexShrink: 0,
-                        }}>
-                          <Users size={14} />
-                        </div>
-                        <span style={{ fontSize: '14px', fontWeight: 700, color: colors.accentPurple, flex: 1 }}>
-                          {groupName(selectedGroupId)}
-                        </span>
-                        <Check size={15} color={colors.accentPurple} />
-                      </div>
-                    ) : groups.length === 0 ? (
-                      /* No groups yet */
+                    {groups.length === 0 ? (
                       <p style={{ fontSize: '13px', color: colors.textSecondary, margin: 0 }}>
                         No groups yet. Create one from the Groups tab.
                       </p>
                     ) : (
-                      /* Selectable list — capped height so form fields stay visible for 4+ groups */
-                      <div style={{
-                        border: `1px solid ${colors.border}`,
-                        borderRadius: 14,
-                        overflow: 'hidden',
-                        maxHeight: groups.length > 3 ? 192 : 'none',
-                        overflowY: groups.length > 3 ? 'auto' : 'visible',
-                      }}>
-                        {groups.map((g, i) => {
-                          const sel = selectedGroupId === g.id
-                          const isLast = i === groups.length - 1
-                          return (
-                            <button
-                              key={g.id}
-                              onClick={() => setSelectedGroupId(g.id)}
-                              className="w-full flex items-center gap-3 cursor-pointer border-none outline-none text-left"
-                              style={{
-                                background: sel
-                                  ? colors.accentLight
-                                  : (preferences.darkMode ? '#1B1B1B' : colors.card),
-                                padding: '11px 14px',
-                                borderBottom: isLast ? 'none' : `1px solid ${colors.border}`,
-                              }}
-                            >
-                              {/* Group initial avatar */}
-                              <div style={{
-                                width: 30, height: 30, borderRadius: 9, flexShrink: 0,
-                                background: sel
-                                  ? (preferences.darkMode ? 'rgba(154,77,90,0.3)' : 'rgba(74,31,35,0.1)')
-                                  : colors.elevated,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '12px', fontWeight: 700,
-                                color: sel ? colors.accentPurple : colors.textSecondary,
-                              }}>
-                                {g.name.charAt(0).toUpperCase()}
-                              </div>
-                              <span style={{
-                                fontSize: '14px', fontWeight: sel ? 700 : 500,
-                                color: sel ? colors.accentPurple : colors.textPrimary,
-                                flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                              }}>
-                                {g.name}
-                              </span>
-                              {/* Radio dot */}
-                              <div style={{
-                                width: 18, height: 18, borderRadius: 9, flexShrink: 0,
-                                border: sel
-                                  ? 'none'
-                                  : `2px solid ${preferences.darkMode ? '#444' : '#D0CBC6'}`,
-                                background: sel ? colors.accentPurple : 'transparent',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              }}>
-                                {sel && <div style={{ width: 7, height: 7, borderRadius: 4, background: '#fff' }} />}
-                              </div>
-                            </button>
-                          )
-                        })}
-                      </div>
+                      <button
+                        onClick={() => setShowGroupPicker(true)}
+                        className="w-full flex items-center gap-3 cursor-pointer border-none outline-none text-left"
+                        style={{
+                          background: colors.accentLight,
+                          border: `1px solid ${preferences.darkMode ? 'rgba(240,199,207,0.25)' : 'rgba(74,31,35,0.15)'}`,
+                          borderRadius: 13, padding: '12px 14px',
+                        }}
+                      >
+                        <div style={{
+                          width: 34, height: 34, borderRadius: 10, flexShrink: 0,
+                          background: preferences.darkMode ? 'rgba(154,77,90,0.3)' : 'rgba(74,31,35,0.1)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '13px', fontWeight: 700, color: colors.accentPurple,
+                        }}>
+                          {groupName(selectedGroupId).charAt(0).toUpperCase() || '?'}
+                        </div>
+                        <span style={{ fontSize: '14px', fontWeight: 700, color: colors.accentPurple, flex: 1 }}>
+                          {groupName(selectedGroupId) || 'Select group'}
+                        </span>
+                        {/* Chevron */}
+                        <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={colors.accentPurple} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                      </button>
                     )}
                   </div>
                 )}
@@ -751,6 +713,77 @@ export default function Recipes() {
                   {editId ? 'Update recipe' : activeTab === 'shared' ? 'Share recipe' : 'Save recipe'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Group picker sheet (above form sheet) ── */}
+      {showGroupPicker && (
+        <div
+          className="fixed inset-0 z-[60] flex items-end justify-center"
+          style={{ background: 'rgba(0,0,0,0.5)' }}
+          onClick={() => setShowGroupPicker(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md animate-slide-up"
+            style={{
+              background: preferences.darkMode ? '#1B1B1B' : '#FFFFFF',
+              borderRadius: '24px 24px 0 0',
+              padding: '20px 20px 40px',
+              boxShadow: '0 -4px 32px rgba(0,0,0,0.18)',
+            }}
+          >
+            <div style={{ width: 40, height: 4, borderRadius: 2, background: preferences.darkMode ? '#333' : '#E8E8E8', margin: '0 auto 18px' }} />
+            <h3 style={{ fontFamily: serifFont, fontSize: '20px', fontWeight: 400, color: colors.textPrimary, margin: '0 0 16px 0' }}>
+              Choose group
+            </h3>
+            <div style={{ border: `1px solid ${colors.border}`, borderRadius: 14, overflow: 'hidden' }}>
+              {groups.map((g, i) => {
+                const sel = selectedGroupId === g.id
+                const isLast = i === groups.length - 1
+                return (
+                  <button
+                    key={g.id}
+                    onClick={() => { setSelectedGroupId(g.id); setShowGroupPicker(false) }}
+                    className="w-full flex items-center gap-3 cursor-pointer border-none outline-none text-left"
+                    style={{
+                      background: sel ? colors.accentLight : (preferences.darkMode ? '#1B1B1B' : '#FBFAF8'),
+                      padding: '13px 16px',
+                      borderBottom: isLast ? 'none' : `1px solid ${colors.border}`,
+                    }}
+                  >
+                    <div style={{
+                      width: 36, height: 36, borderRadius: 11, flexShrink: 0,
+                      background: sel
+                        ? (preferences.darkMode ? 'rgba(154,77,90,0.3)' : 'rgba(74,31,35,0.1)')
+                        : (preferences.darkMode ? '#252525' : '#EDE9E4'),
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: '14px', fontWeight: 700,
+                      color: sel ? colors.accentPurple : colors.textSecondary,
+                    }}>
+                      {g.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: '15px', fontWeight: sel ? 700 : 500, color: sel ? colors.accentPurple : colors.textPrimary, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {g.name}
+                      </p>
+                      <p style={{ fontSize: '11px', color: colors.textSecondary, margin: '1px 0 0 0' }}>
+                        {g.role === 'owner' ? 'Owner' : 'Member'}
+                      </p>
+                    </div>
+                    <div style={{
+                      width: 22, height: 22, borderRadius: 11, flexShrink: 0,
+                      border: sel ? 'none' : `2px solid ${preferences.darkMode ? '#444' : '#CCC'}`,
+                      background: sel ? colors.accentPurple : 'transparent',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      {sel && <div style={{ width: 8, height: 8, borderRadius: 4, background: '#FFF' }} />}
+                    </div>
+                  </button>
+                )
+              })}
             </div>
           </div>
         </div>

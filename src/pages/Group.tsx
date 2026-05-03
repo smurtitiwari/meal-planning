@@ -82,10 +82,10 @@ export default function Group() {
               fontSize: '11px', fontWeight: 600, letterSpacing: '0.1em',
               textTransform: 'uppercase', color: C.sub, margin: '0 0 4px 0',
             }}>
-              Group
+              Groups
             </p>
             <h1 style={{ fontFamily: serifFont, fontSize: '32px', fontWeight: 400, color: C.text, margin: 0, lineHeight: 1.1 }}>
-              {preferences.groupEnabled ? activeGroup.name : 'Your groups'}
+              Your groups
             </h1>
           </div>
 
@@ -132,7 +132,7 @@ export default function Group() {
                   {/* Group icon */}
                   <div style={{
                     width: 44, height: 44, borderRadius: 14,
-                    background: C.soft, color: C.accent, flexShrink: 0,
+                    background: C.elevated, color: C.sub, flexShrink: 0,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
                     <Users size={20} />
@@ -146,8 +146,8 @@ export default function Group() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
                       <span style={{
                         display: 'inline-flex', alignItems: 'center', gap: 4,
-                        background: C.soft, color: C.accent,
-                        fontSize: '11px', fontWeight: 700,
+                        background: C.elevated, color: C.sub,
+                        fontSize: '11px', fontWeight: 600,
                         padding: '2px 8px', borderRadius: 999,
                       }}>
                         <Users size={10} />
@@ -167,8 +167,8 @@ export default function Group() {
                       <div key={m.id} style={{
                         width: 28, height: 28, borderRadius: 14,
                         marginLeft: i === 0 ? 0 : -8,
-                        background: C.soft, border: `2px solid ${C.card}`,
-                        color: C.accent,
+                        background: C.elevated, border: `2px solid ${C.card}`,
+                        color: C.sub,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 11, fontWeight: 700,
                       }}>
@@ -196,7 +196,7 @@ export default function Group() {
                   <button
                     onClick={() => { setActiveGroup(group.id); ensureAndInvite() }}
                     className="flex items-center gap-1.5 bg-transparent border-none cursor-pointer p-0"
-                    style={{ color: C.accent, fontSize: '13px', fontWeight: 600 }}
+                    style={{ color: C.accent, fontSize: '13px', fontWeight: 700 }}
                   >
                     <UserPlus size={14} />
                     Invite flatmate
@@ -204,10 +204,10 @@ export default function Group() {
                   <button
                     onClick={() => {
                       setActiveGroup(group.id)
-                      navigate('/recipes/new', { state: { lockedGroupId: group.id } })
+                      navigate('/recipes/new', { state: { mode: 'share', lockedGroupId: group.id } })
                     }}
                     className="flex items-center gap-1.5 bg-transparent border-none cursor-pointer p-0"
-                    style={{ color: C.accent, fontSize: '13px', fontWeight: 600 }}
+                    style={{ color: C.accent, fontSize: '13px', fontWeight: 700 }}
                   >
                     <BookOpen size={14} />
                     Add recipe
@@ -254,8 +254,8 @@ export default function Group() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 5 }}>
                   <span style={{
                     display: 'inline-flex', alignItems: 'center', gap: 4,
-                    background: C.soft, color: C.accent,
-                    fontSize: '11px', fontWeight: 700,
+                    background: C.elevated, color: C.sub,
+                    fontSize: '11px', fontWeight: 600,
                     padding: '2px 8px', borderRadius: 999,
                   }}>
                     <Users size={10} />
@@ -299,7 +299,7 @@ export default function Group() {
                     {/* Avatar */}
                     <div style={{
                       width: 36, height: 36, borderRadius: 18,
-                      background: C.soft, color: C.accent,
+                      background: C.elevated, color: C.sub,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: 13, fontWeight: 700, flexShrink: 0,
                     }}>
@@ -318,7 +318,7 @@ export default function Group() {
                     <span style={{
                       display: 'flex', alignItems: 'center', gap: 4,
                       padding: '3px 8px', borderRadius: 999,
-                      background: C.soft, color: C.accent,
+                      background: C.elevated, color: C.sub,
                       fontSize: 11, fontWeight: 600, flexShrink: 0,
                     }}>
                       {member.role === 'owner' && <Crown size={11} />}
@@ -332,7 +332,7 @@ export default function Group() {
                   <button
                     onClick={ensureAndInvite}
                     className="flex items-center gap-1.5 bg-transparent border-none cursor-pointer p-0"
-                    style={{ color: C.accent, fontSize: '13px', fontWeight: 600 }}
+                    style={{ color: C.sub, fontSize: '13px', fontWeight: 500 }}
                   >
                     <UserPlus size={14} />
                     Invite flatmate
@@ -352,7 +352,7 @@ export default function Group() {
                   <button
                     onClick={() => { setDetailGroupId(null); navigate('/recipes', { state: { tab: 'shared' } }) }}
                     className="flex items-center gap-1 bg-transparent border-none cursor-pointer"
-                    style={{ fontSize: '12px', fontWeight: 600, color: C.accent, padding: 0 }}
+                    style={{ fontSize: '12px', fontWeight: 600, color: C.sub, padding: 0 }}
                   >
                     See all <ChevronRight size={13} />
                   </button>
@@ -372,13 +372,13 @@ export default function Group() {
                     Be the first to share a recipe with this group.
                   </p>
                   <button
-                    onClick={() => { setDetailGroupId(null); navigate('/recipes/new', { state: { lockedGroupId: detailGroup?.id } }) }}
+                    onClick={() => { setDetailGroupId(null); navigate('/recipes/new', { state: { mode: 'share', lockedGroupId: detailGroup?.id } }) }}
                     className="flex items-center gap-2 border-none cursor-pointer mx-auto transition-smooth"
                     style={{
-                      background: C.soft, color: C.accent,
+                      background: C.elevated, color: C.sub,
                       padding: '8px 16px', borderRadius: 999,
                       fontSize: '13px', fontWeight: 600,
-                      border: `1px solid ${C.selBorder}`,
+                      border: `1px solid ${C.border}`,
                     }}
                   >
                     <BookOpen size={14} />
@@ -399,7 +399,7 @@ export default function Group() {
                     >
                       <div style={{
                         width: 34, height: 34, borderRadius: 10,
-                        background: C.soft, color: C.accent,
+                        background: C.elevated, color: C.sub,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontSize: 12, fontWeight: 700, flexShrink: 0,
                       }}>

@@ -1,4 +1,9 @@
 import { useState } from 'react'
+import blinkitLogo from '../assets/blinkit.png'
+import zeptoLogo from '../assets/zepto.png'
+import instamartLogo from '../assets/instamart.png'
+import bigbasketLogo from '../assets/bigbasket.png'
+import dunzoLogo from '../assets/dunzo.png'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store/useStore'
 import BottomNav from '../components/BottomNav'
@@ -18,12 +23,12 @@ const AVOID_OPTIONS: { label: string; emoji: string }[] = [
   { label: 'Onion & Garlic', emoji: '🧅' },
   { label: 'Seafood', emoji: '🦐' },
 ]
-const GROCERY_APPS: { id: 'blinkit' | 'zepto' | 'swiggy' | 'bigbasket' | 'dunzo'; name: string; emoji: string }[] = [
-  { id: 'blinkit', name: 'Blinkit', emoji: '⚡' },
-  { id: 'zepto', name: 'Zepto', emoji: '🟣' },
-  { id: 'swiggy', name: 'Swiggy Instamart', emoji: '🧡' },
-  { id: 'bigbasket', name: 'BigBasket', emoji: '🟢' },
-  { id: 'dunzo', name: 'Dunzo', emoji: '📦' },
+const GROCERY_APPS: { id: 'blinkit' | 'zepto' | 'swiggy' | 'bigbasket' | 'dunzo'; name: string; logo: string }[] = [
+  { id: 'blinkit',   name: 'Blinkit',         logo: blinkitLogo },
+  { id: 'zepto',     name: 'Zepto',            logo: zeptoLogo },
+  { id: 'swiggy',    name: 'Swiggy Instamart', logo: instamartLogo },
+  { id: 'bigbasket', name: 'BigBasket',        logo: bigbasketLogo },
+  { id: 'dunzo',     name: 'Dunzo Daily',      logo: dunzoLogo },
 ]
 const LANGUAGE_LABELS: Record<'english' | 'hindi' | 'hinglish', string> = {
   english: 'English',
@@ -416,7 +421,7 @@ export default function Profile() {
                         background: sel ? 'rgba(74, 31, 35, 0.06)' : '#FFFFFF',
                         border: sel ? '1.5px solid rgba(74, 31, 35, 0.22)' : `1px solid ${colors.border}`,
                       }}>
-                      <span style={{ fontSize: '22px', lineHeight: 1, flexShrink: 0 }}>{app.emoji}</span>
+                      <img src={app.logo} alt={app.name} style={{ width: 28, height: 28, borderRadius: 8, objectFit: 'contain', flexShrink: 0 }} />
                       <span className="flex-1 text-left" style={{ fontSize: '14px', fontWeight: 600, color: sel ? (preferences.darkMode ? colors.accentText : colors.accent) : colors.textPrimary }}>{app.name}</span>
                       {sel && <Check size={16} style={{ color: colors.accent }} />}
                     </button>
