@@ -18,14 +18,7 @@ export default function Group() {
   const [newGroupName, setNewGroupName] = useState('')
 
   /* ── Data ── */
-  const visibleGroups = groups.length > 0
-    ? groups
-    : [{
-        id: preferences.groupId || 'preview-group',
-        name: preferences.groupName || 'Flat 503 Kitchen',
-        inviteCode: preferences.groupInviteCode || 'SMRUTI-HOME',
-        role: 'owner' as const,
-      }]
+  const visibleGroups = groups
 
   const activeGroup = visibleGroups.find((g) => g.id === preferences.groupId) || visibleGroups[0]
 
@@ -100,14 +93,35 @@ export default function Group() {
           </button>
         </div>
 
-        {/* ── Group cards ── */}
-        <p style={{
-          fontSize: '11px', fontWeight: 600, color: C.sub,
-          textTransform: 'uppercase', letterSpacing: '0.1em', margin: '0 0 10px 0',
-        }}>
-          Your groups
-        </p>
+        {/* ── Empty state ── */}
+        {visibleGroups.length === 0 && (
+          <div style={{
+            textAlign: 'center', padding: '48px 24px',
+            background: C.card, border: `1px solid ${C.border}`,
+            borderRadius: 20,
+          }}>
+            <div style={{ fontSize: '48px', marginBottom: 14 }}>👥</div>
+            <p style={{ fontSize: '16px', fontWeight: 600, color: C.text, margin: '0 0 6px 0' }}>
+              No groups yet
+            </p>
+            <p style={{ fontSize: '13px', color: C.sub, lineHeight: 1.55, margin: '0 0 20px 0' }}>
+              Create a group to share recipes and meal plans with flatmates or family.
+            </p>
+            <button
+              onClick={() => setShowCreateGroup(true)}
+              style={{
+                background: C.accent, color: '#FFF', border: 'none',
+                borderRadius: 14, padding: '10px 20px',
+                fontSize: '14px', fontWeight: 600, cursor: 'pointer',
+              }}
+            >
+              Create a group
+            </button>
+          </div>
+        )}
 
+        {/* ── Group cards ── */}
+        {visibleGroups.length > 0 && (
         <div className="space-y-2.5">
           {visibleGroups.map((group) => {
             const members = getMembersForGroup(group.id)
@@ -217,6 +231,7 @@ export default function Group() {
             )
           })}
         </div>
+        )}
 
       </div>
 
