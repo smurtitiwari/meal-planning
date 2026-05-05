@@ -7,6 +7,11 @@ import SegmentedControl from '../components/SegmentedControl'
 import MealPreviewSheet from '../components/MealPreviewSheet'
 import { X, Plus, Check, Trash2, RefreshCw, Repeat2, ShoppingCart } from 'lucide-react'
 import { GROCERY_CATEGORY_EMOJI, getCategoryForItem } from '../utils/groceryCategories'
+import blinkitLogo from '../assets/blinkit.png'
+import zeptoLogo from '../assets/zepto.png'
+import instamartLogo from '../assets/instamart.png'
+import bigbasketLogo from '../assets/bigbasket.png'
+import dunzoLogo from '../assets/dunzo.png'
 
 const serifFont = "'DM Serif Display', Georgia, serif"
 const mealLabel: Record<string, string> = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' }
@@ -430,12 +435,12 @@ export default function Planner() {
             </div>
             <div className="space-y-2.5">
               {(() => {
-                const appCatalog: Record<string, { name: string; emoji: string; url: string }> = {
-                  blinkit: { name: 'Blinkit', emoji: '⚡', url: 'https://blinkit.com' },
-                  zepto: { name: 'Zepto', emoji: '🟣', url: 'https://www.zeptonow.com' },
-                  swiggy: { name: 'Swiggy Instamart', emoji: '🧡', url: 'https://www.swiggy.com/instamart' },
-                  bigbasket: { name: 'BigBasket', emoji: '🟢', url: 'https://www.bigbasket.com' },
-                  dunzo: { name: 'Dunzo', emoji: '📦', url: 'https://www.dunzo.com' },
+                const appCatalog: Record<string, { name: string; logo: string; url: string }> = {
+                  blinkit: { name: 'Blinkit', logo: blinkitLogo, url: 'https://blinkit.com' },
+                  zepto: { name: 'Zepto', logo: zeptoLogo, url: 'https://www.zeptonow.com' },
+                  swiggy: { name: 'Swiggy Instamart', logo: instamartLogo, url: 'https://www.swiggy.com/instamart' },
+                  bigbasket: { name: 'BigBasket', logo: bigbasketLogo, url: 'https://www.bigbasket.com' },
+                  dunzo: { name: 'Dunzo', logo: dunzoLogo, url: 'https://www.dunzo.com' },
                 }
                 const selectedIds = (preferences.preferredGroceryApps && preferences.preferredGroceryApps.length > 0)
                   ? preferences.preferredGroceryApps
@@ -451,7 +456,7 @@ export default function Planner() {
                         background: preferences.darkMode ? colors.elevatedSurface : '#F6F6F6',
                         border: `1px solid ${preferences.darkMode ? colors.border : '#F4F4F4'}`,
                       }}>
-                      <span style={{ fontSize: '22px', lineHeight: 1, flexShrink: 0 }}>{app.emoji}</span>
+                      <img src={app.logo} alt={`${app.name} logo`} style={{ width: 24, height: 24, objectFit: 'contain', flexShrink: 0 }} />
                       <span className="flex-1 text-left" style={{ fontSize: '14px', fontWeight: 600, color: colors.textPrimary }}>{app.name}</span>
                       <span style={{ fontSize: '11px', fontWeight: 700, color: colors.accentText, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Open</span>
                     </button>
