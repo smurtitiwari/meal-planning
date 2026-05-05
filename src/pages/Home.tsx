@@ -6,7 +6,7 @@ import BottomNav from '../components/BottomNav'
 import CookMessage from '../components/CookMessage'
 import MealPreviewSheet from '../components/MealPreviewSheet'
 import InviteSheet from '../components/InviteSheet'
-import { ChefHat, Repeat2, Sparkles, X, User, Users } from 'lucide-react'
+import { ChefHat, RefreshCw, Sparkles, X, User, Users } from 'lucide-react'
 
 const mealLabel: Record<string, string> = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' }
 const allMealTypes: ('breakfast' | 'lunch' | 'dinner')[] = ['breakfast', 'lunch', 'dinner']
@@ -320,26 +320,20 @@ function MealCard({
             e.stopPropagation()
             onExchange()
           }}
-          className="absolute flex items-center justify-center gap-1 border-none cursor-pointer outline-none transition-smooth"
+          className="absolute flex items-center gap-1.5 border-none cursor-pointer outline-none bg-transparent p-0 transition-smooth"
           style={{
-            top: 10,
-            right: 10,
+            top: 12,
+            right: 14,
             zIndex: 2,
-            minWidth: 44,
-            minHeight: 32,
-            padding: '6px 8px',
-            borderRadius: 999,
-            background: colors.chipBg,
             color: colors.accentPurple,
-            fontSize: '10px',
-            fontWeight: 800,
-            letterSpacing: '0.01em',
+            fontSize: '13px',
+            fontWeight: 700,
           }}
-          aria-label={`Exchange ${mealLabel[type].toLowerCase()}`}
+          aria-label={`Rotate ${mealLabel[type].toLowerCase()}`}
           type="button"
         >
-          <Repeat2 size={12} strokeWidth={2.4} />
-          Exchange
+          <RefreshCw size={14} strokeWidth={2.4} />
+          Rotate
         </button>
 
         <button
