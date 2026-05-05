@@ -6,7 +6,7 @@ import BottomNav from '../components/BottomNav'
 import CookMessage from '../components/CookMessage'
 import MealPreviewSheet from '../components/MealPreviewSheet'
 import InviteSheet from '../components/InviteSheet'
-import { ChefHat, Sparkles, X, User, Users } from 'lucide-react'
+import { ChefHat, Repeat2, Sparkles, X, User, Users } from 'lucide-react'
 
 const mealLabel: Record<string, string> = { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner' }
 const allMealTypes: ('breakfast' | 'lunch' | 'dinner')[] = ['breakfast', 'lunch', 'dinner']
@@ -30,7 +30,7 @@ const darkColors = {
 }
 export default function Home() {
   const navigate = useNavigate()
-  const { preferences, weeklyPlan, groupMembers, initWeeklyPlan } = useStore()
+  const { preferences, weeklyPlan, groupMembers, initWeeklyPlan, rotateMeal } = useStore()
   const colors = preferences.darkMode ? darkColors : lightColors
   const today = new Date().toISOString().split('T')[0]
   const currentType = getCurrentMealType()
@@ -98,6 +98,7 @@ export default function Home() {
                 isDone={todayPlan.done?.[type]} isSkipped={todayPlan.skipped?.[type]}
                 cookTime={meal.cookTime}
                 onClick={() => setPreviewMeal(meal)}
+                onExchange={() => rotateMeal(today, type)}
               />
             )
           })}
@@ -292,20 +293,16 @@ function QuickAction({
 }
 
 function MealCard({
-  colors, type, name, ingredients, image, isCurrent, isDone, cookTime, onClick,
+  colors, type, name, ingredients, image, isCurrent, isDone, cookTime, onClick, onExchange,
 }: {
-  colors: typeof lightColors, type: string, name: string, ingredients: string[], image: string
-  isCurrent: boolean, isDone?: boolean, isSkipped?: boolean, cookTime?: string, onClick: () => void
+  colors: typeof lightColors, type: 'breakfast' | 'lunch' | 'dinner', name: string, ingredients: string[], image: string
+  isCurrent: boolean, isDone?: boolean, isSkipped?: boolean, cookTime?: string, onClick: () => void, onExchange: () => void
 }) {
   const [imgError, setImgError] = useState(false)
   const showImage = image && !imgError
 
   return (
-    <button
-      onClick={onClick}
-      className="w-full bg-transparent border-none p-0 cursor-pointer text-left focus:outline-none"
-      style={{ minHeight: 44 }}
-    >
+    <div className="w-full" style={{ minHeight: 44 }}>
       <div
         style={{
           background: colors.card,
@@ -318,47 +315,89 @@ function MealCard({
           position: 'relative',
         }}
       >
-        {/* Image */}
-        <div
-          style={{
-            width: 92, height: 92, flexShrink: 0, borderRadius: 14,
-            overflow: 'hidden', background: colors.iconSurface,
-            position: 'relative',
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onExchange()
           }}
+          className="absolute flex items-center justify-center gap-1 border-none cursor-pointer outline-none transition-smooth"
+          style={{
+            top: 10,
+            right: 10,
+            zIndex: 2,
+            minWidth: 44,
+            minHeight: 32,
+            padding: '6px 8px',
+            borderRadius: 999,
+            background: colors.chipBg,
+            color: colors.accentPurple,
+            fontSize: '10px',
+            fontWeight: 800,
+            letterSpacing: '0.01em',
+          }}
+          aria-label={`Exchange ${mealLabel[type].toLowerCase()}`}
+          type="button"
         >
-          {showImage ? (
-            <img src={image} alt={name} onError={() => setImgError(true)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : (
-            <div
-              style={{
-                width: '100%', height: '100%',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: colors.accentPurple, fontSize: '11px', fontWeight: 800,
-                textTransform: 'uppercase', letterSpacing: '0.08em',
-              }}
-            >
-              {type.slice(0, 2)}
-            </div>
-          )}
-          {isCurrent && (
-            <div
-              style={{
-                position: 'absolute',
-                top: 6, left: 6,
-                background: 'rgba(17,17,17,0.82)',
-                color: '#FFF',
-                fontSize: '8px', fontWeight: 800, letterSpacing: '0.08em',
-                padding: '3px 6px', borderRadius: 999, textTransform: 'uppercase',
-                backdropFilter: 'blur(6px)',
-              }}
-            >
-              Now
-            </div>
-          )}
-        </div>
+          <Repeat2 size={12} strokeWidth={2.4} />
+          Exchange
+        </button>
 
-        {/* Content */}
-        <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <button
+          onClick={onClick}
+          className="w-full bg-transparent border-none p-0 cursor-pointer text-left focus:outline-none"
+          style={{ minWidth: 0, display: 'flex', alignItems: 'stretch', gap: 14 }}
+          type="button"
+        >
+          {/* Image */}
+          <div
+            style={{
+              width: 92, height: 92, flexShrink: 0, borderRadius: 14,
+              overflow: 'hidden', background: colors.iconSurface,
+              position: 'relative',
+            }}
+          >
+            {showImage ? (
+              <img src={image} alt={name} onError={() => setImgError(true)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <div
+                style={{
+                  width: '100%', height: '100%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: colors.accentPurple, fontSize: '11px', fontWeight: 800,
+                  textTransform: 'uppercase', letterSpacing: '0.08em',
+                }}
+              >
+                {type.slice(0, 2)}
+              </div>
+            )}
+            {isCurrent && (
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 6, left: 6,
+                  background: 'rgba(17,17,17,0.82)',
+                  color: '#FFF',
+                  fontSize: '8px', fontWeight: 800, letterSpacing: '0.08em',
+                  padding: '3px 6px', borderRadius: 999, textTransform: 'uppercase',
+                  backdropFilter: 'blur(6px)',
+                }}
+              >
+                Now
+              </div>
+            )}
+          </div>
+
+          {/* Content */}
+          <div
+            style={{
+              flex: 1,
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              paddingRight: 76,
+            }}
+          >
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
             <span style={{ fontSize: '9px', fontWeight: 800, color: colors.textSecondary, textTransform: 'uppercase', letterSpacing: '0.09em' }}>
               {mealLabel[type]?.toUpperCase()}
@@ -414,8 +453,9 @@ function MealCard({
               </span>
             </div>
           )}
-        </div>
+          </div>
+        </button>
       </div>
-    </button>
+    </div>
   )
 }
