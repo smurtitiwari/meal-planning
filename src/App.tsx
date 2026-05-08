@@ -9,6 +9,7 @@ import Planner from './pages/Planner'
 import Recipes from './pages/Recipes'
 import Profile from './pages/Profile'
 import AskChef from './pages/AskChef'
+import SmartMealIdeas from './pages/SmartMealIdeas'
 import RecipeDetail from './pages/RecipeDetail'
 import Group from './pages/Group'
 import AuthCallback from './pages/AuthCallback'
@@ -101,6 +102,7 @@ export default function App() {
         <Route path="/recipes/new/group" element={<SelectGroup />} />
         <Route path="/group" element={<Group />} />
         <Route path="/ask" element={<AskChef />} />
+        <Route path="/smart-meal-ideas" element={<SmartMealIdeas />} />
         <Route path="/profile" element={<Profile />} />
       </Routes>
     </div>

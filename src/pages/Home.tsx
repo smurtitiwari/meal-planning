@@ -105,31 +105,38 @@ export default function Home() {
         </div>
       )}
 
-      {/* ── Quick actions (Grocery + Meal plan message) ── */}
+      {/* ── Quick actions ── */}
       <div
         className="px-5 mt-4"
         style={{
-          display: 'grid',
-          gridTemplateColumns: preferences.hasCook ? '1fr 1fr' : '1fr',
+          display: 'flex',
+          flexDirection: 'column',
           gap: 12,
         }}
       >
-        <QuickAction
-          icon={<span style={{ fontSize: 24 }}>🛍️</span>}
-          title="Grocery list"
-          subtitle="Ready to shop"
-          colors={colors}
-          onClick={() => navigate('/planner?tab=grocery')}
-        />
-        {preferences.hasCook && (
+        <div style={{ display: 'flex', gap: 12 }}>
           <QuickAction
-            icon={<span style={{ fontSize: 24 }}>✨</span>}
-            title="Meal plan message"
-            subtitle="AI generated draft for cook"
+            icon="🛒"
+            title="Grocery list"
+            subtitle="Shop ingredients"
+            colors={colors}
+            onClick={() => navigate('/planner?tab=grocery')}
+          />
+          <QuickAction
+            icon="👩🏻‍🍳"
+            title="Message to cook"
+            subtitle="Today's plan for cook"
             colors={colors}
             onClick={() => setShowCookMessage(true)}
           />
-        )}
+        </div>
+        <QuickAction
+          icon="✨"
+          title="Smart meal ideas"
+          subtitle="Use what you have"
+          colors={colors}
+          onClick={() => navigate('/smart-meal-ideas')}
+        />
       </div>
 
       {preferences.groupEnabled && groupMembers.length <= 1 && (
@@ -160,7 +167,7 @@ export default function Home() {
       )}
 
       {/* ── AI Cook Message Bottom Modal ── */}
-      {showCookMessage && preferences.hasCook && (
+      {showCookMessage && (
         <div
           className="fixed inset-0 z-50 flex items-end justify-center"
           style={{ background: 'rgba(0,0,0,0.42)' }}
@@ -265,26 +272,29 @@ function QuickAction({
         background: colors.card,
         border: `1px solid ${colors.border}`,
         borderRadius: 16,
-        padding: '12px 14px',
+        padding: '14px 13px',
         gap: 10,
-        minHeight: 60,
+        minHeight: 76,
+        width: '100%',
       }}
     >
       <div
         style={{
-          width: 34, height: 34,
+          width: 32,
+          height: 32,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: 22,
+          fontSize: 24,
+          lineHeight: 1,
           flexShrink: 0,
         }}
       >
         {icon}
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: '13px', fontWeight: 700, color: colors.textPrimary, margin: 0, lineHeight: 1.2 }}>
+        <p style={{ fontSize: '14px', fontWeight: 800, color: colors.textPrimary, margin: 0, lineHeight: 1.18 }}>
           {title}
         </p>
-        <p style={{ fontSize: '11px', color: colors.textSecondary, margin: '2px 0 0 0', lineHeight: 1.2 }}>
+        <p style={{ fontSize: '11px', color: colors.textSecondary, margin: '4px 0 0 0', lineHeight: 1.25 }}>
           {subtitle}
         </p>
       </div>
